@@ -43,3 +43,5 @@ yarn-error.log*
 /apps/backend/prj-d-pwa-8b7a-firebase-adminsdk-7sxjp-5c4facc293.json
 /apps/mobile/google-services.json
 /apps/mobile/google-services.plist
+/.idea/
+/.expo/
