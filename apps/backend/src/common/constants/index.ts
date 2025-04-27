@@ -1,0 +1,3 @@
+export const DDT_ACCOUNT_ID = 102
+
+export const TRANSACTION_TIMEOUT = 10000

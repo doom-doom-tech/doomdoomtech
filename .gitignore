@@ -36,3 +36,10 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+
+/apps/backend/AuthKey_C29TK4N8BW.p8
+/apps/backend/prf-d-pwa-8b7a.json
+/apps/backend/prj-d-pwa-8b7a-firebase-adminsdk-7sxjp-5c4facc293.json
+/apps/mobile/google-services.json
+/apps/mobile/google-services.plist

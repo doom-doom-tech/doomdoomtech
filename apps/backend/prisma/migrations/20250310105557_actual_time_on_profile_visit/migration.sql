@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "visits" ALTER COLUMN "created" SET DATA TYPE TIMESTAMP(3);

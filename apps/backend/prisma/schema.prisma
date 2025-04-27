@@ -1,0 +1,1073 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model AuthorizationCode {
+    id    Int    @id @default(autoincrement())
+    email String @unique
+    code  String
+
+    @@index([code])
+    @@index([email])
+    @@map(name: "authorization_codes")
+}
+
+model User {
+    id              Int     @id @default(autoincrement())
+    uuid            String  @unique @default(uuid())
+    email           String  @unique
+    bio             String?
+    username        String  @unique
+    avatar_url      String?
+    banner_url      String?
+    verified        Boolean @default(false)
+    email_verified  Boolean @default(false)
+    tracks_count    Int     @default(0)
+    followers_count Int     @default(0)
+    following_count Int     @default(0)
+    label           Boolean @default(false)
+    premium         Boolean @default(false)
+
+    alerts Alert[] @relation(name: "alertReceiver")
+
+    activity      UserActivity?
+    settings      UserSettings?
+    bank          BankAccount?
+    verification  LabelVerification?
+    credits       Credits?
+    tags          TaggedTrack[]
+    likes         Like[]
+    alert_user    AlertUser[]
+    albums        Album[]
+    comments      Comment[]
+    messages_sent Message[]
+    feed_items    FeedItemUser[]
+    conversations ConversationUser[]
+    socials       SocialPlatform[]
+    tracks        TrackArtist[]
+    pending_jobs  PendingJob[]
+    devices       Device[]
+    media         Media[]
+
+    notes Note[] @relation(name: "CreatedNotes")
+    loops Note[] @relation(name: "LoopedNotes")
+
+    blocking  BlockedUser[] @relation("UserBlocking")
+    blockedBy BlockedUser[] @relation("UserBlocked")
+
+    collabs_sent CollabRequest[] @relation(name: "CollabSender")
+    collabs      CollabRequest[] @relation(name: "CollabReceiver")
+
+    followers Follow[] @relation(name: "followReceiver")
+    following Follow[] @relation(name: "followExecutioner")
+
+    visits   Visit[] @relation(name: "Visits")
+    visitors Visit[] @relation(name: "Visitors")
+
+    list        List?
+    invite_code InviteCode?
+
+    role   Role @relation(fields: [roleID], references: [id])
+    roleID Int  @default(1)
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+    deleted Boolean  @default(false)
+
+    @@index([id])
+    @@index([uuid])
+    @@index([username])
+    @@map(name: "users")
+}
+
+model UserSettings {
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int  @unique
+
+    events           Int     @default(0)
+    invite_code_used String?
+
+    @@map(name: "user_settings")
+}
+
+model Credits {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int  @unique
+
+    amount Float
+
+    @@map(name: "credits")
+}
+
+model BankAccount {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int  @unique
+
+    account Int
+
+    @@index([userID])
+    @@map("bank_accounts")
+}
+
+model UserActivity {
+    user   User @relation(fields: [userID], references: [id])
+    userID Int  @id
+
+    last_active DateTime
+
+    @@map(name: "user_activity")
+}
+
+model FakeUser {
+    id Int @id @default(autoincrement())
+
+    userID Int @unique
+
+    genre   Genre @relation(fields: [genreID], references: [id], onDelete: Cascade)
+    genreID Int
+
+    subgenre   SubGenre @relation(fields: [subgenreID], references: [id], onDelete: Cascade)
+    subgenreID Int
+
+    @@index([userID])
+    @@index([genreID])
+    @@index([subgenreID])
+    @@map(name: "user_genres")
+}
+
+enum SocialPlatformType {
+    Tiktok
+    Website
+    Twitter
+    Snapchat
+    Facebook
+    Instagram
+    Soundcloud
+    Spotify
+}
+
+model SocialPlatform {
+    type SocialPlatformType
+    url  String
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    @@id(name: "social", [userID, type])
+    @@unique([userID, type])
+    @@map(name: "social_platforms")
+}
+
+model Track {
+    id           Int     @id @default(autoincrement())
+    uuid         String  @unique @default(uuid())
+    title        String
+    cover_url    String?
+    audio_url    String?
+    video_url    String?
+    waveform_url String?
+    caption      String?
+
+    credits  Int     @default(0)
+    explicit Boolean @default(false)
+    active   Boolean @default(true)
+
+    main_artist Int
+
+    notes      Note[]
+    likes      Like[]
+    media      Media[]
+    tags       TaggedTrack[]
+    feedItems  FeedItem[]
+    collabs    CollabRequest[]
+    artists    TrackArtist[]
+    albums     AlbumTrack[]
+    metrics    TrackMetrics?
+    statistics TrackStatistics[]
+    lists      ListTrack[]
+    reports    Report[]
+
+    play       TrackPlay?
+    score      TrackScore?
+    metadata   TrackMetadata?
+    popularity TrackPopularity?
+
+    subgenre   SubGenre @relation(fields: [subgenreID], references: [id])
+    subgenreID Int
+
+    genre   Genre @relation(fields: [genreID], references: [id])
+    genreID Int
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+    deleted Boolean  @default(false)
+
+    @@index([title])
+    @@index([genreID])
+    @@index([created])
+    @@index([main_artist])
+    @@index([genreID, created])
+    @@map(name: "tracks")
+}
+
+model TrackMetadata {
+    id Int @id @default(autoincrement())
+
+    track   Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int?   @unique
+
+    bpm         String?
+    era         String?
+    key         String?
+    mood        String?
+    energy      String?
+    emotion     String?
+    instruments String?
+
+    @@map(name: "track_metadata")
+}
+
+model TaggedTrack {
+    id Int @id @default(autoincrement())
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    @@index([userID])
+    @@index([trackID])
+    @@map(name: "tagged_tracks")
+}
+
+enum TrackArtistRole {
+    Label
+    Artist
+    Producer
+    Songwriter
+}
+
+model TrackArtist {
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    role      TrackArtistRole
+    royalties Int
+
+    @@id(name: "trackArtist", fields: [trackID, userID])
+    @@index([trackID])
+    @@index([userID])
+    @@map(name: "track_artists")
+}
+
+model TrackStatistics {
+    id Int @id @default(autoincrement())
+
+    average_list_position Int @default(0)
+
+    total_lists    Int @default(0)
+    total_likes    Int @default(0)
+    total_views    Int @default(0)
+    total_plays    Int @default(0)
+    total_shares   Int @default(0)
+    total_ratings  Int @default(0)
+    total_streams  Int @default(0)
+    total_playtime Int @default(0)
+    total_comments Int @default(0)
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int
+
+    created DateTime @default(now())
+    updated DateTime @default(now()) @updatedAt
+
+    @@unique([created, trackID])
+    @@index([trackID])
+    @@index([created, trackID])
+    @@map(name: "track_statistics")
+}
+
+model TrackMetrics {
+    id Int @id @default(autoincrement())
+
+    average_list_position Int @default(0)
+
+    total_lists    Int @default(0)
+    total_likes    Int @default(0)
+    total_views    Int @default(0)
+    total_plays    Int @default(0)
+    total_shares   Int @default(0)
+    total_ratings  Int @default(0)
+    total_streams  Int @default(0)
+    total_playtime Int @default(0)
+    total_comments Int @default(0)
+
+    track   Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int?   @unique
+
+    @@index([trackID])
+    @@map(name: "track_metrics")
+}
+
+model TrackScore {
+    id Int @id @default(autoincrement())
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int   @unique
+
+    day     Int @default(0)
+    week    Int @default(0)
+    month   Int @default(0)
+    overall Int @default(0)
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@index([trackID])
+    @@index([created, trackID])
+    @@map(name: "track_scores")
+}
+
+model TrackPlay {
+    id Int @id @default(autoincrement())
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int   @unique
+
+    day     Int @default(0)
+    week    Int @default(0)
+    month   Int @default(0)
+    overall Int @default(0)
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@index([trackID])
+    @@index([created, trackID])
+    @@map(name: "track_plays")
+}
+
+model TrackPopularity {
+    id Int @id @default(autoincrement())
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int   @unique
+
+    day     Int @default(0)
+    week    Int @default(0)
+    month   Int @default(0)
+    overall Int @default(0)
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@index([trackID])
+    @@index([created, trackID])
+    @@map(name: "track_popularity")
+}
+
+model CollabRequest {
+    id Int @id @default(autoincrement())
+
+    sender   User @relation(name: "CollabSender", fields: [senderID], references: [id], onDelete: Cascade)
+    senderID Int
+
+    target   User @relation(name: "CollabReceiver", fields: [targetID], references: [id], onDelete: Cascade)
+    targetID Int
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int
+
+    role      TrackArtistRole
+    royalties Int
+
+    created DateTime @default(now()) @db.Date
+
+    @@unique([targetID, trackID])
+    @@index([trackID])
+    @@index([targetID])
+    @@index([senderID])
+    @@map(name: "collab_requests")
+}
+
+model Album {
+    id   Int    @id @default(autoincrement())
+    uuid String @unique @default(uuid())
+
+    name      String
+    cover_url String?
+
+    tracks    AlbumTrack[]
+    likes     Like[]
+    feedItems FeedItem[]
+    media     Media[]
+    reports   Report[]
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    likes_count Int @default(0)
+
+    release DateTime @default(now())
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+    deleted Boolean  @default(false)
+
+    @@index([name])
+    @@index([userID])
+    @@map(name: "albums")
+}
+
+model AlbumTrack {
+    id Int @id @default(autoincrement())
+
+    position Int
+
+    album   Album @relation(fields: [albumID], references: [id], onDelete: Cascade)
+    albumID Int
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int
+
+    @@unique([albumID, position])
+    @@index([trackID])
+    @@index([albumID])
+    @@map(name: "album_tracks")
+}
+
+enum MediaType {
+    Image
+    Video
+    File
+}
+
+model Media {
+    id   Int       @id @default(autoincrement())
+    url  String
+    type MediaType
+
+    track   Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int?
+
+    user   User? @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int?
+
+    album   Album? @relation(fields: [albumID], references: [id], onDelete: Cascade)
+    albumID Int?
+
+    notes NoteMedia[]
+
+    created DateTime @default(now())
+    updated DateTime @default(now()) @updatedAt
+
+    @@index([userID])
+    @@index([albumID])
+    @@index([trackID])
+    @@map(name: "media")
+}
+
+model Note {
+    id      Int    @id @default(autoincrement())
+    uuid    String @unique @default(uuid())
+    content String
+
+    user   User @relation(name: "CreatedNotes", fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    track   Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int?
+
+    loop Boolean @default(false)
+
+    looper   User? @relation(name: "LoopedNotes", fields: [looperID], references: [id], onDelete: Cascade)
+    looperID Int?
+
+    likes_count    Int @default(0)
+    loops_count    Int @default(0)
+    comments_count Int @default(0)
+
+    media     NoteMedia[]
+    feedItems FeedItem[]
+    likes     Like[]
+    reports   Report[]
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+    deleted Boolean  @default(false)
+
+    @@index([content])
+    @@index([userID])
+    @@index([trackID])
+    @@index([looperID])
+    @@map(name: "notes")
+}
+
+model NoteMedia {
+    id Int @id @default(autoincrement())
+
+    note   Note @relation(fields: [noteID], references: [id], onDelete: Cascade)
+    noteID Int
+
+    media   Media @relation(fields: [mediaID], references: [id], onDelete: Cascade)
+    mediaID Int
+
+    @@map(name: "note_media")
+}
+
+model List {
+    id   Int    @id @default(autoincrement())
+    uuid String @unique @default(uuid())
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int  @unique
+
+    tracks ListTrack[]
+
+    @@index([userID])
+    @@map(name: "lists")
+}
+
+model ListTrack {
+    id Int @id @default(autoincrement())
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int
+
+    list   List @relation(fields: [listID], references: [id], onDelete: Cascade)
+    listID Int
+
+    position Int
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@unique([listID, trackID])
+    @@index([listID])
+    @@index([trackID])
+    @@map(name: "list_tracks")
+}
+
+model Genre {
+    id        Int        @id @default(autoincrement())
+    name      String
+    subgenres SubGenre[]
+
+    track      Track[]
+    fake_users FakeUser[]
+
+    @@unique([name])
+    @@index([name])
+    @@map(name: "genres")
+}
+
+model SubGenre {
+    id          Int     @id @default(autoincrement())
+    name        String
+    group       String
+    description String?
+
+    genre   Genre @relation(fields: [genreID], references: [id], onDelete: Cascade)
+    genreID Int
+
+    track      Track[]
+    fake_users FakeUser[]
+
+    @@unique([genreID, name])
+    @@index([name])
+    @@index([genreID])
+    @@map(name: "subgenres")
+}
+
+model Role {
+    id   Int    @id @default(autoincrement())
+    name String
+    user User[]
+
+    permissions RolePermission[]
+
+    @@map(name: "roles")
+}
+
+model RolePermission {
+    role   Role @relation(fields: [roleID], references: [id])
+    roleID Int
+
+    permission   Permission @relation(fields: [permissionID], references: [id])
+    permissionID Int
+
+    @@id([roleID, permissionID])
+    @@map(name: "role_permissions")
+}
+
+model Permission {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    roles RolePermission[]
+
+    @@map(name: "permissions")
+}
+
+model Follow {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(name: "followExecutioner", fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    follows   User @relation(name: "followReceiver", fields: [followsID], references: [id], onDelete: Cascade)
+    followsID Int
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@unique([userID, followsID])
+    @@index([userID])
+    @@index([followsID])
+    @@map(name: "follows")
+}
+
+enum AlertEntityType {
+    User
+    List
+    Note
+    Track
+    Reply
+    Album
+    Comment
+    Message
+}
+
+enum AlertAction {
+    Like
+    Play
+    Rate
+    List
+    Info
+    Loop
+    Share
+    Follow
+    Collab
+    Upload
+    Comment
+    Message
+}
+
+model Alert {
+    id Int @id @default(autoincrement())
+
+    read Boolean @default(false)
+
+    event   AlertEvent? @relation(fields: [eventID], references: [id], onDelete: Cascade)
+    eventID Int?
+
+    target   User @relation(name: "alertReceiver", fields: [targetID], references: [id], onDelete: Cascade)
+    targetID Int
+
+    content String?
+    count   Int         @default(0)
+    action  AlertAction
+    users   AlertUser[]
+    queue   AlertQueue?
+
+    entityID   Int?
+    entityType AlertEntityType?
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@unique([action, entityType, entityID, targetID])
+    @@index([targetID])
+    @@index([targetID, created])
+    @@map(name: "alerts")
+}
+
+model AlertUser {
+    id Int @id @default(autoincrement())
+
+    alert   Alert @relation(fields: [alertID], references: [id], onDelete: Cascade)
+    alertID Int
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    @@index([userID])
+    @@index([alertID])
+    @@map(name: "alert_users")
+}
+
+model AlertEvent {
+    id     Int     @id @default(autoincrement())
+    event  String
+    params String
+    alert  Alert[]
+
+    @@map(name: "alert_events")
+}
+
+model AlertQueue {
+    alert   Alert @relation(fields: [alertID], references: [id])
+    alertID Int   @unique
+
+    username String
+    count    Int
+    expires  DateTime
+
+    @@index([alertID])
+    @@map(name: "alert_queue")
+}
+
+enum MessageType {
+    Text
+    Track
+}
+
+model Message {
+    id Int @id @default(autoincrement())
+
+    content String
+
+    type MessageType? @default(Text)
+
+    conversation   Conversation @relation(fields: [conversationID], references: [id], onDelete: Cascade)
+    conversationID Int
+
+    entityID Int?
+
+    sender   User @relation(fields: [senderID], references: [id], onDelete: Cascade)
+    senderID Int
+
+    seen Boolean @default(false)
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+    deleted Boolean  @default(false)
+
+    @@index([senderID])
+    @@index([conversationID])
+    @@map(name: "messages")
+}
+
+model Conversation {
+    id Int @id @default(autoincrement())
+
+    messages Message[]
+
+    title String?
+
+    users ConversationUser[]
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@map(name: "conversations")
+}
+
+model ConversationUser {
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    conversation   Conversation @relation(fields: [conversationID], references: [id], onDelete: Cascade)
+    conversationID Int
+
+    @@id(name: "userConversation", [userID, conversationID])
+    @@map(name: "conversation_users")
+}
+
+model ActiveSocket {
+    userID   Int    @id
+    socketID String
+
+    @@map(name: "active_sockets")
+}
+
+enum CommentEntityType {
+    Track
+    Note
+}
+
+model Comment {
+    id Int @id @default(autoincrement())
+
+    sender   User @relation(fields: [senderID], references: [id], onDelete: Cascade)
+    senderID Int
+
+    content String
+
+    entity   CommentEntityType
+    entityID Int
+
+    parentID Int?
+
+    likes   Like[]
+    reports Report[]
+
+    likes_count Int @default(0)
+
+    created DateTime @default(now())
+    updated DateTime @default(now()) @updatedAt
+    deleted Boolean  @default(false)
+
+    @@index([entity, entityID])
+    @@map(name: "comments")
+}
+
+enum ReportEntity {
+    Comment
+    Track
+}
+
+model PasswordResetTokens {
+    email String
+    token String
+
+    @@unique([email])
+    @@map(name: "reset_password_tokens")
+}
+
+model VerifyEmailToken {
+    email String
+    token String
+
+    @@unique([email])
+    @@map(name: "verify_email_tokens")
+}
+
+enum DevicePlatformEnum {
+    ios
+    android
+}
+
+model Device {
+    id Int @id @default(autoincrement())
+
+    push_token     String?
+    device_token   String?
+    expo_device_id String
+    platform       DevicePlatformEnum?
+
+    user   User? @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int?
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@index([userID])
+    @@map(name: "devices")
+}
+
+enum PendingJobSlug {
+    notify_last_active_new_tracks
+}
+
+model PendingJob {
+    user   User @relation(fields: [userID], references: [id])
+    userID Int
+
+    id          String
+    slug        PendingJobSlug
+    description String
+    expires     DateTime
+
+    @@unique([userID, slug])
+    @@map(name: "pending_jobs")
+}
+
+model AppleUser {
+    token String
+    email String
+
+    @@unique([token, email])
+    @@map("apple_users")
+}
+
+model BlockedUser {
+    id Int @id @default(autoincrement())
+
+    blocker   User @relation("UserBlocking", fields: [blockerID], references: [id], onDelete: Cascade)
+    blockerID Int
+
+    blocked   User @relation("UserBlocked", fields: [blockedID], references: [id], onDelete: Cascade)
+    blockedID Int
+
+    createdAt DateTime @default(now())
+
+    @@unique([blockerID, blockedID])
+    @@map(name: "blocked_users")
+}
+
+model BugReport {
+    id Int @id @default(autoincrement())
+
+    value String
+
+    @@map(name: "bug_reports")
+}
+
+model FailedJob {
+    id Int @id @default(autoincrement())
+
+    job   String
+    error String
+
+    created DateTime
+
+    @@map(name: "failed_jobs")
+}
+
+enum FeedItemType {
+    Note
+    Track
+    Album
+}
+
+model FeedItem {
+    id Int @id @default(autoincrement())
+
+    entityType FeedItemType
+    entityID   Int
+
+    created DateTime @default(now()) @db.Date
+
+    users FeedItemUser[]
+
+    track   Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int?
+
+    album   Album? @relation(fields: [albumID], references: [id], onDelete: Cascade)
+    albumID Int?
+
+    note   Note? @relation(fields: [noteID], references: [id], onDelete: Cascade)
+    noteID Int?
+
+    @@index([entityType, entityID])
+    @@index([created])
+    @@map(name: "feed_items")
+}
+
+model FeedItemUser {
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    item   FeedItem @relation(fields: [itemID], references: [id], onDelete: Cascade)
+    itemID Int
+
+    @@unique([userID, itemID])
+    @@index([userID])
+    @@index([itemID])
+    @@map(name: "feed_item_users")
+}
+
+model Like {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    track   Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int?
+
+    album   Album? @relation(fields: [albumID], references: [id], onDelete: Cascade)
+    albumID Int?
+
+    comment   Comment? @relation(fields: [commentID], references: [id], onDelete: Cascade)
+    commentID Int?
+
+    note   Note? @relation(fields: [noteID], references: [id], onDelete: Cascade)
+    noteID Int?
+
+    amount Int @default(1)
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@index([userID])
+    @@index([trackID])
+    @@index([albumID])
+    @@index([commentID])
+    @@map(name: "likes")
+}
+
+model Visit {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(name: "Visits", fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    visitor   User @relation(name: "Visitors", fields: [visitorID], references: [id], onDelete: Cascade)
+    visitorID Int
+
+    created DateTime @default(now())
+    updated DateTime @default(now()) @updatedAt
+
+    @@map(name: "visits")
+}
+
+model InviteCode {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int  @unique
+
+    code String
+
+    usages Int @default(0)
+
+    created DateTime @default(now())
+    updated DateTime @default(now()) @updatedAt
+
+    @@map(name: "invite_codes")
+}
+
+enum LabelVerificationStatus {
+    Pending
+    Declined
+    Completed
+}
+
+model LabelVerification {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int  @unique
+
+    status LabelVerificationStatus
+
+    @@map(name: "label_verifications")
+}
+
+model Report {
+    id Int @id @default(autoincrement())
+
+    track   Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int?
+
+    album   Album? @relation(fields: [albumID], references: [id], onDelete: Cascade)
+    albumID Int?
+
+    comment   Comment? @relation(fields: [commentID], references: [id], onDelete: Cascade)
+    commentID Int?
+
+    note   Note? @relation(fields: [noteID], references: [id], onDelete: Cascade)
+    noteID Int?
+
+    content String
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@map(name: "reports")
+}
