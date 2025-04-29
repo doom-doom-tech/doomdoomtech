@@ -13,6 +13,9 @@ import {RefreshSession} from "./features/session/middleware/RefreshSession";
 import QueueWorkerManager from "./common/queues/QueueWorkerManager";
 import {CronJobService} from "./common/services/CronjobService";
 import prisma from "./common/utils/prisma";
+import {Context} from "./common/utils/context";
+import {UserInterface} from "./features/user/types";
+import {INotificationService} from "./features/notification/services/NotificationService";
 
 require('dotenv').config()
 
@@ -125,7 +128,6 @@ async function bootstrap() {
             apiKey: "f1cb2c553f196d0caec92ac9b081f2f4-us12",
             server: "us12",
         });
-
     } catch (error) {
         console.error("Failed to start the server:", error);
         process.exit(1);

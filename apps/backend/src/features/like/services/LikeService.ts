@@ -142,7 +142,7 @@ class LikeService extends Service implements ILikeService {
 				entityID: data.entityID,
 				userID: Context.get('authID'),
 				body: `Liked your ${data.entity.toLowerCase()}`,
-				data: { url: `/${data.entity.toLowerCase()}/${data.entityID}}` },
+				data: { url: `/${data.entity.toLowerCase()}/${data.entityID}` },
 			})
 		}
 	}
