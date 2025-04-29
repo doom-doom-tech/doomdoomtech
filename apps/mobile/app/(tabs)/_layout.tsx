@@ -32,7 +32,7 @@ const TabLayout = () => {
 
                 <InviteCode />
                 <PremiumConfirmation />
-                <SubscriptionPresentation />
+                {/*<SubscriptionPresentation />*/}
             </SocketContextProvider>
         </GlobalUserContextProvider>
     )

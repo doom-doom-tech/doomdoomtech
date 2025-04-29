@@ -22,9 +22,9 @@ const MostPopularTracks = () => {
         period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag, userID: user?.getID()
     })
 
-    const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<Track>) => (
+    const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<Track>) => (
         <TrackContextProvider track={item} key={item.getID()}>
-            <TrackTile />
+            <TrackTile/>
         </TrackContextProvider>
     ), [])
 
@@ -34,17 +34,17 @@ const MostPopularTracks = () => {
 
     useEventListener('charts:refetch', mostPopularTracksQuery.refetch)
 
-    return(
-        <Queueable query={mostPopularTracksQuery}>
-            <Block
-                <Track>
-                title={"Most popular"}
-                subtitle={"View all"}
-                callback={routeAdditionalTracks}
-                query={mostPopularTracksQuery}
-                renderItem={RenderItem}
-            />
-        </Queueable>
+    return (
+            <Queueable query={mostPopularTracksQuery}>
+                <Block
+                    <Track>
+                    title={"Most popular"}
+                    subtitle={"View all"}
+                    callback={routeAdditionalTracks}
+                    query={mostPopularTracksQuery}
+                    renderItem={RenderItem}
+                />
+            </Queueable>
     )
 }
 

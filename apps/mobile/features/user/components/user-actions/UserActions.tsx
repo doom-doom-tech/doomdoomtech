@@ -74,11 +74,14 @@ const UserActions = ({}: UserActionsProps) => {
                     />
                 )}
 
-                { user.isLabel() && isCurrentUser && <IconButton
-		            icon={<Hashtag color={palette.offwhite} />}
-		            fill={'darkgrey'}
-		            callback={routeLabelInbox}
-	            />}
+                { user.isLabel() && isCurrentUser && (
+                    <IconButton
+                        premium
+                        icon={<Hashtag color={palette.offwhite} />}
+                        fill={'darkgrey'}
+                        callback={routeLabelInbox}
+                    />
+                )}
 
                 { isCurrentUser && <IconButton
 		            icon={<Bell color={palette.offwhite} />}

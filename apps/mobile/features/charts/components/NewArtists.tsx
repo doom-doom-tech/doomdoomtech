@@ -1,5 +1,4 @@
-import {StyleSheet, View} from 'react-native'
-import {useCallback, useMemo} from "react";
+import {useCallback} from "react";
 import {useFilterStoreSelectors} from "@/features/filter/store/filter";
 import useUserLatest from "@/features/user/hooks/useUserLatest";
 import {ListRenderItemPropsInterface} from "@/common/components/List";
@@ -10,11 +9,7 @@ import UserTile from "@/features/user/components/user-tile/UserTile";
 import useEventListener from "@/common/hooks/useEventListener";
 import {router} from "expo-router";
 
-interface NewArtistsProps {
-
-}
-
-const NewArtists = ({}: NewArtistsProps) => {
+const NewArtists = () => {
 
     const period = useFilterStoreSelectors.period()
     const subgenre = useFilterStoreSelectors.subgenre()
@@ -25,15 +20,7 @@ const NewArtists = ({}: NewArtistsProps) => {
         period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag
     })
 
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
-
-            },
-        })
-    }, []);
-
-    const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<User>) => (
+    const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<User>) => (
         <UserContextProvider user={item} key={item.getID()}>
             <UserTile />
         </UserContextProvider>
@@ -46,16 +33,14 @@ const NewArtists = ({}: NewArtistsProps) => {
     useEventListener('charts:refetch', newArtistsQuery.refetch)
 
     return(
-        <View style={styles.wrapper}>
-            <Block
-                <User>
-                title={"New artists"}
-                subtitle={"View all"}
-                callback={routeAdditionalUsers}
-                query={newArtistsQuery}
-                renderItem={RenderItem}
-            />
-        </View>
+        <Block
+            <User>
+            title={"New artists"}
+            subtitle={"View all"}
+            callback={routeAdditionalUsers}
+            query={newArtistsQuery}
+            renderItem={RenderItem}
+        />
     )
 }
 

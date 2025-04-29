@@ -10,11 +10,7 @@ import useEventListener from "@/common/hooks/useEventListener";
 import Block from "@/common/components/block/Block";
 import Queueable from "@/common/components/Queueable";
 
-interface LatestTracksProps {
-
-}
-
-const LatestTracks = ({}: LatestTracksProps) => {
+const LatestTracks = () => {
 
     const user = useFilterStoreSelectors.user()
     const period = useFilterStoreSelectors.period()
@@ -26,7 +22,7 @@ const LatestTracks = ({}: LatestTracksProps) => {
         period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag, userID: user?.getID()
     })
 
-    const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<Track>) => (
+    const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<Track>) => (
         <TrackContextProvider track={item} key={item.getID()}>
             <TrackTile />
         </TrackContextProvider>

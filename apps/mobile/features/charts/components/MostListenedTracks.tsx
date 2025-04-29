@@ -1,5 +1,4 @@
-import {StyleSheet, View} from 'react-native'
-import {useCallback, useMemo, useRef} from "react";
+import {useCallback} from "react";
 import {ListRenderItemPropsInterface} from "@/common/components/List";
 import Track from "@/features/track/classes/Track";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
@@ -9,15 +8,9 @@ import Block from "@/common/components/block/Block";
 import useMostListenedTracks from "@/features/track/hooks/useMostListenedTracks";
 import useEventListener from "@/common/hooks/useEventListener";
 import {router} from "expo-router";
-import * as Crypto from "expo-crypto";
-import useMediaActions from "@/common/hooks/useMediaActions";
 import Queueable from "@/common/components/Queueable";
 
-interface BestRatedTracksProps {
-
-}
-
-const BestRatedTracks = ({}: BestRatedTracksProps) => {
+const BestRatedTracks = () => {
 
     const period = useFilterStoreSelectors.period()
     const user = useFilterStoreSelectors.user()
@@ -25,25 +18,13 @@ const BestRatedTracks = ({}: BestRatedTracksProps) => {
     const genre = useFilterStoreSelectors.genre()
     const tag = useFilterStoreSelectors.label()
 
-    const { current: listUUID} = useRef(Crypto.randomUUID())
-
-    const { fillQueue } = useMediaActions()
-
     const mostListenedQuery = useMostListenedTracks({
         period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag, userID: user?.getID()
     })
 
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
-
-            },
-        })
-    }, []);
-
-    const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<Track>) => (
+    const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<Track>) => (
         <TrackContextProvider track={item}>
-            <TrackTile />
+            <TrackTile/>
         </TrackContextProvider>
     ), [])
 
@@ -53,9 +34,8 @@ const BestRatedTracks = ({}: BestRatedTracksProps) => {
 
     useEventListener('charts:refetch', mostListenedQuery.refetch)
 
-    return(
-        <Queueable query={mostListenedQuery}>
-            <View style={styles.wrapper}>
+    return (
+            <Queueable query={mostListenedQuery}>
                 <Block
                     <Track>
                     title={"Most listened"}
@@ -64,8 +44,7 @@ const BestRatedTracks = ({}: BestRatedTracksProps) => {
                     query={mostListenedQuery}
                     renderItem={RenderItem}
                 />
-            </View>
-        </Queueable>
+            </Queueable>
     )
 }
 

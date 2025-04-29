@@ -1,5 +1,4 @@
-import {StyleSheet, View} from 'react-native'
-import {useCallback, useMemo} from "react";
+import {useCallback} from "react";
 import Block from "@/common/components/block/Block";
 import {ListRenderItemPropsInterface} from "@/common/components/List";
 import {useFilterStoreSelectors} from "@/features/filter/store/filter";
@@ -21,15 +20,7 @@ const LatestLabels = () => {
         period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag
     })
 
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
-
-            },
-        })
-    }, []);
-
-    const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<Label>) => (
+    const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<Label>) => (
         <LabelContextProvider label={item}>
             <LabelTile />
         </LabelContextProvider>
@@ -42,16 +33,14 @@ const LatestLabels = () => {
     useEventListener('charts:refetch', latestNotesQuery.refetch)
 
     return(
-        <View style={styles.wrapper}>
-            <Block
-                <Label>
-                title={"Latest labels"}
-                subtitle={"View all"}
-                callback={routeAdditionalTracks}
-                query={latestNotesQuery}
-                renderItem={RenderItem}
-            />
-        </View>
+        <Block
+            <Label>
+            title={"Latest labels"}
+            subtitle={"View all"}
+            callback={routeAdditionalTracks}
+            query={latestNotesQuery}
+            renderItem={RenderItem}
+        />
     )
 }
 

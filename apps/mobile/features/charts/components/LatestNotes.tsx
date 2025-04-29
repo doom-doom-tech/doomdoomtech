@@ -1,5 +1,4 @@
-import {StyleSheet, View} from 'react-native'
-import {useCallback, useMemo} from "react";
+import {useCallback} from "react";
 import useNoteLatest from "@/features/note/hooks/useNoteLatest";
 import Block from "@/common/components/block/Block";
 import {ListRenderItemPropsInterface} from "@/common/components/List";
@@ -21,15 +20,7 @@ const LatestNotes = () => {
         period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag
     })
 
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
-
-            },
-        })
-    }, []);
-
-    const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<Note>) => (
+    const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<Note>) => (
         <NoteContextProvider note={item}>
             <NoteTile />
         </NoteContextProvider>
@@ -42,16 +33,14 @@ const LatestNotes = () => {
     useEventListener('charts:refetch', latestNotesQuery.refetch)
 
     return(
-        <View style={styles.wrapper}>
-            <Block
-                <Note>
-                title={"Latest notes"}
-                subtitle={"View all"}
-                callback={routeAdditionalTracks}
-                query={latestNotesQuery}
-                renderItem={RenderItem}
-            />
-        </View>
+        <Block
+            <Note>
+            title={"Latest notes"}
+            subtitle={"View all"}
+            callback={routeAdditionalTracks}
+            query={latestNotesQuery}
+            renderItem={RenderItem}
+        />
     )
 }
 

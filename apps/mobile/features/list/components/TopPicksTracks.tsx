@@ -11,7 +11,7 @@ import Toast from 'react-native-root-toast';
 import {convertToQueryResult, formatServerErrorResponse} from '@/common/services/utilities';
 import {TOASTCONFIG} from '@/common/constants';
 import useListRemoveTrack from '@/features/list/hooks/useListRemoveTrack';
-import {StyleSheet, useWindowDimensions} from 'react-native';
+import {DeviceEventEmitter, StyleSheet, useWindowDimensions} from 'react-native';
 import Queueable from '@/common/components/Queueable';
 import DraggableTrackRow from "@/features/track/components/track-row/DraggableTrackRow";
 
@@ -35,7 +35,7 @@ const TopPicksTracks = () => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             container: {
-                height: height,
+
             },
         });
     }, []);
@@ -50,6 +50,7 @@ const TopPicksTracks = () => {
                 trackID: track.getID(),
             });
             setTracks((previous) => _.reject(previous, (p) => track.getID() === p.getID()));
+            DeviceEventEmitter.emit('track:remove', track.getID());
         } catch (error: any) {
             Toast.show(formatServerErrorResponse(error), TOASTCONFIG.error);
         }

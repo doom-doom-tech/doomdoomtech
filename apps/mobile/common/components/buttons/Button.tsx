@@ -55,6 +55,7 @@ const Button = ({
 
     const formatWrapperStyle = useCallback((pressed: boolean) => ({
         flexGrow: fullWidth ? 1 : 1,
+        maxHeight: 48,
         width: fullWidth ? '100%' : undefined,
         borderRadius: 4,
         borderWidth: 2,

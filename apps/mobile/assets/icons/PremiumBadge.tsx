@@ -3,8 +3,6 @@ import Svg, {Circle, Path, SvgProps} from "react-native-svg"
 
 const SvgComponent = (props: SvgProps) => (
     <Svg
-        width={66}
-        height={66}
         fill="none"
         {...props}
     >

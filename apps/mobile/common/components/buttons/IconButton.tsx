@@ -3,6 +3,8 @@ import {ReactElement, useMemo} from "react";
 import {palette} from "@/theme";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
 import PremiumBadge from "@/assets/icons/PremiumBadge";
+import PremiumFeature from "@/assets/icons/PremiumFeature";
+import {router} from "expo-router";
 
 interface IconButtonProps {
     notify?: boolean
@@ -16,42 +18,43 @@ const IconButton = ({notify, premium, icon, fill, callback}: IconButtonProps) =>
 
     const { premiumMember } = usePaymentContext()
 
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
-                borderRadius: 4,
-                width: 50, height: 50,
-                backgroundColor: palette[fill]
-            },
-            touchable: {
-                width: 50, height: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-            },
-            notify: {
-                position: 'absolute',
-                left: '40%',
-                bottom: -6,
-                width: 12, height: 12,
-                borderRadius: 12,
-                backgroundColor: palette.error
-            }
-        })
-    }, [fill]);
+    const styles = StyleSheet.create({
+        wrapper: {
+            borderRadius: 4,
+            width: 50, height: 50,
+            backgroundColor: premium ? palette[fill].concat('50') : palette[fill]
+        },
+        touchable: {
+            width: 50, height: 50,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        icon: {
+            position: 'absolute',
+            left: 13,
+            bottom: -12,
+            width: 24, height: 24,
+        },
+    })
 
     const handlePress = () => {
         if(premium && !premiumMember) {
-            DeviceEventEmitter.emit('')
+            router.push('/paywall')
+        } else {
+            callback()
         }
     }
 
     return(
         <View style={styles.wrapper}>
-            <TouchableOpacity style={styles.touchable} activeOpacity={0.5} onPress={callback}>
+            <TouchableOpacity style={styles.touchable} activeOpacity={0.5} onPress={handlePress}>
                 {icon}
             </TouchableOpacity>
-            { notify && <View style={styles.notify} /> }
-            {/*{ premium && <PremiumBadge /> }*/}
+            { premium && (
+                <View style={styles.icon}>
+                    <PremiumFeature />
+                </View>
+            ) }
         </View>
     )
 }

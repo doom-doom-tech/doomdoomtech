@@ -7,9 +7,9 @@ import UserCircle from "@/features/user/components/UserCircle";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import {router, usePathname} from "expo-router";
 import {useTabContext} from "@/common/context/TabBarContextProvider";
-import Save from '@/assets/icons/Save';
 import _ from 'lodash';
 import Plus from "@/assets/icons/Plus";
+import Heart from "@/assets/icons/Heart";
 
 interface BottomNavigationProps {
 
@@ -63,7 +63,7 @@ const BottomNavigation = ({}: BottomNavigationProps) => {
             active: false,
         },
         {
-            icon: <Save />,
+            icon: <Heart />,
             label: 'List',
             active: false
         },

@@ -21,6 +21,9 @@ import {useShareStoreSelectors} from "@/features/share/store/share";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
 import Share from "@/assets/icons/Share";
+import Heart from "@/assets/icons/Heart";
+import HeartFilled from "@/assets/icons/HeartFilled";
+import TopPicksTrigger from "@/features/list/components/TopPicksTrigger";
 
 const FeedTrackMetrics = () => {
 
@@ -31,9 +34,6 @@ const FeedTrackMetrics = () => {
     const { shareTrack } = useAlgoliaEvents()
 
     const setShareState = useShareStoreSelectors.setState()
-
-    const saveTrackMutation = useListSaveTrack()
-    const removeTrackMutation = useListRemoveTrack()
 
     const [saved, setSaved] = useState<boolean>(track.saved())
     const [liked, setLiked] = useState<boolean>(track.liked())
@@ -77,27 +77,6 @@ const FeedTrackMetrics = () => {
         }
     }, [])
 
-    const { saveToTopPicks } = useAlgoliaEvents()
-
-    const manageSaveTrack = useCallback(() => {
-        if(!user) return router.push('/auth')
-
-        if(saved) return removeTrackMutation.mutate({ trackID: track.getID() })
-
-        saveTrackMutation.mutate({ trackID: track.getID() })
-        saveToTopPicks(track.getID())
-    }, [saved, track, user])
-
-    const catchSaveTrackEvent = useCallback((trackID: number) => {
-        if(trackID === track.getID()) setSaved(true)
-    }, [track])
-
-    const catchRemoveTrackEvent = useCallback((trackID: number) => {
-        if(trackID === track.getID()) setSaved(false)
-    }, [track])
-
-    useEventListener('track:save', catchSaveTrackEvent)
-    useEventListener('track:remove', catchRemoveTrackEvent)
     useEventListener('track:likes:increase', handleIncrementLikes)
 
     return(
@@ -122,9 +101,7 @@ const FeedTrackMetrics = () => {
                 />
             </View>
 
-            <TouchableOpacity activeOpacity={0.9} onPress={manageSaveTrack}>
-                {saved ? <SaveFilled/> : <Save/>}
-            </TouchableOpacity>
+            <TopPicksTrigger />
         </View>
     )
 }

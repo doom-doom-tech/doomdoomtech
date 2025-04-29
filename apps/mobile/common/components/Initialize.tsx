@@ -1,4 +1,4 @@
-import {Fragment, useCallback, useEffect} from "react";
+import {Fragment, useCallback, useEffect, useRef} from "react";
 import {useFonts} from "expo-font";
 import * as Device from "expo-device"
 import useRegisterDevice from "@/features/device/hooks/useRegisterDevice";
@@ -13,12 +13,15 @@ import {STORAGE_KEYS} from "@/common/services/api";
 import useMediaEvents from "@/common/hooks/useMediaEvents";
 import * as SplashScreen from 'expo-splash-screen';
 import useSubscriptionValidate from "@/features/subscription/hooks/useSubscriptionValidate";
+import _ from "lodash";
 
 const Initialize = () => {
 
     useMediaEvents()
 
     useFonts({ 'Syne': require('@/assets/fonts/SYNE.ttf')});
+
+    const responseListener = useRef<Notifications.EventSubscription>()
 
     const registerDeviceMutation = useRegisterDevice()
     const requestFreshSessionMutation = useSessionRequest()
@@ -116,10 +119,14 @@ const Initialize = () => {
     }, []);
 
     useEffect(() => {
-        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-            router.push(response.notification.request.content.data.url)
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(({notification}) => {
+            const deeplink = _.get(notification, 'request.content.data.data.url', undefined)
+            if(deeplink) router.push(deeplink)
         });
-        return () => subscription.remove();
+
+        return () => {
+            responseListener.current && Notifications.removeNotificationSubscription(responseListener.current);
+        };
     }, []);
 
     return <Fragment />
