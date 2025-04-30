@@ -1,14 +1,14 @@
-import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { Fragment, useCallback, useEffect, useMemo } from "react";
-import { constants, palette, spacing } from "@/theme";
+import {StyleSheet, TouchableOpacity, useWindowDimensions, View} from "react-native";
+import {Fragment, useCallback, useEffect, useMemo} from "react";
+import {constants, palette, spacing} from "@/theme";
 import BottomPlayerInformation from "@/common/components/tab-bar/bottom-player/BottomPlayerInformation";
 import BottomPlayerAction from "@/common/components/tab-bar/bottom-player/BottomPlayerAction";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { useMediaStoreSelectors } from "@/common/store/media";
+import Animated, {useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
+import {useMediaStoreSelectors} from "@/common/store/media";
 import BottomPlayerProgress from "@/common/components/tab-bar/bottom-player/BottomPlayerProgress";
 import TrackCover from "@/features/track/components/TrackCover";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
-import { router, usePathname } from "expo-router";
+import {router, usePathname} from "expo-router";
 
 const BottomPlayer = () => {
     const { width } = useWindowDimensions();
@@ -127,7 +127,17 @@ const BottomPlayer = () => {
             )}
             {current && mediaType === 'video' && (
                 <Animated.View
-                    style={[styles.videoWrapper, animatedVideoStyle, { opacity: videoOpacity }]}
+                    style={[styles.videoWrapper, animatedVideoStyle, {
+                        opacity: videoOpacity ,
+                        shadowColor: '#000',
+                        shadowOffset: {
+                            width: 0,
+                            height: 5,
+                        },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 4,
+                        elevation: 5,
+                    }]}
                     pointerEvents={'auto'}
                 >
                     <TrackContextProvider track={current}>

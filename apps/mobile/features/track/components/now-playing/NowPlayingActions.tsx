@@ -1,7 +1,6 @@
 import {ActivityIndicator, DeviceEventEmitter, StyleSheet, View} from 'react-native'
 import {useCallback, useEffect, useMemo, useState} from "react";
 import IconButton from "@/common/components/buttons/IconButton";
-import Save from "@/assets/icons/Save";
 import Flame from "@/assets/icons/Flame";
 import Pause from "@/assets/icons/Pause";
 import Next from "@/assets/icons/Next";
@@ -13,7 +12,6 @@ import Toast from "react-native-root-toast";
 import {TOASTCONFIG} from "@/common/constants";
 import FlameFilled from "@/assets/icons/FlameFilled";
 import {useQueueStoreSelectors} from "@/common/store/queue";
-import SaveFilled from "@/assets/icons/SaveFilled";
 import useListSaveTrack from "@/features/list/hooks/useListSaveTrack";
 import useListRemoveTrack from "@/features/list/hooks/useListRemoveTrack";
 import useEventListener from "@/common/hooks/useEventListener";
@@ -22,6 +20,8 @@ import {router} from "expo-router";
 import More from "@/assets/icons/More";
 import {wait} from "@/common/services/utilities";
 import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
+import TopPicksTrigger from "@/features/list/components/TopPicksTrigger";
+import TrackContextProvider from "@/features/track/context/TrackContextProvider";
 
 interface NowPlayingActionsProps {
 
@@ -104,33 +104,37 @@ const NowPlayingActions = ({}: NowPlayingActionsProps) => {
 
     useEventListener('track:rate', catchRatingEvent)
 
+    if(!current) return <View />
+
     return(
         <View style={styles.wrapper}>
-            <IconButton
-                icon={saved ? <SaveFilled /> : <Save />}
-                fill={'darkgrey'}
-                callback={handleSave}
-            />
-            <IconButton
-                icon={liked ? <FlameFilled /> : <Flame />}
-                fill={'darkgrey'}
-                callback={handleTriggerTrackRating}
-            />
-            <IconButton
-                icon={buffering ? <ActivityIndicator /> : active ? <Pause /> : <Play />}
-                fill={'rose'}
-                callback={togglePlayback}
-            />
-            <IconButton
-                icon={<Next />}
-                fill={'darkgrey'}
-                callback={handleNext}
-            />
-            <IconButton
-                icon={<More />}
-                fill={'darkgrey'}
-                callback={handleRouteSingle}
-            />
+            <TrackContextProvider track={current}>
+                <IconButton
+                    icon={<TopPicksTrigger />}
+                    fill={'darkgrey'}
+                    callback={handleSave}
+                />
+                <IconButton
+                    icon={liked ? <FlameFilled /> : <Flame />}
+                    fill={'darkgrey'}
+                    callback={handleTriggerTrackRating}
+                />
+                <IconButton
+                    icon={buffering ? <ActivityIndicator /> : active ? <Pause /> : <Play />}
+                    fill={'rose'}
+                    callback={togglePlayback}
+                />
+                <IconButton
+                    icon={<Next />}
+                    fill={'darkgrey'}
+                    callback={handleNext}
+                />
+                <IconButton
+                    icon={<More />}
+                    fill={'darkgrey'}
+                    callback={handleRouteSingle}
+                />
+            </TrackContextProvider>
         </View>
     )
 }

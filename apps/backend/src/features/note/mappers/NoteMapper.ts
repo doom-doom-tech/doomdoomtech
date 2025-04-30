@@ -83,6 +83,7 @@ export default class NoteMapper {
             trackID: data.track ? data.track.id : null,
             likes_count: data.likes_count || 0,
             loops_count: data.loops_count || 0,
+            media_type: 'audio'
         }
     }
 

@@ -88,7 +88,7 @@ class AuthService extends Service implements IAuthService {
 		};
 
 		await authQueue.scheduleDeleteAuthorizationCodeJob({ email: data.email });
-		// await emailService.send(config);
+		await emailService.send(config);
 	}
 
 	public authorize = async (data: VerifyAuthorizationCodeRequest) => {

@@ -52,8 +52,8 @@ const Charts = () => {
             marginTop: top * -1
         },
         container: {
-            paddingBottom: 400,
-            gap: 32
+            gap: 32,
+            paddingBottom: 400
         },
         icons: {
             flexDirection: 'row',
@@ -91,7 +91,8 @@ const Charts = () => {
     }, []);
 
     const animatedContentStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value
+        opacity: opacity.value,
+        gap: 32
     }))
 
     useEffect(() => {

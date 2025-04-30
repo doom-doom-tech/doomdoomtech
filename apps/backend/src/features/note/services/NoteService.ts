@@ -97,6 +97,8 @@ class NoteService extends Service implements INoteService {
     public async create(data: CreateNoteRequest & AuthenticatedRequest) {
         let note: NoteInterface = {} as NoteInterface;
 
+        const algoliaService = container.resolve<IAlgoliaService>("AlgoliaService")
+
         // Step 1: Create the Note and FeedItem in a transaction
         await this.db.$transaction(async (client) => {
             const db = client as ExtendedPrismaClient;
@@ -129,13 +131,18 @@ class NoteService extends Service implements INoteService {
             }
         });
 
+        if(data.attachments) {
+            if(_.some(data.attachments, (attachment) => attachment.type === 'Video')) {
+                await algoliaService.pushRecord(note)
+            } else {
+                await algoliaService.pushRecord(note)
+            }
+        }
+
         // Step 2: Create NoteMedia records outside the transaction
         if (data.attachments) {
-            const algoliaService = container.resolve<IAlgoliaService>("AlgoliaService")
             const mediaService = container.resolve<IMediaService>('MediaService');
             const noteMediaService = container.resolve<INoteMediaService>('NoteMediaService');
-
-            await algoliaService.pushRecord(note)
 
             for (let attachment of data.attachments) {
                 const media = await mediaService.create({

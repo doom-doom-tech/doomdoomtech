@@ -35,7 +35,7 @@ const TopPicksTracks = () => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             container: {
-
+                flex: 1,
             },
         });
     }, []);

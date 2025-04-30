@@ -53,7 +53,7 @@ class FeedService extends Singleton implements IFeedService {
     }
 
     /**
-     * Fetch personalized tracks from Algolia using the Search API
+     * Fetch personalized tracks and notes from Algolia using the Search API
      * @param data AuthenticatedRequest containing the user ID
      * @returns An array of FeedItemType objects (tracks only)
      */

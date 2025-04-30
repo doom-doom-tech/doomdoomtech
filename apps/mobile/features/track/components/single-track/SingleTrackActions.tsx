@@ -8,10 +8,8 @@ import Mic from "@/assets/icons/Mic";
 import Send from "@/assets/icons/Send";
 import User from "@/features/user/classes/User";
 import {router} from "expo-router";
-import Save from "@/assets/icons/Save";
 import useListSaveTrack from "@/features/list/hooks/useListSaveTrack";
 import useListRemoveTrack from "@/features/list/hooks/useListRemoveTrack";
-import SaveFilled from "@/assets/icons/SaveFilled";
 import useEventListener from "@/common/hooks/useEventListener";
 import {useCreateNoteStoreSelectors} from "@/features/note/store/create-note";
 import {useFilterStoreSelectors} from "@/features/filter/store/filter";
@@ -29,6 +27,8 @@ import useTrackDelete from "@/features/track/hooks/useTrackDelete";
 import {formatServerErrorResponse, wait} from "@/common/services/utilities";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
+import HeartFilled from "@/assets/icons/HeartFilled";
+import Heart from "@/assets/icons/Heart";
 
 interface SingleTrackActionsProps {
 
@@ -78,7 +78,11 @@ const SingleTrackActions = ({}: SingleTrackActionsProps) => {
         DeviceEventEmitter.emit('sheet:close', { name: 'TrackOptions' })
         await wait(200)
 
-        if(saved) return removeTrackMutation.mutate({ trackID: track.getID() })
+        if(saved) {
+            setSaved(false)
+            return removeTrackMutation.mutate({ trackID: track.getID() })
+        }
+
         saveTrackMutation.mutate({ trackID: track.getID() })
         saveToTopPicks(track.getID())
     }, [saved])
@@ -167,8 +171,8 @@ const SingleTrackActions = ({}: SingleTrackActionsProps) => {
 
     const actions = useMemo(() => ([
         {
-            icon: saved ? <SaveFilled /> : <Save />,
-            label: "Add to top picks",
+            icon: saved ? <HeartFilled color={palette.olive} /> : <Heart />,
+            label: saved ? "Remove from top picks" : "Add to top picks",
             callback: handleAddToTopPicks
         },
         ...track.getArtists().map(artist => ({
