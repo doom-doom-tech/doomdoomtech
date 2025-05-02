@@ -22,6 +22,7 @@ export const palette = {
     transparent: '#FFFFFF00',
     platinum: '#a1d6cc',
     gold: '#f1c129',
+    premium: '#A98C1B',
     silver: '#dfdfdf',
     bronze: '#9a6e41',
     action: '#0078FF'

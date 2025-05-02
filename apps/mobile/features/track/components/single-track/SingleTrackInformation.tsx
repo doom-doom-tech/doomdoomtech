@@ -12,6 +12,8 @@ import FlameFilled from "@/assets/icons/FlameFilled";
 import Toast from "react-native-root-toast";
 import {TOASTCONFIG} from "@/common/constants";
 import Text from "@/common/components/Text";
+import User from '@/features/user/classes/User';
+import {router} from "expo-router";
 
 interface SingleTrackInformationProps {
 
@@ -70,6 +72,10 @@ const SingleTrackInformation = ({}: SingleTrackInformationProps) => {
 
     useEventListener('track:likes:increase', handleIncrementLikes)
 
+    const routeArtist = (artist: User) => () => {
+        router.push(`/user/${artist.getID()}`)
+    }
+
     return(
         <View style={styles.wrapper}>
             <View>
@@ -77,7 +83,12 @@ const SingleTrackInformation = ({}: SingleTrackInformationProps) => {
                     {track.getTitle()}
                 </Text>
                 <Text style={styles.artists}>
-                    {artists}
+                    {track.getArtists().map((artist, index) => (
+                        <Text onPress={routeArtist(artist)}>
+                            {artist.getUsername()}
+                            { track.getArtists().length > 1 && index <= track.getArtists().length - 2 && ', ' }
+                        </Text>
+                    ))}
                 </Text>
             </View>
             <View style={styling.row.s}>

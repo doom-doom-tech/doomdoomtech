@@ -6,6 +6,7 @@ import Screen from "@/common/components/Screen";
 import MetaData from "@/common/components/MetaData";
 import ShareContent from "@/features/share/components/ShareContent";
 import Logo from "@/assets/icons/Logo";
+import api from "@/common/services/api";
 
 const ShareTrack = () => {
 
@@ -20,11 +21,33 @@ const ShareTrack = () => {
         image: "",
     });
 
+    // State for track data fetched from API
+    const [trackData, setTrackData] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+
+    // Function to fetch track data from API
+    const fetchTrackData = async (trackId: string) => {
+        try {
+            setLoading(true);
+            const response = await api.get(`/track/${trackId}`);
+            const track = response.data.data.track;
+            setTrackData({
+                title: track.title,
+                artist: track.artists[0].username,
+                image: track.cover_source,
+            });
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching track data:", error);
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (typeof window !== "undefined") {
             const urlParams = new URLSearchParams(window.location.search);
             setQueryParams({
-                id: urlParams.get("id") || "",
+                id: urlParams.get("id") || params.id || "",
                 title: urlParams.get("title") || "",
                 artist: urlParams.get("artist") || "",
                 image: urlParams.get("image") || "",
@@ -32,10 +55,23 @@ const ShareTrack = () => {
         }
     }, []);
 
+    // Fetch track data if we have an ID but no title/artist/image
+    useEffect(() => {
+        const paramId = params.id || queryParams.id;
+        const hasParams = params.title || queryParams.title;
+
+        if (paramId && !hasParams && !trackData && !loading) {
+            fetchTrackData(paramId);
+        }
+    }, [params, queryParams]);
+
     // Use params from useLocalSearchParams if available (dynamic), otherwise fallback to queryParams (static)
-    const { id, title, artist, image } = Object.keys(params).length
-        ? params
-        : queryParams;
+    // If we have trackData from API, use that
+    const { id, title, artist, image } = trackData 
+        ? { id: params.id || queryParams.id, ...trackData }
+        : Object.keys(params).length > 1
+            ? params
+            : queryParams;
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -55,12 +91,29 @@ const ShareTrack = () => {
         <Screen>
             <View style={styles.wrapper}>
                 <Logo width={150} style={styles.logo} onPress={() => router.push("/")} />
-                <MetaData
-                    title={`${artist} - ${title}`}
-                    image={image}
-                    url={`https://doomdoom.tech/share?id=${encodeURIComponent(id)}&artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}&image=${encodeURIComponent(image)}`}
-                />
-                <ShareContent {...{ id, title, artist, image }} />
+                {loading ? (
+                    <MetaData
+                        title="Loading track..."
+                        description="Please wait while we load the track information."
+                    />
+                ) : (
+                    <MetaData
+                        title={`${artist} - ${title}`}
+                        description={`Listen to ${title} by ${artist} on DoomDoomTech`}
+                        image={image}
+                        url={`https://doomdoom.tech/s/${id}`}
+                        additionalMetaData={
+                            <>
+                                <meta property="og:image:width" content="1200" />
+                                <meta property="og:image:height" content="630" />
+                                <meta property="og:site_name" content="DoomDoomTech" />
+                                <meta property="og:type" content="music.song" />
+                                <meta property="music:musician" content={artist} />
+                            </>
+                        }
+                    />
+                )}
+                <ShareContent id={Number(id)} title={title} artist={artist} image={image} />
             </View>
         </Screen>
     );

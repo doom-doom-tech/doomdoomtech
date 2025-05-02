@@ -4,9 +4,9 @@ import {useTrackContext} from "@/features/track/context/TrackContextProvider";
 import {palette, spacing} from "@/theme";
 import Title from "@/common/components/Title";
 import EqualizerAnimation from "@/common/components/EqualizerAnimation";
-import Text from "@/common/components/Text";
 import User from '@/features/user/classes/User';
 import {router} from "expo-router";
+import Subtitle from "@/common/components/Subtitle";
 
 interface TrackInformationProps {
     center?: boolean
@@ -55,16 +55,7 @@ const TrackInformation = ({center}: TrackInformationProps) => {
     return(
         <View style={styles.wrapper}>
             <Title content={track.getTitle()} center={center} append={<EqualizerAnimation size={18} />} />
-            <Text style={styles.subtitle}>
-                { track.getArtists().map(artist => (
-                    <Text onPress={handleRouteArtist(artist)}>
-                        {
-                            artist.getUsername()
-                        }
-                    </Text>
-                ))}
-            </Text>
-            {/*<Subtitle content={artists} center={center} />*/}
+            <Subtitle content={artists} center={center} />
         </View>
     )
 }

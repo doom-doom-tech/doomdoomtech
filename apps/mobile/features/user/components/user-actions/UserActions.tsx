@@ -4,13 +4,14 @@ import useSingleUserContext from "@/features/user/hooks/useSingleUserContext";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import FollowButton from "@/features/follow/components/FollowButton";
 import IconButton from "@/common/components/buttons/IconButton";
-import {palette, spacing} from "@/theme";
+import {palette, spacing, styling} from "@/theme";
 import CreditFunds from "@/features/credits/components/CreditFunds";
 import Hashtag from "@/assets/icons/Hashtag";
 import Bell from "@/assets/icons/Bell";
 import {router} from "expo-router";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
 import Eye from "@/assets/icons/Eye";
+import Button from '@/common/components/buttons/Button';
 
 interface UserActionsProps {
 
@@ -43,10 +44,17 @@ const UserActions = ({}: UserActionsProps) => {
         })
     }, []);
 
+    const routePaywall = () => router.push('/paywall')
+
     const InitialActions = useMemo(() => {
-        if(isCurrentUser) return <CreditFunds amount={currentUser?.getCreditValue() ?? 0} />
+        if(isCurrentUser) return(
+            <View style={styling.row.m}>
+                <CreditFunds amount={currentUser?.getCreditValue() ?? 0} />
+                { !premiumMember && isCurrentUser && <Button fill={'premium'} label={"Upgrade"} callback={routePaywall} /> }
+            </View>
+        )
         return <FollowButton user={user} />
-    }, [isCurrentUser, user, currentUser])
+    }, [isCurrentUser, user, currentUser, premiumMember])
 
     const routeLabelInbox = useCallback(() => {
         router.push(`/label/${user.getUsername()}/inbox`)

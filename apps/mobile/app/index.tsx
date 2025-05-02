@@ -1,7 +1,7 @@
 import {Redirect} from "expo-router";
 import {StatusBar} from "expo-status-bar";
 import {Fragment, useEffect} from "react";
-import {LogBox} from "react-native";
+import {LogBox, Platform} from "react-native";
 import * as SplashScreen from 'expo-splash-screen';
 import useExpoUpdates from "@/common/hooks/useExpoUpdates";
 import * as Notifications from 'expo-notifications';
@@ -13,11 +13,13 @@ Notifications.setNotificationHandler({
         shouldSetBadge: true,
     }),
 });
+//
+// SplashScreen.setOptions({
+//     duration: 3000,
+//     fade: false,
+// });
 
-SplashScreen.setOptions({
-    duration: 3000,
-    fade: false,
-});
+Platform.OS === 'android' && SplashScreen.hide()
 
 // Ignore all log notifications
 LogBox.ignoreAllLogs(true);

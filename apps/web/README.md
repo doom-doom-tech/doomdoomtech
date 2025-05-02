@@ -35,6 +35,28 @@ npm run reset-project
 
 This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
+## Building and Serving for Web
+
+To build and serve the web app:
+
+1. Build the app for web:
+
+   ```bash
+   npm run build
+   ```
+
+   This will create a static export in the `dist` directory.
+
+2. Serve the static export:
+
+   ```bash
+   npm run serve
+   ```
+
+   This will start a local server at http://localhost:3000 with proper routing for single-page applications.
+
+   > **Note:** The `--single` flag is used to ensure that all routes (including dynamic routes like `/s/24`) are properly handled by redirecting to the index.html file.
+
 ## Learn more
 
 To learn more about developing your project with Expo, look at the following resources:

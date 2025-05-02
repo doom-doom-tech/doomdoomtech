@@ -3,12 +3,13 @@ import {useCallback, useMemo} from "react";
 import Button from "@/common/components/buttons/Button";
 import Copy from "@/assets/icons/Copy";
 import {useShareStoreSelectors} from "@/features/share/store/share";
-import {palette} from "@/theme";
+import {palette, spacing} from "@/theme";
 import * as Clipboard from 'expo-clipboard';
 import {wait} from "@/common/services/utilities";
 import {router} from "expo-router";
 import Toast from "react-native-root-toast";
 import {TOASTCONFIG} from "@/common/constants";
+import Text from "@/common/components/Text";
 
 interface ShareActionsProps {
 
@@ -30,15 +31,25 @@ const ShareActions = ({}: ShareActionsProps) => {
         if(!entity) return
 
         try {
-            await Clipboard.setStringAsync(`https://ddt-web.expo.app/share?id=${entity.getID()}&title=${entity.getTitle()}&artist=${entity.getMainArtist().getUsername()}&image=${entity.getCoverSource()}`)
-            router.back()
-            await wait(200)
-            Toast.show('Track link copied', TOASTCONFIG.success)
+            if(entity.getCoverSource()) {
+                // Use the new shorter URL format
+                await Clipboard.setStringAsync(`https://doomdoom.tech/s/${entity.getID()}`)
+                router.back()
+                await wait(200)
+                Toast.show('Track link copied', TOASTCONFIG.success)
+            }
         } catch (error: any) {
             Toast.show('Error copying the link', TOASTCONFIG.error)
         }
     }, [entity])
 
+    if(entity?.getVideoSource()) return(
+        <View style={{ padding: spacing.m, backgroundColor: palette.granite }}>
+            <Text style={{ textAlign: 'center' }}>
+                We're sorry. Video sharing is not yet available.
+            </Text>
+        </View>
+    )
 
     return(
         <View style={styles.wrapper}>

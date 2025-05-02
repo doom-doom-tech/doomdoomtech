@@ -9,6 +9,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build": "expo export -p web",
+    "serve": "npx serve dist --single",
     "test": "jest --watchAll",
     "lint": "expo lint"
   },

@@ -1,7 +1,7 @@
 {
     "buildCommand": "expo export -p web",
     "outputDirectory": "dist",
-    "devCommand": "npx serve dist",
+    "devCommand": "npx serve dist --single",
     "cleanUrls": true,
     "framework": null,
     "rewrites": [
