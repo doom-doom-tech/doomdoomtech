@@ -5,7 +5,6 @@ import {useTrackContext} from "@/features/track/context/TrackContextProvider";
 import UserCircle from "@/features/user/components/UserCircle";
 import Note from "@/assets/icons/Note";
 import Mic from "@/assets/icons/Mic";
-import Send from "@/assets/icons/Send";
 import User from "@/features/user/classes/User";
 import {router} from "expo-router";
 import useListSaveTrack from "@/features/list/hooks/useListSaveTrack";
@@ -29,6 +28,7 @@ import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
 import HeartFilled from "@/assets/icons/HeartFilled";
 import Heart from "@/assets/icons/Heart";
+import Share from "@/assets/icons/Share";
 
 interface SingleTrackActionsProps {
 
@@ -191,7 +191,7 @@ const SingleTrackActions = ({}: SingleTrackActionsProps) => {
             callback: handleBrowseGenre
         },
         {
-            icon: <Send />,
+            icon: <Share />,
             label: "Share this track",
             callback: handleShareTrack
         },
