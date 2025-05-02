@@ -1,6 +1,5 @@
 import {Linking, StyleSheet, Text, useWindowDimensions, View} from 'react-native'
 import {useCallback, useMemo} from "react";
-import {Image} from "expo-image";
 import {palette, spacing} from "@/theme";
 import Button from "@/common/components/Button";
 
@@ -14,6 +13,8 @@ interface ShareContentProps {
 const ShareContent = ({id, title, artist, image}: ShareContentProps) => {
 
     const { width, height } = useWindowDimensions();
+
+    console.log(image)
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -30,6 +31,7 @@ const ShareContent = ({id, title, artist, image}: ShareContentProps) => {
             },
             title: {
                 fontSize: 24,
+                textAlign: 'center',
                 color: palette.offwhite
             },
         })
@@ -41,7 +43,7 @@ const ShareContent = ({id, title, artist, image}: ShareContentProps) => {
 
     return(
         <View style={styles.wrapper}>
-            <Image source={image} style={styles.image} />
+            <img src={image} style={styles.image} alt={''}/>
             <Text style={styles.title}>
                 { artist } - { title }
             </Text>

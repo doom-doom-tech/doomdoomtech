@@ -13,6 +13,8 @@ const ShareTrack = () => {
     const { height } = useWindowDimensions();
     const params = useLocalSearchParams<any>();
 
+    console.log(params)
+
     // Fallback for static export: Parse query params client-side
     const [queryParams, setQueryParams] = useState({
         id: "",
@@ -31,10 +33,13 @@ const ShareTrack = () => {
             setLoading(true);
             const response = await api.get(`/track/${trackId}`);
             const track = response.data.data.track;
+
+            console.log(track)
+
             setTrackData({
                 title: track.title,
                 artist: track.artists[0].username,
-                image: track.cover_source,
+                image: track.cover_url,
             });
             setLoading(false);
         } catch (error) {
@@ -86,6 +91,8 @@ const ShareTrack = () => {
             },
         });
     }, [height]);
+
+    console.log(trackData)
 
     return (
         <Screen>

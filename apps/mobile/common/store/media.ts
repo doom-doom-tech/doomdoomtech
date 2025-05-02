@@ -12,6 +12,7 @@ interface InitialMediaStore {
     duration: number
     state: State
     current: Track | null
+    videoPreviewMinimized: boolean
 }
 
 interface MediaStoreActions {
@@ -26,6 +27,7 @@ const initialMediaStore = {
     duration: 0,
     state: "none",
     current: null,
+    videoPreviewMinimized: false,
 } as InitialMediaStore
 
 interface MediaStore extends InitialMediaStore, MediaStoreActions {}
@@ -45,5 +47,6 @@ export const useMediaStoreSelectors = {
     duration: () => MediaStore((state) => state.duration),
     state: () => MediaStore((state) => state.state),
     current: () => MediaStore((state) => state.current),
+    videoPreviewMinimized: () => MediaStore((state) => state.videoPreviewMinimized),
     setState: () => MediaStore((state) => state.setState),
 };
