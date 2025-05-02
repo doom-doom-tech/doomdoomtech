@@ -8,7 +8,6 @@ import {IUserService} from "../../features/user/services/UserService";
 const ContextHandler = (req: Request, res: Response, next: NextFunction) => {
     Context.run(async () => {
         const userService = container.resolve<IUserService>("UserService")
-
         const token = req.headers["authorization"];
 
         let authID = 0;
@@ -18,7 +17,11 @@ const ContextHandler = (req: Request, res: Response, next: NextFunction) => {
             try {
                 const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string);
 
-                authID = _.toNumber(decoded);
+                if(typeof decoded === "string") {
+                    authID = _.toNumber(decoded);
+                } else {
+                    authID = _.toNumber(decoded.userId);
+                }
             } catch (error) {
                 authID = 0;
             }
@@ -29,6 +32,8 @@ const ContextHandler = (req: Request, res: Response, next: NextFunction) => {
                 userID: authID, authID
             });
         }
+
+        // if(_.isNaN(authID)) authID = 0;
 
         // Store in Context
         Context.set("authID", authID);

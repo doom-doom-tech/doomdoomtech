@@ -31,9 +31,6 @@ class SocialLoginController extends Controller implements ISocialLoginController
 		try {
 			const googleAuthService = container.resolve<IGoogleAuthService>("GoogleAuthService");
 
-			console.log(req.body.token)
-
-
 			const result = await googleAuthService.login(req.body.token);
 			res.status(200).json(result);
 		} catch (error: any) {
