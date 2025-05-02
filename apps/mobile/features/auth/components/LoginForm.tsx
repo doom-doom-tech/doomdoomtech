@@ -77,6 +77,9 @@ const LoginForm = () => {
 
     const handleRequestLoginCode = useCallback(async (values: LoginRequest) => {
         try {
+
+            console.log('????')
+
             Keyboard.dismiss()
 
             await requestAuthCodeMutation.mutateAsync(values)
@@ -87,6 +90,7 @@ const LoginForm = () => {
             await wait(200)
             router.push('/(sheets)/login-code')
         } catch (error: any) {
+            console.log(JSON.stringify(error))
             Toast.show(formatServerErrorResponse(error), TOASTCONFIG.error)
         }
     }, [])

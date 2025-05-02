@@ -5,6 +5,7 @@ import Bell from "@/assets/icons/Bell";
 import {router} from "expo-router";
 import useAlertCount from "@/features/alert/hooks/useAlertCount";
 import BellMasked from "@/assets/icons/BellMasked";
+import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 
 interface AlertBellProps {
 
@@ -13,6 +14,7 @@ interface AlertBellProps {
 const AlertBell = ({}: AlertBellProps) => {
 
     const alertsCountQuery = useAlertCount()
+    const user = useGlobalUserContext()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -32,8 +34,10 @@ const AlertBell = ({}: AlertBellProps) => {
     }, []);
 
     const routeAlerts = useCallback(() => {
+        if(!user) return router.push('/auth')
+
         router.push(`/alerts`)
-    }, [])
+    }, [user])
 
     const shouldNotify = useMemo(() => {
         if(alertsCountQuery.isError || alertsCountQuery.isLoading || alertsCountQuery.data === undefined) return false

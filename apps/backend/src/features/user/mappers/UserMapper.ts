@@ -13,6 +13,7 @@ export class UserMapper {
         return {
             id: true,
             uuid: true,
+            email: true,
             label: true,
             username: true,
             verified: true,
@@ -34,6 +35,7 @@ export class UserMapper {
         return {
             id: user.id ?? '',
             uuid: user.uuid ?? '',
+            email: user.email ?? '',
             label: user.label ?? false,
             premium: user.premium,
             username: user.username ?? '',

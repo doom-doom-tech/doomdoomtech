@@ -6,6 +6,7 @@ import {useConnectUserDevice} from "@/features/device/hooks/useConnectUserDevice
 import {SingleUserInterface} from "@/features/user/types";
 import api from "@/common/services/api";
 import {useAuthStoreSelectors} from "@/features/auth/store/auth";
+import {usePaymentContext} from "@/common/context/PaymentContextProvider";
 
 interface SocialLoginSuccessPayload {
 	user: SingleUserInterface
@@ -21,6 +22,8 @@ const useSocialLogin = () => {
 	const connectDevice = useConnectUserDevice()
 	const setAuthState = useAuthStoreSelectors.setState()
 
+	const { logInWithRevenueCat, setDisplayName, setEmail } = usePaymentContext();
+
 	return useMutation({
 		mutationFn: (data: SocialLoginRequest) => handleSocialLogin(data),
 		onSuccess: async (response, variables, context) => {
@@ -28,6 +31,11 @@ const useSocialLogin = () => {
 			DeviceEventEmitter.emit('user:invalidate')
 			setAuthState({ authorized: true })
 			await connectDevice(response.user.id)
+
+			await setEmail(response.user.email);
+			await setDisplayName(response.user.username);
+
+			await logInWithRevenueCat(response.user.id.toString());
 		}
 	})
 }

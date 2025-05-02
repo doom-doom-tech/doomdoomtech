@@ -1,20 +1,20 @@
 import {ActivityIndicator, DeviceEventEmitter, StyleSheet, View} from 'react-native'
 import {Fragment, useCallback, useEffect, useMemo} from "react";
 import Screen from "@/common/components/Screen";
-import UserHeader from "@/features/user/components/user-header/UserHeader"
 import SingleUserContextProvider from "@/features/user/context/SingleUserContextProvider";
-import UserActions from "@/features/user/components/user-actions/UserActions";
 import {spacing} from "@/theme";
-import UserLists from "@/features/user/components/user-lists/UserLists";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import {useLocalSearchParams} from "expo-router";
 import useUser from "@/features/user/hooks/useUser";
-import UserBiography from "@/features/user/components/UserBiography";
-import Scroll from "@/common/components/Scroll";
-import UserSocials from "@/features/user/components/UserSocials";
 import Error from "@/common/screens/Error";
 import useUserVisit from "@/features/user/hooks/useUserVisit";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
+import Scroll from "@/common/components/Scroll";
+import UserHeader from "@/features/user/components/user-header/UserHeader";
+import UserBiography from "@/features/user/components/UserBiography";
+import UserSocials from "@/features/user/components/UserSocials";
+import UserActions from "@/features/user/components/user-actions/UserActions";
+import UserLists from "@/features/user/components/user-lists/UserLists";
 
 interface UserProps {
 

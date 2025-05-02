@@ -1,4 +1,4 @@
-import {View, StyleSheet, useWindowDimensions, TouchableOpacity} from 'react-native'
+import {ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View} from 'react-native'
 import React, {useState} from "react";
 import {Image} from "expo-image";
 import PremiumBadge from "@/assets/icons/PremiumBadge";
@@ -125,7 +125,7 @@ const Paywall = () => {
     }
 
     return(
-        <View style={styles.wrapper}>
+        <ScrollView style={styles.wrapper}>
             <Image style={styles.background} source={require("@/assets/images/paywall.png")} />
 
             <View style={styles.pane}>
@@ -166,7 +166,7 @@ const Paywall = () => {
             <TouchableOpacity style={styles.close} onPress={router.back}>
                 <Close color={palette.offwhite} />
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     )
 }
 

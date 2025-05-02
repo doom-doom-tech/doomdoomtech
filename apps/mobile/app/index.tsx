@@ -6,10 +6,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import useExpoUpdates from "@/common/hooks/useExpoUpdates";
 import * as Notifications from 'expo-notifications';
 
-// Keep the splash screen visible while we fetch resources
-// SplashScreen.preventAutoHideAsync();
-
-
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
         shouldShowAlert: true,

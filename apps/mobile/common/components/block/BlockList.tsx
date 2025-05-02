@@ -25,8 +25,8 @@ const BlockList = <T extends any>({...rest}: ListProps<T>) => {
             infinite
             horizontal
             disableRefresh
-            disableVirtualization
             directionalLockEnabled
+            removeClippedSubviews
             contentContainerStyle={styles.container}
             {...rest} />
     )

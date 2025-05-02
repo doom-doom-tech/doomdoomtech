@@ -36,6 +36,7 @@ const TopPicksTracks = () => {
         return StyleSheet.create({
             container: {
                 flex: 1,
+                paddingBottom: 400
             },
         });
     }, []);

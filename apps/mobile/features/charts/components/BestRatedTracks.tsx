@@ -38,11 +38,15 @@ const BestRatedTracks = () => {
         <Queueable query={bestRatedTracksQuery}>
             <Block
                 <Track>
+                windowSize={3}
                 title={"Best rated"}
                 subtitle={"View all"}
-                callback={routeAdditionalTracks}
-                query={bestRatedTracksQuery}
+                initialNumToRender={3}
                 renderItem={RenderItem}
+                maxToRenderPerBatch={3}
+                query={bestRatedTracksQuery}
+                callback={routeAdditionalTracks}
+                keyExtractor={(item) => String(item.getID())}
             />
         </Queueable>
     )

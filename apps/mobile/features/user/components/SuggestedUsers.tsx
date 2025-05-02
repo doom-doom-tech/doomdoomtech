@@ -7,12 +7,15 @@ import SuggestedUser from "@/features/user/components/SuggestedUser";
 import useUserSuggested from "@/features/user/hooks/useUserSuggested";
 import Text from "@/common/components/Text";
 import {palette, spacing} from "@/theme";
+import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 
 interface SuggestedUsersProps {
 
 }
 
 const SuggestedUsers = ({}: SuggestedUsersProps) => {
+
+    const currentUser = useGlobalUserContext()
 
     const suggestedUsersQuery = useUserSuggested()
 
@@ -41,6 +44,8 @@ const SuggestedUsers = ({}: SuggestedUsersProps) => {
             <SuggestedUser />
         </UserContextProvider>
     ), [])
+
+    if(!currentUser) return <></>
 
     return(
         <View style={styles.wrapper}>

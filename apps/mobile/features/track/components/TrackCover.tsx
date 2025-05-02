@@ -1,4 +1,4 @@
-import {AppState, AppStateStatus, StyleSheet, View} from 'react-native';
+import {AppState, AppStateStatus, Platform, StyleSheet, View} from 'react-native';
 import {Image} from 'expo-image';
 import React, {Fragment, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useTrackContext} from '@/features/track/context/TrackContextProvider';
@@ -108,7 +108,7 @@ const TrackCover = ({ size = 100 }: TrackCoverProps) => {
     }
 
     /**
-     * If app is not active, you can optionally return an empty view
+     * If the app is not active, you can optionally return an empty view
      * to avoid playing/styling the video.
      */
     if (currentAppState !== 'active') return <Fragment />;
@@ -125,7 +125,7 @@ const TrackCover = ({ size = 100 }: TrackCoverProps) => {
                 resizeMode={ResizeMode.COVER}
                 isMuted={true}
                 isLooping={true}
-                shouldPlay={true}
+                shouldPlay={Platform.OS === 'ios'}
             />
         </View>
     );

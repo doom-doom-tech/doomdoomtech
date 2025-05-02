@@ -31,10 +31,10 @@ const CommentsInput = ({entity, entityID}: CommentsInputProps) => {
             },
             button: {
                 position: 'absolute',
-                width: 48,
-                height: 48,
-                right: 24,
-                top: 12,
+                width: 60,
+                height: '100%',
+                right: 12,
+                top: 0,
                 backgroundColor: palette.olive,
                 justifyContent: 'center',
                 alignItems: 'center'

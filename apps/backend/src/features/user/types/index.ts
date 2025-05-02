@@ -10,6 +10,7 @@ export interface UserSettings {
 export interface UserInterface {
     id: number
     uuid: string
+    email: string
     label: boolean
     premium: boolean
     username: string
@@ -23,6 +24,7 @@ export interface SingleUserInterface {
     id: number
     bio: string
     uuid: string
+    email: string
     label: boolean
     credits: number
     premium: boolean

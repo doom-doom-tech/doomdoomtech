@@ -5,7 +5,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         ...config,
         name: 'doomdoomtech',
         slug: 'doomdoomtech',
-        version: '2.0.17',
+        version: '2.0.18',
         orientation: 'portrait',
         icon: './assets/images/icon.png',
         scheme: 'doomdoomtech',
@@ -33,7 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                 foregroundImage: './assets/images/adaptive-icon.png',
                 backgroundColor: '#ffffff',
             },
-            versionCode: 217,
+            versionCode: 218,
             googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
             package: 'app.doomdoom.tech',
             permissions: [
