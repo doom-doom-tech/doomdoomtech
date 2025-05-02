@@ -5,8 +5,6 @@ import TopPicksHeader from "@/features/list/components/TopPicksHeader";
 import TopPicksTracks from "@/features/list/components/TopPicksTracks";
 import {ImageBackground} from "expo-image";
 import TopPicksBackground from "@/assets/images/top-picks.png";
-import ChartsHeader from "@/features/charts/components/ChartsHeader";
-import ChartsTitle from "@/features/charts/components/ChartsTitle";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import TopPicksTitle from "@/features/list/components/TopPicksTitle";
 
@@ -26,7 +24,7 @@ const ListOverview = ({}: ListOverviewProps) => {
             },
             header: {
                 width,
-                height: 300,
+                height: 250,
                 paddingTop: top,
                 marginTop: top * -1
             },

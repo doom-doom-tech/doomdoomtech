@@ -1,13 +1,18 @@
 import {GoogleSignin, SignInSuccessResponse} from "@react-native-google-signin/google-signin";
 import {router} from "expo-router";
-import {useCallback, useEffect} from "react";
+import {useCallback, useEffect, useState} from "react";
 import useSocialLogin from "@/features/auth/hooks/useSocialLogin";
 import Google from "@/assets/icons/Google";
 import SocialLoginButton from "@/features/auth/components/socials/SocialLoginButton";
 import Toast from "react-native-root-toast";
 import {TOASTCONFIG} from "@/common/constants";
+import {wait} from "@/common/services/utilities";
+import {ActivityIndicator} from "react-native";
+import {palette} from "@/theme";
 
 const GoogleLogin = () => {
+
+	const [loading, setLoading] = useState<boolean>(false);
 
 	const socialLoginMutation = useSocialLogin()
 
@@ -29,11 +34,13 @@ const GoogleLogin = () => {
 
 	const handleGoogleSignIn = useCallback(async () => {
 		try {
+			setLoading(true)
+
 			const response = await GoogleSignin.signIn();
 
 			if(response.type === 'cancelled') return Toast.show("Login cancelled", TOASTCONFIG.warning)
 
-			const {  data } = response as SignInSuccessResponse
+			const { data } = response as SignInSuccessResponse
 
 			if(data.idToken && data.user) {
 				await socialLoginMutation.mutateAsync({
@@ -45,16 +52,20 @@ const GoogleLogin = () => {
 					avatar_url: data.user.photo
 				});
 
-				router.push('/feed')
+				router.back();
+				await wait(200);
+				Toast.show("Logged in", TOASTCONFIG.success);
 			}
 		} catch (e: any) {
 			console.error('Error during Google Sign-In:', e);
+		} finally {
+			setLoading(false)
 		}
 	}, [])
 
     return(
         <SocialLoginButton
-	        Icon={<Google />}
+	        Icon={loading ? <ActivityIndicator color={palette.olive} /> : <Google />}
 	        callback={handleGoogleSignIn}
         />
     )

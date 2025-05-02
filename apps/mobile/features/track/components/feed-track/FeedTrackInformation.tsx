@@ -1,8 +1,9 @@
-import {StyleSheet, useWindowDimensions, View} from 'react-native'
+import {StyleSheet, TouchableOpacity, useWindowDimensions, View} from 'react-native'
 import {useMemo} from "react";
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
 import {palette} from "@/theme";
 import Text from "@/common/components/Text";
+import {router} from "expo-router";
 
 interface FeedTrackInformationProps {
 
@@ -30,6 +31,18 @@ const FeedTrackInformation = ({}: FeedTrackInformationProps) => {
             artists: {
                 color: palette.offwhite,
                 opacity: 0.6
+            },
+            artistContainer: {
+                flexDirection: 'row',
+                flexWrap: 'wrap'
+            },
+            artist: {
+                color: palette.offwhite,
+                opacity: 0.6
+            },
+            separator: {
+                color: palette.offwhite,
+                opacity: 0.6
             }
         })
     }, []);
@@ -39,9 +52,22 @@ const FeedTrackInformation = ({}: FeedTrackInformationProps) => {
             <Text style={styles.title} numberOfLines={1}>
                 {track.getTitle()}
             </Text>
-            <Text style={styles.artists}>
-                {track.getArtists().map(artist => artist.getUsername()).join(', ')}
-            </Text>
+            <View style={styles.artistContainer}>
+                {track.getArtists().map((artist, index) => (
+                    <View key={artist.getID()} style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity
+                            onPress={() => router.push(`/user/${artist.getID()}`)}
+                        >
+                            <Text style={styles.artist}>
+                                {artist.getUsername()}
+                            </Text>
+                        </TouchableOpacity>
+                        {index < track.getArtists().length - 1 && (
+                            <Text style={styles.separator}>, </Text>
+                        )}
+                    </View>
+                ))}
+            </View>
         </View>
     )
 }

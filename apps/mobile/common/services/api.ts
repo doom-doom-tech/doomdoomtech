@@ -2,7 +2,8 @@ import axios, {AxiosError, InternalAxiosRequestConfig} from "axios";
 import * as Device from 'expo-device'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const API_BASE_URL = 'https://api.doomdoom.tech'
+export const API_BASE_URL = 'http://192.168.2.23:8080'
+// export const API_BASE_URL = 'https://api.doomdoom.tech'
 // export const API_BASE_URL = 'https://10.101.8.162:8080'
 
 export const STORAGE_KEYS = {

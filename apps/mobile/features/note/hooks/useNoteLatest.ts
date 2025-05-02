@@ -15,8 +15,6 @@ const fetchLatestNotes = async (cursor: string | null, data: AdditionalRankedLis
         cursor: cursor
     })
 
-    console.log(response.items.map(note => note.getContent()))
-
     return response
 }
 

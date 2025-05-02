@@ -1,10 +1,11 @@
-import {StyleSheet, View} from 'react-native'
-import {useMemo} from "react";
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {useCallback, useMemo} from "react";
 import useUserContext from "@/features/user/hooks/useUserContext";
 import UserImageCircle from "@/features/user/components/UserImageCircle";
 import FollowButton from "@/features/follow/components/FollowButton";
 import {palette, spacing} from "@/theme";
 import Text from "@/common/components/Text";
+import {router} from "expo-router";
 
 
 interface SuggestedUserProps {
@@ -31,10 +32,17 @@ const SuggestedUser = ({}: SuggestedUserProps) => {
         })
     }, []);
 
+    const handleRouteUser = useCallback(() => {
+        router.push(`/user/${user.getID()}`)
+    }, [user])
+
     return(
         <View style={styles.wrapper}>
-            <UserImageCircle size={110} source={user.getImageSource()} />
-            <Text style={styles.username}>
+            <TouchableOpacity onPress={handleRouteUser}>
+                <UserImageCircle size={110} source={user.getImageSource()} />
+            </TouchableOpacity>
+
+            <Text style={styles.username} onPress={handleRouteUser}>
                 {user.getUsername()}
             </Text>
             <FollowButton small user={user} />

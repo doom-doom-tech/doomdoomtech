@@ -47,7 +47,7 @@ const Charts = () => {
         },
         header: {
             width,
-            height: 300,
+            height: 250,
             paddingTop: top,
             marginTop: top * -1
         },

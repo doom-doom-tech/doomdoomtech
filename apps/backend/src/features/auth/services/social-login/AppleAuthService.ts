@@ -9,43 +9,69 @@ import {SingleUserMapper} from "../../../user/mappers/SingleUserMapper";
 import {container} from "../../../../common/utils/tsyringe";
 
 export interface IAppleAuthService extends IServiceInterface {
-	login(payload: OAuthUserInfo): Promise<{user: SingleUserInterface, token: string}>
+	login(payload: OAuthUserInfo): Promise<{ user: SingleUserInterface; token: string }>;
 }
 
 @singleton()
 class AppleAuthService extends Service implements IAppleAuthService {
-
-	constructor(
-		@inject("Database") protected db: ExtendedPrismaClient,
-	) { super() }
-
-	public async findUserByToken(token: string): Promise<SingleUserInterface | null> {
-		const response = await this.db.appleUser.findFirst({ where: { token } });
-
-		if (!response) return null;
-
-		return SingleUserMapper.format(
-			await this.db.user.findFirst({
-				where: { email: response.email },
-				select: SingleUserMapper.getSelectableFields(),
-			})
-		)
+	constructor(@inject("Database") protected db: ExtendedPrismaClient) {
+		super();
 	}
 
 	public async login(payload: OAuthUserInfo) {
 		try {
-			const existingUser = await this
-				.findUserByToken(payload.token as string);
+			const email = payload.email?.toLowerCase();
+			let user;
 
-			if (existingUser) {
-				const jwtToken = this.generateJWT(existingUser.id);
-				return { user: existingUser, token: jwtToken };
+			// Step 1: If no email is provided, try to found the appleUser by token
+			if (!email && payload.token) {
+				const appleUser = await this.db.appleUser.findFirst({
+					where: { token: payload.token },
+				});
+
+				if (!appleUser) {
+					throw new Error("No Apple account found for the provided token");
+				}
+
+				// Step 2: Find the user by the email from the appleUser record
+				user = SingleUserMapper.format(await this.db.user.findUnique({
+					where: { email: appleUser.email },
+					select: SingleUserMapper.getSelectableFields(),
+				}));
+
+				if (!user) {
+					throw new Error("User not found for the linked Apple account");
+				}
+
+				// Step 3: Update the token in appleUser if necessary
+				await this.db.appleUser.update({
+					where: { token_email: { token: payload.token, email: appleUser.email } },
+					data: { token: payload.token },
+				});
+			} else {
+				// Step 4: Original logic for when email is provided
+				user = SingleUserMapper.format(await this.db.user.findUnique({
+					where: { email },
+					select: SingleUserMapper.getSelectableFields(),
+				}));
+
+				if (user) {
+					// Ensure an Apple account is linked
+					await this.db.appleUser.upsert({
+						where: { token_email: { token: payload.token!, email } },
+						update: { token: payload.token! },
+						create: { email, token: payload.token! },
+					});
+				} else {
+					// Register a new user
+					user = await this.registerNewUser(payload);
+				}
 			}
 
-			const newUser = await this.registerNewUser(payload);
-			const jwtToken = this.generateJWT(newUser.id);
+			const formattedUser = SingleUserMapper.format(user);
+			const jwtToken = this.generateJWT(formattedUser.id);
 
-			return { user: newUser, token: jwtToken };
+			return { user: formattedUser, token: jwtToken };
 		} catch (error) {
 			console.error("Apple login error:", error);
 			throw new Error("Failed to process Apple login");
@@ -57,10 +83,12 @@ class AppleAuthService extends Service implements IAppleAuthService {
 
 		const username = await this.createUniqueUsername(payload.firstName, payload.lastName);
 
+		// Create Apple user record
 		await this.db.appleUser.create({
-			data: { token: payload.token!, email: payload.email }
-		})
+			data: { token: payload.token!, email: payload.email },
+		});
 
+		// Register new user
 		const registerResponse = await authService.signup({
 			code: null,
 			username,
@@ -100,7 +128,7 @@ class AppleAuthService extends Service implements IAppleAuthService {
 	}
 
 	private generateJWT(userId: number | string): string {
-		return jwt.sign(String(userId), process.env.TOKEN_SECRET as string);
+		return jwt.sign({ userId: String(userId) }, process.env.TOKEN_SECRET as string);
 	}
 
 	private generateRandomString(length: number): string {

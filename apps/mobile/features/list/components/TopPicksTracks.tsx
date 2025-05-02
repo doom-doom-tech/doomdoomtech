@@ -11,7 +11,7 @@ import Toast from 'react-native-root-toast';
 import {convertToQueryResult, formatServerErrorResponse} from '@/common/services/utilities';
 import {TOASTCONFIG} from '@/common/constants';
 import useListRemoveTrack from '@/features/list/hooks/useListRemoveTrack';
-import {DeviceEventEmitter, StyleSheet, useWindowDimensions} from 'react-native';
+import {DeviceEventEmitter, StyleSheet, useWindowDimensions, View} from 'react-native';
 import Queueable from '@/common/components/Queueable';
 import DraggableTrackRow from "@/features/track/components/track-row/DraggableTrackRow";
 
@@ -23,6 +23,7 @@ const TopPicksTracks = () => {
     const { width, height } = useWindowDimensions();
 
     const [removing, setRemoving] = useState<boolean>(false);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
 
     const removeTrackMutation = useListRemoveTrack();
 
@@ -35,11 +36,12 @@ const TopPicksTracks = () => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             container: {
-                flex: 1,
-                paddingBottom: 400
+                height: height - 150,
+                paddingBottom: 200
             },
+            wrapper: {flex: 1}
         });
-    }, []);
+    }, [height]);
 
     useEffect(() => {
         if (topPicksQuery.isSuccess && topPicksQuery.data) setTracks(topPicksQuery.data);
@@ -67,12 +69,17 @@ const TopPicksTracks = () => {
                     // Switch to 'edit' mode if currently in 'idle'
                     setTopPicksState({ state: 'edit' });
                 }
+                // Set dragging state to true
+                setIsDragging(true);
                 // Start the drag immediately
                 originalOnDragStart();
             };
 
             // Only call onDragEnd if the item is being dragged
-            const handlePressOut = isActive ? originalOnDragEnd : _.noop;
+            const handlePressOut = isActive ? () => {
+                setIsDragging(false);
+                originalOnDragEnd();
+            } : _.noop;
 
             return (
                 <DraggableTrackRow
@@ -86,7 +93,7 @@ const TopPicksTracks = () => {
                 />
             );
         },
-        [state, handleRemoveTrack, setTopPicksState]
+        [state, handleRemoveTrack, setTopPicksState, setIsDragging]
     );
 
     const handleReordering = useCallback(
@@ -115,17 +122,20 @@ const TopPicksTracks = () => {
 
     return (
         <Queueable query={convertToQueryResult(tracks)}>
-            <DragList
-                data={tracks}
-                ListEmptyComponent={TopPicksEmpty}
-                contentContainerStyle={styles.container}
-                onRefresh={topPicksQuery.refetch}
-                refreshing={topPicksQuery.isRefetching}
-                keyExtractor={(item) => String(item.getID())}
-                onReordered={handleReordering}
-                containerStyle={styles.container}
-                renderItem={RenderItem}
-            />
+            <View style={styles.wrapper}>
+                <DragList
+                    data={tracks}
+                    scrollEnabled={!isDragging}
+                    ListEmptyComponent={TopPicksEmpty}
+                    contentContainerStyle={styles.container}
+                    onRefresh={topPicksQuery.refetch}
+                    refreshing={topPicksQuery.isRefetching}
+                    keyExtractor={(item) => String(item.getID())}
+                    onReordered={handleReordering}
+                    containerStyle={styles.container}
+                    renderItem={RenderItem}
+                />
+            </View>
         </Queueable>
     );
 };

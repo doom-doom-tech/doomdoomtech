@@ -1,4 +1,4 @@
-import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native'
+import {ActivityIndicator, FlatList, StyleSheet, Text, View} from 'react-native'
 import {Fragment, useCallback, useMemo, useRef, useState} from "react";
 import useFeedRandom from "@/features/feed/hooks/useFeedRandom";
 import {FeedItemEntity} from "@/features/feed/types";
@@ -25,6 +25,11 @@ const RandomFeed = () => {
         return StyleSheet.create({
             container: {
                 paddingBottom: 400
+            },
+            footerText: {
+                paddingVertical: 24,
+                color: palette.granite,
+                textAlign: 'center',
             }
         })
     }, [])
@@ -47,7 +52,7 @@ const RandomFeed = () => {
                 </View>
             )
         } else {
-            return <Fragment />
+            return <Text style={styles.footerText}>That's all for now</Text>
         }
     }, [randomFeedQuery.isFetchingNextPage])
 

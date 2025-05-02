@@ -16,7 +16,7 @@ export interface IMediaCompressionService {
 }
 
 @singleton()
-class MediaCompressionService extends Service implements IMediaCompressionService {
+export default class MediaCompressionService extends Service implements IMediaCompressionService {
 
     constructor(
         @inject("UserService") private userService: IUserService,
@@ -165,5 +165,3 @@ class MediaCompressionService extends Service implements IMediaCompressionServic
         });
     };
 }
-
-MediaCompressionService.register()

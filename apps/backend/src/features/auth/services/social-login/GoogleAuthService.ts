@@ -6,7 +6,6 @@ import {OAuthUserInfo} from "../../types";
 import {container, inject, singleton} from "tsyringe";
 import Service, {IServiceInterface} from "../../../../common/services/Service";
 import {SingleUserInterface} from "../../../user/types";
-import {UserMapper} from "../../../user/mappers/UserMapper";
 import {SingleUserMapper} from "../../../user/mappers/SingleUserMapper";
 import {IListService} from "../../../list/services/ListService";
 import {IAuthService} from "../AuthService";
@@ -45,7 +44,7 @@ class GoogleAuthService extends Service implements IGoogleAuthService {
 		let user = SingleUserMapper.format(
 			await this.db.user.findUnique({
 				where: { email: userInfo.email },
-				select: UserMapper.getSelectableFields()
+				select: SingleUserMapper.getSelectableFields()
 			})
 		);
 

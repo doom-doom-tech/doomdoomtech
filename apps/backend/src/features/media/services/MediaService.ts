@@ -130,7 +130,6 @@ class MediaService extends Service implements IMediaService {
     }
 
     private async compressFile(file: Express.Multer.File): Promise<Buffer> {
-
         const mediaCompressionService = container.resolve<IMediaCompressionService>("MediaCompressionService")
 
         switch (true) {

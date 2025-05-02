@@ -11,6 +11,7 @@ import {MoisesPollingMastering} from "../../features/track/jobs/MoisesPollingMas
 import {MoisesPollingMetadata} from "../../features/track/jobs/MoisesPollingMetadata";
 import AlgoliaService, {IAlgoliaService} from "../services/AlgoliaService";
 import AlgoliaController, {IAlgoliaController} from "../controllers/AlgoliaController";
+import MediaCompressionService from "../../features/media/services/MediaCompressionService";
 
 /**
  * Auto-register all classes in the specified directories into the DI container
@@ -35,7 +36,9 @@ export const autoRegisterServices = async (): Promise<void> => {
         useClass: MoisesPollingMastering,
     });
 
-
+    container.register("MediaCompressionService", {
+        useClass: MediaCompressionService,
+    });
 
     const folders = [
         "services",

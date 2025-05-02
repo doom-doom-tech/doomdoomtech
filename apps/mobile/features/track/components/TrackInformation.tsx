@@ -1,10 +1,12 @@
 import {StyleSheet, View} from 'react-native'
-import {useMemo} from "react";
+import {useCallback, useMemo} from "react";
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
 import {palette, spacing} from "@/theme";
-import Subtitle from "@/common/components/Subtitle";
 import Title from "@/common/components/Title";
 import EqualizerAnimation from "@/common/components/EqualizerAnimation";
+import Text from "@/common/components/Text";
+import User from '@/features/user/classes/User';
+import {router} from "expo-router";
 
 interface TrackInformationProps {
     center?: boolean
@@ -33,6 +35,11 @@ const TrackInformation = ({center}: TrackInformationProps) => {
             },
             artists: {
                 color: palette.granite
+            },
+            subtitle: {
+                fontSize: 12,
+                color: palette.granite,
+                textAlign: center ? 'center' : 'left'
             }
         })
     }, []);
@@ -41,10 +48,23 @@ const TrackInformation = ({center}: TrackInformationProps) => {
         return track.getArtists().map(artist => artist.getUsername()).join(', ')
     }, [track])
 
+    const handleRouteArtist = useCallback((artist: User) => () => {
+        router.push(`/user/${artist.getID()}`)
+    }, [])
+
     return(
         <View style={styles.wrapper}>
             <Title content={track.getTitle()} center={center} append={<EqualizerAnimation size={18} />} />
-            <Subtitle content={artists} center={center} />
+            <Text style={styles.subtitle}>
+                { track.getArtists().map(artist => (
+                    <Text onPress={handleRouteArtist(artist)}>
+                        {
+                            artist.getUsername()
+                        }
+                    </Text>
+                ))}
+            </Text>
+            {/*<Subtitle content={artists} center={center} />*/}
         </View>
     )
 }

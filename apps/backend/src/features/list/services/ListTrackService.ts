@@ -50,13 +50,26 @@ class ListTrackService extends Singleton implements IListTrackService {
                 data: { position: { increment: 1 } },
             });
 
-            await db.listTrack.create({
-                data: {
-                    trackID: data.trackID,
-                    listID: list.id,
-                    position: 0,
-                }
-            });
+            const existing = await db.listTrack.findUnique({
+                where: {
+                    listID_trackID: {
+                        listID: list.id,
+                        trackID: data.trackID,
+                    }
+                },
+            })
+
+            console.log(Boolean(existing))
+
+            if(!existing) {
+                await db.listTrack.create({
+                    data: {
+                        trackID: data.trackID,
+                        listID: list.id,
+                        position: 0,
+                    }
+                });
+            }
 
             const redisKey = `cg:${Context.get("authID")}:list:tracks`;
             const cachedListTracks = await this.redis.lrange(redisKey, 0, -1);

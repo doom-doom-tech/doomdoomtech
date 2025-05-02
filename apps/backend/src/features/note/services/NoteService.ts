@@ -228,7 +228,14 @@ class NoteService extends Service implements INoteService {
             fetchFunction: async (params) => await this.db.note.paginate({
                 where: {
                     OR: [
-                        { userID: data.userID }
+                        {
+                            userID: data.userID,
+                            loop: false
+                        },
+                        {
+                            looperID: data.userID,
+                            loop: true
+                        }
                     ]
                 },
                 select: NoteMapper.getSelectableFields(),
