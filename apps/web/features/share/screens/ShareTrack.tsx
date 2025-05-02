@@ -58,11 +58,7 @@ const ShareTrack = () => {
                 <MetaData
                     title={`${artist} - ${title}`}
                     image={image}
-                    url={`https://doomdoom.tech/share?artist=${encodeURIComponent(
-                        artist
-                    )}&title=${encodeURIComponent(title)}&image=${encodeURIComponent(
-                        image
-                    )}`}
+                    url={`https://doomdoom.tech/share?id=${encodeURIComponent(id)}&artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}&image=${encodeURIComponent(image)}`}
                 />
                 <ShareContent {...{ id, title, artist, image }} />
             </View>

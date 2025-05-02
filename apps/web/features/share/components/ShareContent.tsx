@@ -20,7 +20,7 @@ const ShareContent = ({id, title, artist, image}: ShareContentProps) => {
             wrapper: {
                 gap: spacing.s,
                 width: width || '100vw',
-                width: height || '100vw',
+                height: height || '100vh',
                 alignItems: 'center',
                 justifyContent: 'center',
             },
