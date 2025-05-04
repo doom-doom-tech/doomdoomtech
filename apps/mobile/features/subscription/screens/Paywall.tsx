@@ -116,7 +116,7 @@ const Paywall = () => {
         },
         {
             label: "",
-            user: "Use up to 5 label tags per upload and spotlight your tracks to your favorite labels and A&R managers."
+            user: "Use up to 5 label tags per upload and spotlight your tracks to your favorite labels."
         },
     ]
 

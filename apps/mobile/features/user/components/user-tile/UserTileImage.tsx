@@ -45,6 +45,17 @@ const UserTileImage = ({size, selectable, selected, onSelect = _.noop}: UserTile
                 justifyContent: 'center',
                 alignItems: 'center',
                 backgroundColor: selected ? palette.olive : palette.lightgrey
+            },
+            badgeCircle: {
+                width: 32,
+                height: 32,
+                borderRadius: 32,
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: palette.premium
             }
         })
     }, [size, selected]);
@@ -58,7 +69,14 @@ const UserTileImage = ({size, selectable, selected, onSelect = _.noop}: UserTile
     }, [user, onSelect])
 
     const SelectionComponent = useCallback(() => {
-        if(!selectable) return <Fragment />
+        // if(!selectable && user.isPremium()) return (
+        //     <View style={styles.badgeCircle}>
+        //         <PremiumFeature />
+        //     </View>
+        // )
+
+        if(!selectable && !user.isPremium()) return <Fragment />
+
         return(
             <View style={styles.selectionCircle}>
                 { selected && <Check color={palette.black}/> }
@@ -70,6 +88,7 @@ const UserTileImage = ({size, selectable, selected, onSelect = _.noop}: UserTile
         return (
             <TouchableOpacity style={styles.wrapper} onPress={handleRouteUser}>
                 <User />
+                <SelectionComponent />
             </TouchableOpacity>
         )
     }

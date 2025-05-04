@@ -13,6 +13,8 @@ import {useUploadSettings} from "@/features/upload/store/upload-settings";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
 import * as Crypto from "expo-crypto";
 import Purchases from "react-native-purchases";
+import {useUploadProgressStoreSelectors} from "@/features/upload/store/upload-progress";
+import {TrackInterface} from "@/features/track/types";
 
 interface UploadCompleteActionsProps {
 
@@ -27,6 +29,8 @@ const UploadCompleteActions = ({}: UploadCompleteActionsProps) => {
     const { premiumEnabled } = useUploadSettings()
 
     const { packages, setCustomer } = usePaymentContext()
+
+    const setUploadProgressState = useUploadProgressStoreSelectors.setState()
 
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -104,12 +108,14 @@ const UploadCompleteActions = ({}: UploadCompleteActionsProps) => {
                     ...filePayload
                 };
 
-                createTrackMutation.mutate(payload);
-            }, 300); // Delay execution slightly to allow navigation to complete
+                setUploadProgressState({ track: payload as unknown as TrackInterface, active: true })
+
+                createTrackMutation.mutate(payload as any);
+            }, 300);
 
             router.dismissTo('/upload/overview');
             router.back();
-        } catch (error) {
+        } catch (error: any) {
             Toast.show(formatServerErrorResponse(error), TOASTCONFIG.error);
         } finally {
             setLoading(false);

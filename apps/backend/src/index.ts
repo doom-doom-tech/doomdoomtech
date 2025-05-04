@@ -124,6 +124,9 @@ async function bootstrap() {
             apiKey: "f1cb2c553f196d0caec92ac9b081f2f4-us12",
             server: "us12",
         });
+
+        console.log('emitting')
+        await new SocketManager(io).emitToRoom(`user_14`, 'track:upload:complete', {})
     } catch (error) {
         console.error("Failed to start the server:", error);
         process.exit(1);

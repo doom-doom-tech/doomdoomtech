@@ -10,10 +10,13 @@ import {TODO} from "@/common/types/common";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import FeedPersonalizationTrigger from "@/features/feed/components/FeedPersonalizationTrigger";
 import {palette, spacing} from "@/theme";
+import {useUploadProgressStoreSelectors} from "@/features/upload/store/upload-progress";
 
 const RandomFeed = () => {
 
     const user = useGlobalUserContext()
+
+    const progressActive = useUploadProgressStoreSelectors.active()
 
     const randomFeedQuery = useFeedRandom()
 
@@ -42,7 +45,7 @@ const RandomFeed = () => {
         if(!user) return <Fragment />
         if(user.getSettings().events >= 100) return <Fragment />
         return <FeedPersonalizationTrigger />
-    }, [user])
+    }, [user, progressActive])
 
     const ListFooterComponent = useMemo(() => {
         if(randomFeedQuery.isFetchingNextPage) {

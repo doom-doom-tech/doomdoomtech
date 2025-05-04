@@ -105,7 +105,7 @@ const UserHeaderContent = ({}: UserHeaderContentProps) => {
                 <Brush style={styles.brush} color={palette.black} />
             </TouchableOpacity>
         )
-    }, [user, currentUser, handleEditUser])
+    }, [user, currentUser, handleEditUser, premiumMember])
 
     return(
         <View style={styles.wrapper}>

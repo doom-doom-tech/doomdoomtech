@@ -17,7 +17,7 @@ import _ from "lodash";
 import {Syne_400Regular, Syne_500Medium, Syne_700Bold, Syne_800ExtraBold} from "@expo-google-fonts/syne";
 
 // Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 const Initialize = () => {
 
@@ -123,12 +123,14 @@ const Initialize = () => {
                 await requestFreshSession()
                 await validateSubscriptionState()
 
-                // Hide splash screen once fonts are loaded and initialization is complete
+                // Hide the splash screen once fonts are loaded and initialization is complete
                 await SplashScreen.hideAsync()
             }
         }
 
-        initialize()
+        SplashScreen.hideAsync()
+
+        initialize().then()
     }, [fontsLoaded]);
 
     useEffect(() => {

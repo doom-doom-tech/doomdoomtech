@@ -33,6 +33,7 @@ import {SingleUserInterface} from "../../user/types";
 import {TrackQueue} from "../queues/TrackQueue";
 import {IQueue} from "../../../common/types";
 import {PrepareNotifyFollowersNewUploadPayload} from "../jobs/PrepareNotifyFollowersNewUpload";
+import SocketManager from "../../../common/services/SocketManager";
 
 export interface ITrackService extends IServiceInterface {
     all(data: FetchTracksRequest): Promise<PaginationResult<TrackInterface>>
@@ -379,7 +380,13 @@ class TrackService extends Service implements ITrackService {
             })
         }
 
-        return TrackMapper.format(track)
+        const formattedTrack = TrackMapper.format(track);
+
+        // // Emit socket event for track creation
+        const socketManager = container.resolve<SocketManager>("SocketManager");
+        socketManager && await socketManager.emitToRoom(`user_${data.authID}`, 'track:upload:complete', {})
+
+        return formattedTrack
     }
 
     public async latest (data: FetchRankedListRequest) {

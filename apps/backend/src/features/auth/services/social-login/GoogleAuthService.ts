@@ -41,18 +41,17 @@ class GoogleAuthService extends Service implements IGoogleAuthService {
 	}
 
 	private async findOrCreateUser(userInfo: OAuthUserInfo): Promise<SingleUserInterface> {
-		let user = SingleUserMapper.format(
-			await this.db.user.findUnique({
-				where: { email: userInfo.email },
-				select: SingleUserMapper.getSelectableFields()
-			})
-		);
 
-		if (!user) {
-			user = await this.registerNewUser(userInfo);
+		let foundUser = await this.db.user.findUnique({
+			where: { email: userInfo.email },
+			select: SingleUserMapper.getSelectableFields()
+		});
+
+		if (!foundUser) {
+			foundUser = await this.registerNewUser(userInfo) as any;
 		}
 
-		return user;
+		return SingleUserMapper.format(foundUser);
 	}
 
 	private async registerNewUser(userInfo: OAuthUserInfo): Promise<SingleUserInterface> {

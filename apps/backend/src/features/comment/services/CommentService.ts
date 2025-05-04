@@ -262,6 +262,8 @@ class CommentService extends Service implements ICommentService {
 		const recipients = await notificationService.getNotifiableRecipients(data, db);
 
 		for (const recipient of recipients) {
+			if(recipient.id === data.authID) continue;
+
 			await notificationService.bindTransactionClient(db).trigger({
 				title: recipient.username,
 				userID: data.authID,

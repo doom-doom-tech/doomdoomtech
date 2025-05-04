@@ -15,7 +15,7 @@ const CreditFunds = ({amount = 0}: CreditFundsProps) => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                height: 50,
+                height: 56,
                 gap: spacing.s,
                 paddingHorizontal: spacing.m,
                 flexDirection: 'row',

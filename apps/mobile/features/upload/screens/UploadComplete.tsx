@@ -9,11 +9,7 @@ import UploadCompleteCaption from "@/features/upload/components/upload-complete/
 import UploadCompletePaymentBanner from "@/features/upload/components/upload-complete/UploadCompletePaymentBanner";
 import Scroll from "@/common/components/Scroll";
 
-interface UploadCompleteProps {
-
-}
-
-const UploadComplete = ({}: UploadCompleteProps) => {
+const UploadComplete = () => {
 
     const styles = useMemo(() => {
         return StyleSheet.create({
