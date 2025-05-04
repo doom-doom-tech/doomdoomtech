@@ -38,9 +38,9 @@ export class AuthRouter extends BaseRouter {
 
 		const registrationLimiter = createDynamicRateLimiter({
 			windowMs: 60 * 60 * 1000,
-			limit: 1,
+			limit: 4,
 			handler: (_req: any, res: any) => {
-				res.status(429).json(formatErrorResponse('You can only register once per hour'));
+				res.status(429).json(formatErrorResponse('You can only register 4 accounts per hour'));
 			}
 		}) as any;
 
