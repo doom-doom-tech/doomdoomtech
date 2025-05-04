@@ -35,6 +35,8 @@ class NotifyFollowersNewUpload extends Singleton implements IJob<NotifyFollowers
         const queue = container
             .resolve<IQueue>("NotificationQueue");
 
+        console.log(followers)
+
         await queue.addJob("SendNotificationBatch", {
             notifications: _.map(followers, follower => ({
                 body: artist.username + ' ' + createNotificationText('Upload'),
@@ -42,7 +44,7 @@ class NotifyFollowersNewUpload extends Singleton implements IJob<NotifyFollowers
                 userID: artist.id,
                 entityID: trackID,
                 targetID: follower,
-                data: { url: `/tracks/${trackID}` },
+                data: { url: `/track/${trackID}` },
                 action: 'Upload',
                 entityType: 'Track',
             } as SendPushNotificationRequest)),

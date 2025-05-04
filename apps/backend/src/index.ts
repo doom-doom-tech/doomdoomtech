@@ -12,10 +12,6 @@ import Cachable from "./common/classes/cache/Cachable";
 import {RefreshSession} from "./features/session/middleware/RefreshSession";
 import QueueWorkerManager from "./common/queues/QueueWorkerManager";
 import {CronJobService} from "./common/services/CronjobService";
-import prisma from "./common/utils/prisma";
-import {Context} from "./common/utils/context";
-import {UserInterface} from "./features/user/types";
-import {INotificationService} from "./features/notification/services/NotificationService";
 
 require('dotenv').config()
 

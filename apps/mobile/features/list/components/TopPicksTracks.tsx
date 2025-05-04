@@ -35,11 +35,17 @@ const TopPicksTracks = () => {
 
     const styles = useMemo(() => {
         return StyleSheet.create({
-            container: {
-                height: height - 150,
+            contentContainer: {
+                flexGrow: 1,
                 paddingBottom: 200
             },
-            wrapper: {flex: 1}
+            container: {
+                flex: 1
+            },
+            wrapper: {
+                flex: 1,
+                height: '100%'
+            }
         });
     }, [height]);
 
@@ -127,7 +133,7 @@ const TopPicksTracks = () => {
                     data={tracks}
                     scrollEnabled={!isDragging}
                     ListEmptyComponent={TopPicksEmpty}
-                    contentContainerStyle={styles.container}
+                    contentContainerStyle={styles.contentContainer}
                     onRefresh={topPicksQuery.refetch}
                     refreshing={topPicksQuery.isRefetching}
                     keyExtractor={(item) => String(item.getID())}

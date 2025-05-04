@@ -1,6 +1,6 @@
 import {AppState, AppStateStatus, Platform, StyleSheet, View} from 'react-native';
 import {Image} from 'expo-image';
-import React, {Fragment, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useTrackContext} from '@/features/track/context/TrackContextProvider';
 import {useMediaStoreSelectors} from '@/common/store/media';
 import {State, useProgress} from 'react-native-track-player';
@@ -111,7 +111,7 @@ const TrackCover = ({ size = 100 }: TrackCoverProps) => {
      * If the app is not active, you can optionally return an empty view
      * to avoid playing/styling the video.
      */
-    if (currentAppState !== 'active') return <Fragment />;
+    // if (currentAppState !== 'active') return <Fragment />;
 
     /**
      * Render the video using expo-av

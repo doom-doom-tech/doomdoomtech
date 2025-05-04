@@ -5,10 +5,6 @@ import Brush from '@/assets/icons/Brush';
 import {useTopPicksStoreSelectors} from "@/features/list/store/top-picks";
 import ActionText from "@/common/components/ActionText";
 import useListUpdatePositions from "@/features/list/hooks/useListUpdate";
-import {ImageBackground} from "expo-image";
-import ChartsBackground from "@/assets/images/charts.png";
-import ChartsHeader from "@/features/charts/components/ChartsHeader";
-import ChartsTitle from "@/features/charts/components/ChartsTitle";
 
 const TopPicksHeader = () => {
 
@@ -34,7 +30,9 @@ const TopPicksHeader = () => {
     ), [state])
 
     return(
-        <Header title={""} RightComponent={RightComponent} />
+        <View style={{ height: 60, width: '100%' }}>
+            <Header title={""} RightComponent={RightComponent} />
+        </View>
     )
 }
 

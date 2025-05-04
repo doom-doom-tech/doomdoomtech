@@ -2,7 +2,6 @@ import {StyleSheet, View} from 'react-native'
 import {useCallback, useMemo} from "react";
 import Header from "@/common/components/header/Header";
 import Text from "@/common/components/Text";
-import Premium from '@/assets/icons/Premium';
 import {palette, spacing} from "@/theme";
 
 interface UploadBoostsHeaderProps {
@@ -32,7 +31,7 @@ const UploadBoostsHeader = ({}: UploadBoostsHeaderProps) => {
     const TitleComponent = useCallback(() => (
         <View style={styles.wrapper}>
             <Text style={styles.title}>Boost your track</Text>
-            <Premium style={styles.badge} />
+            {/*<Premium style={styles.badge} />*/}
         </View>
     ), [])
 

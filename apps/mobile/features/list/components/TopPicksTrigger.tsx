@@ -1,8 +1,6 @@
-import {View, StyleSheet, TouchableOpacity} from 'react-native'
+import {StyleSheet, TouchableOpacity} from 'react-native'
 import {useCallback, useMemo, useRef, useState} from "react";
-import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
-import HeartFilled from "@/assets/icons/HeartFilled";
 import Heart from "@/assets/icons/Heart";
 import LottieView from "lottie-react-native";
 import {router} from "expo-router";
@@ -11,6 +9,7 @@ import useListSaveTrack from "@/features/list/hooks/useListSaveTrack";
 import useListRemoveTrack from "@/features/list/hooks/useListRemoveTrack";
 import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
 import useEventListener from "@/common/hooks/useEventListener";
+import {Audio} from "expo-av";
 
 interface TopPicksTriggerProps {
 
@@ -46,7 +45,7 @@ const TopPicksTrigger = ({}: TopPicksTriggerProps) => {
         })
     }, []);
 
-    const manageSaveTrack = useCallback(() => {
+    const manageSaveTrack = useCallback(async () => {
         if(!user) return router.push('/auth')
 
         if(saved) {
@@ -56,6 +55,9 @@ const TopPicksTrigger = ({}: TopPicksTriggerProps) => {
 
         saveTrackMutation.mutate({ trackID: track.getID() })
         saveToTopPicks(track.getID())
+
+        const { sound } = await Audio.Sound.createAsync(require('@/assets/sounds/save.wav'));
+        await sound.playAsync();
     }, [saved, track, user])
 
     const catchSaveTrackEvent = useCallback((trackID: number) => {

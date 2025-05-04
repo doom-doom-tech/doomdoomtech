@@ -8,6 +8,8 @@ import {router} from "expo-router";
 import {useEditUserStoreSelectors} from "@/features/user/store/edit-user";
 import Hashtag from "@/assets/icons/Hashtag";
 import UserImageCircle from "@/features/user/components/UserImageCircle";
+import {usePaymentContext} from "@/common/context/PaymentContextProvider";
+import PremiumFeature from "@/assets/icons/PremiumFeature";
 
 interface UserHeaderContentProps {
 
@@ -17,6 +19,8 @@ const UserHeaderContent = ({}: UserHeaderContentProps) => {
 
     const user = useSingleUserContext()
     const currentUser = useGlobalUserContext()
+
+    const { premiumMember } = usePaymentContext()
 
     const setEditUserState = useEditUserStoreSelectors.setState()
 
@@ -51,6 +55,16 @@ const UserHeaderContent = ({}: UserHeaderContentProps) => {
                 bottom: 0,
                 right: 0
             },
+            premiumCircle: {
+                padding: 4,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 120,
+                position: 'absolute',
+                backgroundColor: palette.premium,
+                bottom: 0,
+                right: 0
+            },
             brush: {
                 width: 16,
                 height: 16,
@@ -75,6 +89,12 @@ const UserHeaderContent = ({}: UserHeaderContentProps) => {
         if(user.isLabel()) return  (
             <TouchableOpacity activeOpacity={0.5} style={styles.labelCircle} onPress={handleEditUser}>
                 <Hashtag color={palette.offwhite} />
+            </TouchableOpacity>
+        )
+
+        if(premiumMember) return (
+            <TouchableOpacity activeOpacity={0.5} style={styles.premiumCircle} onPress={handleEditUser}>
+                <PremiumFeature color={palette.offwhite} />
             </TouchableOpacity>
         )
 

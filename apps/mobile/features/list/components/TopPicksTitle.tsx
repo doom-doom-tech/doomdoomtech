@@ -1,6 +1,4 @@
-import { View, StyleSheet } from 'react-native'
-import {useMemo} from "react";
-import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
+import {StyleSheet, View} from 'react-native'
 import Text from "@/common/components/Text";
 import {palette, spacing} from "@/theme";
 import {Image} from "expo-image";
@@ -14,11 +12,11 @@ const ChartsTitle = ({}: ChartsTitleProps) => {
 
     const styles = StyleSheet.create({
         wrapper: {
-            paddingVertical: 50
+            paddingVertical: 24
         },
         title: {
             fontSize: 32,
-            fontWeight: 900,
+            fontFamily: 'SyneExtraBold',
             color: palette.offwhite,
             paddingLeft: spacing.m,
         },
@@ -31,7 +29,7 @@ const ChartsTitle = ({}: ChartsTitleProps) => {
         },
         waveform: {
             position: 'absolute',
-            bottom: 50,
+            bottom: 24,
             width: '100%',
             height: 40
         }

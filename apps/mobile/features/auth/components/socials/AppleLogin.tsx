@@ -26,8 +26,8 @@ const GoogleLogin = () => {
 
 			await socialLoginMutation.mutateAsync({
 				platform: 'apple',
-				firstName: credentials.fullName.givenName,
-				lastName: credentials.fullName.familyName,
+				firstName: credentials.fullName?.givenName ?? '',
+				lastName: credentials.fullName?.familyName ?? '',
 				email: credentials.email,
 				token: credentials.user,
 				avatar_url: null

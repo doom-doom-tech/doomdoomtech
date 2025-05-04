@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@algolia/client-insights": "^5.21.0",
+    "@expo-google-fonts/syne": "^0.3.0",
     "@expo/react-native-action-sheet": "^4.1.0",
     "@expo/vector-icons": "^14.0.4",
     "@gorhom/bottom-sheet": "^5.1.1",
@@ -40,7 +41,7 @@
     "expo-dev-client": "~5.0.11",
     "expo-device": "~7.0.2",
     "expo-document-picker": "~13.0.3",
-    "expo-font": "~13.0.3",
+    "expo-font": "~13.0.4",
     "expo-haptics": "~14.0.1",
     "expo-image": "~2.0.4",
     "expo-image-picker": "~16.0.5",

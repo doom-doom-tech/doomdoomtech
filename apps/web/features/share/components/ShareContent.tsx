@@ -30,7 +30,7 @@ const ShareContent = ({id, title, artist, image}: ShareContentProps) => {
             textAlign: 'center',
             color: palette.offwhite
         },
-    })
+    }) as any
 
     const handleRouteApp = async () => {
         await Linking.openURL(`doomdoomtech://track/${id}`)

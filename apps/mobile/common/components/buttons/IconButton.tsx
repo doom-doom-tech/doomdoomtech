@@ -1,8 +1,7 @@
-import {DeviceEventEmitter, StyleSheet, TouchableOpacity, View} from 'react-native'
-import {ReactElement, useMemo} from "react";
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {ReactElement} from "react";
 import {palette} from "@/theme";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
-import PremiumBadge from "@/assets/icons/PremiumBadge";
 import PremiumFeature from "@/assets/icons/PremiumFeature";
 import {router} from "expo-router";
 
@@ -22,7 +21,7 @@ const IconButton = ({notify, premium, icon, fill, callback}: IconButtonProps) =>
         wrapper: {
             borderRadius: 4,
             width: 50, height: 50,
-            backgroundColor: premium ? palette[fill].concat('50') : palette[fill]
+            backgroundColor: (premium && !premiumMember) ? palette[fill].concat('50') : palette[fill]
         },
         touchable: {
             width: 50, height: 50,
@@ -50,7 +49,7 @@ const IconButton = ({notify, premium, icon, fill, callback}: IconButtonProps) =>
             <TouchableOpacity style={styles.touchable} activeOpacity={0.5} onPress={handlePress}>
                 {icon}
             </TouchableOpacity>
-            { premium && (
+            { premium && !premiumMember && (
                 <View style={styles.icon}>
                     <PremiumFeature />
                 </View>

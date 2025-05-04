@@ -11,6 +11,7 @@ import {usePaymentContext} from "@/common/context/PaymentContextProvider";
 import Close from "@/assets/icons/Close";
 import {router} from "expo-router";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
+import Background from "@/assets/images/paywall.png"
 
 const Paywall = () => {
 
@@ -113,6 +114,10 @@ const Paywall = () => {
             label: "See who’s viewing your label profile, giving you valuable insights into the artists and fans engaging with your brand.",
             user: "Increase your music's visibility and chances of appearing in playlists and recommendations."
         },
+        {
+            label: "",
+            user: "Use up to 5 label tags per upload and spotlight your tracks to your favorite labels and A&R managers."
+        },
     ]
 
     const triggerPayment = async () => {
@@ -131,7 +136,7 @@ const Paywall = () => {
     return(
         <View style={styles.screen}>
             <ScrollView contentContainerStyle={styles.wrapper}>
-                <Image style={styles.background} source={require("@/assets/images/paywall.png")} />
+                <Image style={styles.background} source={Background} />
 
                 <View style={styles.pane}>
                     <View style={styles.content}>
@@ -146,7 +151,9 @@ const Paywall = () => {
                         </Text>
 
                         <View style={styles.usps}>
-                            { usps.map((usp, index) => (
+                            { usps
+                                .filter(usp => usp[user!.isLabel() ? 'label' : 'user'] !== "")
+                                .map((usp, index) => (
                                 <View style={styles.usp}>
                                     <CheckCircle color={palette.olive} />
                                     <Text style={styles.text}>
@@ -160,7 +167,7 @@ const Paywall = () => {
                             fill={'olive'}
                             loading={loading}
                             callback={triggerPayment}
-                            label={"Try free for 1 month"}
+                            label={"Try 1 month for free"}
                         />
                         <Text style={styles.disclaimer}>
                             1-month free trial, then €10/month. Auto-renews unless canceled before trial ends. Manage or cancel anytime in your account settings.

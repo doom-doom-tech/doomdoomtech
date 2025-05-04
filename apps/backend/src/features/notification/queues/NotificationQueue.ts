@@ -9,7 +9,7 @@ class NotificationQueue extends Singleton implements IQueue {
 
 	public constructor() {
 		super()
-		this.queue = new Queue('notificationQueue', { connection: this.redis })
+		this.queue = new Queue('NotificationQueue', { connection: this.redis })
 	}
 
 	public async initialize(): Promise<void>

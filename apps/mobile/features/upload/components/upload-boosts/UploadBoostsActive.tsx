@@ -1,9 +1,10 @@
 import {StyleSheet, View} from 'react-native'
-import {useCallback, useMemo} from "react";
+import React, {useCallback, useMemo} from "react";
 import SwitchConsent from "@/common/components/consent/SwitchConsent";
-import {spacing} from "@/theme";
+import {palette, spacing} from "@/theme";
 import {useUploadSettings, useUploadSettingsStoreSelectors} from "@/features/upload/store/upload-settings";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
+import Text from "@/common/components/Text";
 
 interface UploadBoostsActiveProps {
 
@@ -20,6 +21,12 @@ const UploadBoostsActive = ({}: UploadBoostsActiveProps) => {
             wrapper: {
                 paddingHorizontal: spacing.m
             },
+            disclaimer: {
+                textAlign: 'center',
+                fontSize: 12,
+                color: palette.granite,
+                marginTop: 8,
+            }
         })
     }, []);
 
@@ -30,6 +37,9 @@ const UploadBoostsActive = ({}: UploadBoostsActiveProps) => {
     return(
         <View style={styles.wrapper}>
             <SwitchConsent label={"Activate"} value={premiumEnabled} callback={togglePremium} />
+            <Text style={styles.disclaimer}>
+                1-month free trial, then €10/month. Auto-renews unless canceled before trial ends. Manage or cancel anytime in your account settings.
+            </Text>
         </View>
     )
 }

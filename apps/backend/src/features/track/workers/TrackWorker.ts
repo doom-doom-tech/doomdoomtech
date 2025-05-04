@@ -1,8 +1,9 @@
 import {singleton} from "tsyringe";
 import {Worker} from "bullmq";
 import Singleton from "../../../common/classes/injectables/Singleton";
-import {IWorker} from "../../../common/types";
+import {IJob, IWorker} from "../../../common/types";
 import {container} from "../../../common/utils/tsyringe";
+import {PrepareNotifyFollowersNewUploadPayload} from "../jobs/PrepareNotifyFollowersNewUpload";
 import {ComputeTrackScoresJob} from "../jobs/ComputeTrackScores";
 
 @singleton()
@@ -21,8 +22,18 @@ export class TrackWorker extends Singleton implements IWorker {
                     const computeJob = container.resolve<ComputeTrackScoresJob>("ComputeTrackScoresJob");
                     await computeJob.process();
                 }
+
+                if (job.name === "PrepareNotifyFollowersNewUpload") {
+                    const computeJob = container.resolve<IJob<PrepareNotifyFollowersNewUploadPayload>>("PrepareNotifyFollowersNewUpload");
+                    await computeJob.process(job);
+                }
+
+                if(job.name === "NotifyFollowersNewUpload") {
+                    const computeJob = container.resolve<IJob<PrepareNotifyFollowersNewUploadPayload>>("NotifyFollowersNewUpload");
+                    await computeJob.process(job);
+                }
             },
-            { connection: this.redis, concurrency: 1 }
+            { connection: this.redis, concurrency: 2 }
         );
 
         this.worker.on("completed", (job) => console.log(`Job ${job.id} completed.`));

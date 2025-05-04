@@ -27,6 +27,8 @@ const BottomPlayer = () => {
     const videoTranslation = useSharedValue(mediaType === 'video' ? 0 : 100);
     const videoOpacity = useSharedValue(mediaType === 'video' ? 1 : 0);
     const containerHeight = useSharedValue(current ? constants.TABBAR_PLAYER_HEIGHT : 0);
+    // Shared value for panning gesture
+    const panY = useSharedValue(0);
 
     const styles = useMemo(() => StyleSheet.create({
         container: {
@@ -70,23 +72,46 @@ const BottomPlayer = () => {
     }));
 
     const animatedVideoStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: videoTranslation.value }],
+        transform: [
+            { translateY: videoTranslation.value + panY.value },
+        ],
     }));
+
+    // Helper functions for animations
+    const fadeInAudioPlayer = useCallback(() => {
+        audioTranslation.value = withTiming(0, { duration: 300 });
+        audioOpacity.value = withTiming(1, { duration: 300 });
+    }, [audioTranslation, audioOpacity]);
+
+    const fadeInVideoPreview = useCallback(() => {
+        videoTranslation.value = withTiming(0, { duration: 300 });
+        videoOpacity.value = withTiming(1, { duration: 300 });
+    }, [videoTranslation, videoOpacity]);
 
     // Animate when mediaType or videoPreviewMinimized changes
     useEffect(() => {
         if (mediaType === 'audio' || (mediaType === 'video' && videoPreviewMinimized)) {
             containerHeight.value = withTiming(constants.TABBAR_PLAYER_HEIGHT, { duration: 300 });
-            audioTranslation.value = withTiming(0, { duration: 300 });
-            audioOpacity.value = withTiming(1, { duration: 300 });
-            videoTranslation.value = withTiming(100, { duration: 300 });
-            videoOpacity.value = withTiming(0, { duration: 300 });
+
+            // First fade out video completely
+            videoOpacity.value = withTiming(0, { duration: 200 }, () => {
+                // Then move it out of view
+                videoTranslation.value = withTiming(100, { duration: 100 });
+
+                // And fade in audio player with a slight delay
+                runOnJS(setTimeout)(fadeInAudioPlayer, 50);
+            });
         } else if (mediaType === 'video' && !videoPreviewMinimized) {
             containerHeight.value = withTiming(constants.TABBAR_PLAYER_HEIGHT, { duration: 300 });
-            videoTranslation.value = withTiming(0, { duration: 300 });
-            videoOpacity.value = withTiming(1, { duration: 300 });
-            audioTranslation.value = withTiming(100, { duration: 300 });
-            audioOpacity.value = withTiming(0, { duration: 300 });
+
+            // First fade out audio player
+            audioOpacity.value = withTiming(0, { duration: 200 }, () => {
+                // Then move it out of view
+                audioTranslation.value = withTiming(100, { duration: 100 });
+
+                // And fade in video preview with a slight delay
+                runOnJS(setTimeout)(fadeInVideoPreview, 50);
+            });
         } else {
             // No current track
             containerHeight.value = withTiming(0, { duration: 300 });
@@ -105,18 +130,54 @@ const BottomPlayer = () => {
     // Create a pan gesture for the video preview
     const panGesture = Gesture.Pan()
         .onUpdate((event) => {
-            // If swiping down, consider minimizing the video preview
-            if (event.translationY > 50 && !videoPreviewMinimized && mediaType === 'video') {
-                runOnJS(setMediaState)({ videoPreviewMinimized: true });
+            // Update panY to provide visual feedback during panning
+            if (!videoPreviewMinimized && mediaType === 'video') {
+                // Only allow downward movement (positive Y values)
+                if (event.translationY > 0) {
+                    panY.value = event.translationY;
+                }
+
+                // If swiping down far enough, minimize the video preview
+                if (event.translationY > 100) {
+                    // Animate the video preview out of view before minimizing
+                    videoOpacity.value = withTiming(0, { duration: 200 }, () => {
+                        // Only set videoPreviewMinimized after the fade-out animation completes
+                        runOnJS(setMediaState)({ videoPreviewMinimized: true });
+                    });
+                    // Animate the panY value to smoothly move the video out of view
+                    panY.value = withTiming(200, { duration: 200 });
+                }
+            }
+        })
+        .onEnd((event) => {
+            // If not minimizing, animate back to original position
+            if (event.translationY <= 100) {
+                panY.value = withTiming(0, { duration: 150 });
             }
         });
 
-    // Reset videoPreviewMinimized when a new video is played
+    // Track ID reference to handle track changes
+    const previousTrackIdRef = useSharedValue<number | null>(null);
+
+    // Update track ID reference when current track changes and reset videoPreviewMinimized for videos
     useEffect(() => {
-        if (mediaType === 'video') {
-            setMediaState({ videoPreviewMinimized: false });
+        // Get current track ID
+        const currentId = current ? current.getID() : null;
+
+        // If there's a track change
+        if (current && currentId !== previousTrackIdRef.value) {
+            // Store the new track ID
+            previousTrackIdRef.value = currentId;
+
+            // If the new track is a video, reset videoPreviewMinimized
+            if (mediaType === 'video') {
+                // Reset position
+                panY.value = 0;
+                // Reset videoPreviewMinimized state
+                setMediaState({ videoPreviewMinimized: false });
+            }
         }
-    }, [current]);
+    }, [current, mediaType, panY, setMediaState]);
 
     const Cover = useCallback(() => {
         if (!current) return <Fragment />;

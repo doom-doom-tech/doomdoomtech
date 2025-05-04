@@ -6,11 +6,12 @@ import {SendPushNotificationRequest} from "../types/requests";
 import {container} from "../../../common/utils/tsyringe";
 import {INotificationService} from "../services/NotificationService";
 
-
-export interface SendNotificationBatchPayload { notifications: Array<SendPushNotificationRequest> }
+export interface SendNotificationBatchPayload {
+    notifications: Array<SendPushNotificationRequest>
+}
 
 @singleton()
-export default class SendNotificationBatch extends Singleton implements IJob {
+export default class SendNotificationBatch extends Singleton implements IJob<SendNotificationBatchPayload> {
     /**
      * Process the job
      * @param job

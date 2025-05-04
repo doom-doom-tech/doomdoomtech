@@ -26,7 +26,7 @@ class NotificationWorker extends Singleton implements IWorker {
 						}
 						case "SendNotificationBatch": {
 							const computeJob = container.resolve<SendNotificationBatch>("SendNotificationBatch");
-							await computeJob.process(job.data);
+							await computeJob.process(job);
 							break;
 						}
 						default:

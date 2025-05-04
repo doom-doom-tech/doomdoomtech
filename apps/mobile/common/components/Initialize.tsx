@@ -14,12 +14,22 @@ import useMediaEvents from "@/common/hooks/useMediaEvents";
 import * as SplashScreen from 'expo-splash-screen';
 import useSubscriptionValidate from "@/features/subscription/hooks/useSubscriptionValidate";
 import _ from "lodash";
+import {Syne_400Regular, Syne_500Medium, Syne_700Bold, Syne_800ExtraBold} from "@expo-google-fonts/syne";
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 const Initialize = () => {
 
     useMediaEvents()
 
-    useFonts({ 'Syne': require('@/assets/fonts/SYNE.ttf')});
+    const [fontsLoaded] = useFonts({
+        Syne: require('@/assets/fonts/SYNE.ttf'),
+        SyneExtraBold: Syne_800ExtraBold,
+        SyneRegular: Syne_400Regular,
+        SyneMedium: Syne_500Medium,
+        SyneBold: Syne_700Bold,
+    });
 
     const responseListener = useRef<Notifications.EventSubscription>()
 
@@ -107,16 +117,19 @@ const Initialize = () => {
 
     useEffect(() => {
         const initialize = async () => {
-            await registerUserDevice()
-            await initializeTrackPlayer()
-            await requestFreshSession()
-            await validateSubscriptionState()
+            if (fontsLoaded) {
+                await registerUserDevice()
+                await initializeTrackPlayer()
+                await requestFreshSession()
+                await validateSubscriptionState()
 
-            setTimeout(() => SplashScreen.hideAsync(), 2000)
+                // Hide splash screen once fonts are loaded and initialization is complete
+                await SplashScreen.hideAsync()
+            }
         }
 
         initialize()
-    }, []);
+    }, [fontsLoaded]);
 
     useEffect(() => {
         responseListener.current = Notifications.addNotificationResponseReceivedListener(({notification}) => {
@@ -128,6 +141,11 @@ const Initialize = () => {
             responseListener.current && Notifications.removeNotificationSubscription(responseListener.current);
         };
     }, []);
+
+    // Only render the app content when fonts are loaded
+    if (!fontsLoaded) {
+        return null;
+    }
 
     return <Fragment />
 }

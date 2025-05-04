@@ -1,6 +1,4 @@
-import {View, StyleSheet, TouchableOpacity} from 'react-native'
-import {useCallback, useMemo} from "react";
-import { ViewStyle } from 'react-native/Libraries/StyleSheet/StyleSheetTypes'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
 import Text from "@/common/components/Text";
 import FilterIcon from "@/features/filter/components/FilterIcon";
 import {router} from "expo-router";
@@ -14,10 +12,13 @@ const ChartsHeader = ({}: ChartsHeaderProps) => {
 
     const styles = StyleSheet.create({
         wrapper: {
+            height: 60,
             flexDirection: 'row',
         },
         searchbar: {
             flex: 5,
+            height: 60,
+            justifyContent: 'center',
             marginHorizontal: spacing.m,
             backgroundColor: palette.black,
             borderRadius: 4,

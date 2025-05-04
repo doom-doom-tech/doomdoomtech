@@ -41,27 +41,31 @@ class DeviceService extends Service implements IDeviceService {
             }
         })
 
-
-
-        await this.db.device.upsert({
-            where: {
-                id: _.get(device, 'id', 0)
-            },
-            update: {
-                expo_device_id: data.expo_device_id ?? '',
-                device_token: data.device_token,
-                push_token: data.push_token,
-                platform: data.platform,
-                userID: data.userID
-            },
-            create: {
-                expo_device_id: data.expo_device_id ?? '',
-                device_token: data.device_token,
-                push_token: data.push_token,
-                platform: data.platform,
-                userID: data.userID
-            }
-        })
+        if (device) {
+            // Update existing device
+            await this.db.device.update({
+                where: {
+                    id: device.id
+                },
+                data: {
+                    expo_device_id: data.expo_device_id ?? '',
+                    push_token: data.push_token,
+                    platform: data.platform,
+                    userID: data.userID
+                }
+            })
+        } else {
+            // Create new device only if it doesn't exist
+            await this.db.device.create({
+                data: {
+                    expo_device_id: data.expo_device_id ?? '',
+                    device_token: data.device_token,
+                    push_token: data.push_token,
+                    platform: data.platform,
+                    userID: data.userID
+                }
+            })
+        }
     }
 }
 

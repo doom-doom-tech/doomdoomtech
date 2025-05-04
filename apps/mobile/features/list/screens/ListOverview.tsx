@@ -14,7 +14,7 @@ interface ListOverviewProps {
 
 const ListOverview = ({}: ListOverviewProps) => {
 
-    const { width } = useWindowDimensions()
+    const { width, height } = useWindowDimensions()
     const { top } = useSafeAreaInsets()
 
     const styles = useMemo(() => {
@@ -24,7 +24,7 @@ const ListOverview = ({}: ListOverviewProps) => {
             },
             header: {
                 width,
-                height: 250,
+                height: height * 0.25,
                 paddingTop: top,
                 marginTop: top * -1
             },

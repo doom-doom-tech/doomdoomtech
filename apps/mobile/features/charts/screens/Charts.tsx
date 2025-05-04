@@ -1,4 +1,4 @@
-import {DeviceEventEmitter, StyleSheet, useWindowDimensions, View} from 'react-native'
+import {DeviceEventEmitter, Platform, StyleSheet, useWindowDimensions, View} from 'react-native'
 import React, {useCallback, useEffect, useState} from "react";
 import Screen from "@/common/components/Screen";
 import {spacing} from "@/theme";
@@ -21,10 +21,11 @@ import LatestNotes from "@/features/charts/components/LatestNotes";
 import LatestVideos from '../components/LatestVideos';
 import Loading from "@/common/screens/Loading";
 import Animated, {useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
+import {StatusBar} from "expo-status-bar";
 
 const Charts = () => {
 
-    const { width } = useWindowDimensions()
+    const { width, height } = useWindowDimensions()
     const { top } = useSafeAreaInsets()
 
     const userFilter = useFilterStoreSelectors.user()
@@ -33,6 +34,8 @@ const Charts = () => {
     const setFilterState = useFilterStoreSelectors.setState()
     const period = useFilterStoreSelectors.period()
     const tag = useFilterStoreSelectors.label()
+
+    const spacingTOP = Platform.OS === 'android' ? top + 24 : top
 
     const [refetching, setRefetching] = useState<boolean>(false);
 
@@ -47,8 +50,8 @@ const Charts = () => {
         },
         header: {
             width,
-            height: 250,
-            paddingTop: top,
+            height: height * 0.25,
+            paddingTop: spacingTOP,
             marginTop: top * -1
         },
         container: {
@@ -122,6 +125,8 @@ const Charts = () => {
                         <LatestNotes />
                     </Animated.View>
                 </>
+
+                <StatusBar backgroundColor={'transparent'} />
             </Scroll>
         </Screen>
     )

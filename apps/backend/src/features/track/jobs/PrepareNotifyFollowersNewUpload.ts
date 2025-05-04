@@ -10,9 +10,9 @@ import {NotifyFollowersNewUploadPayload} from "./NotifyFollowersNewUpload";
 export interface PrepareNotifyFollowersNewUploadPayload { artist: SingleUserInterface, trackID: number }
 
 @singleton()
-class PrepareNotifyFollowersNewUpload extends Singleton implements IJob<PrepareNotifyFollowersNewUploadPayload> {
+export default class PrepareNotifyFollowersNewUpload extends Singleton implements IJob<PrepareNotifyFollowersNewUploadPayload> {
 
-    private readonly batchSize = 300
+    private readonly batchSize = 600
 
     /**
      * Process the job
@@ -48,11 +48,15 @@ class PrepareNotifyFollowersNewUpload extends Singleton implements IJob<PrepareN
      */
     private async getFollowersBatch(artist: SingleUserInterface, offset: number, limit: number) {
         const db = container.resolve<ExtendedPrismaClient>("Database");
+
+        console.log(Number(artist.id))
+
         const followers =  await db.follow.findMany({
             where: {
-                followsID: artist.id
+                followsID: Number(artist.id)
             },
             skip: offset,
+            take: limit,
         })
 
         return _.map(followers, follower => follower.userID)
