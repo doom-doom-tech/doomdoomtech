@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         icon: './assets/images/icon.png',
         scheme: 'doomdoomtech',
         userInterfaceStyle: 'automatic',
-        newArchEnabled: false,
+        newArchEnabled: true,
         splash: {
             image: './assets/images/splash.png',
             resizeMode: 'cover',
@@ -90,7 +90,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             },
         },
         experiments: {
-            typedRoutes: true,
+            typedRoutes: true
         },
         owner: 'doomdoom',
         runtimeVersion: '1.0.0',

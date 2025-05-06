@@ -1,4 +1,4 @@
-import {Redirect} from "expo-router";
+import {Redirect, SplashScreen} from "expo-router";
 import {StatusBar} from "expo-status-bar";
 import {Fragment, useEffect} from "react";
 import {LogBox} from "react-native";
@@ -12,11 +12,8 @@ Notifications.setNotificationHandler({
         shouldSetBadge: true,
     }),
 });
-//
-// SplashScreen.setOptions({
-//     duration: 3000,
-//     fade: false,
-// });
+
+SplashScreen.hideAsync()
 
 // Platform.OS === 'android' && SplashScreen.hide()
 

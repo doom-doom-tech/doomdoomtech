@@ -19,7 +19,6 @@ SplashScreen.setOptions({
     fade: true,
 });
 
-
 const queryClient = new QueryClient({})
 
 const defaultSheetOptions: NativeStackNavigationOptions = {

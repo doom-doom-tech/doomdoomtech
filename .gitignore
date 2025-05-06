@@ -47,7 +47,8 @@ yarn-error.log*
 /.idea/
 /.expo/
 
-/apps/mobile/ios/
-/apps/mobile/android/
+/apps/mobile/ios
+/apps/mobile/android
 /apps/web/.expo/
 /apps/mobile/.expo/
+/apps/functions

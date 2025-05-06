@@ -75,46 +75,6 @@ export default class MediaCompressionService extends Service implements IMediaCo
         return await fs.readFile(inputPath);
     };
 
-    // public audio = (inputPath: string): Promise<Buffer> => {
-    //     return new Promise((resolve, reject) => {
-    //         const passThrough = new PassThrough();
-    //         const buffers: Buffer[] = [];
-    //
-    //         console.log('Starting FFmpeg audio compression');
-    //
-    //         ffmpeg(inputPath)
-    //             .audioCodec('libmp3lame')
-    //             .audioBitrate('128k')
-    //             .audioChannels(2)
-    //             .audioFrequency(44100)
-    //             .outputOptions([
-    //                 '-compression_level 5',
-    //                 '-q:a 3',
-    //                 '-map_metadata -1',
-    //                 '-f mp3',
-    //             ])
-    //             .on("start", (cmd) => {
-    //                 console.log("FFmpeg process started:", cmd);
-    //             })
-    //             .on("progress", (progress) => {
-    //                 console.log(`Processing: ${progress.percent}% done`);
-    //             })
-    //             .on("error", (err) => {
-    //                 console.error("FFmpeg error:", err);
-    //                 reject(err);
-    //             })
-    //             .on("end", () => {
-    //                 console.log("FFmpeg process completed");
-    //                 resolve(Buffer.concat(buffers as any));
-    //             })
-    //             .pipe(passThrough);
-    //
-    //         passThrough.on("data", (chunk: Buffer) => {
-    //             buffers.push(chunk);
-    //         });
-    //     });
-    // }
-
     public image = async (inputPath: string): Promise<Buffer> => {
         return await sharp(inputPath)
             .webp({ quality: 80 })

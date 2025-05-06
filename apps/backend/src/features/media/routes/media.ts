@@ -6,7 +6,6 @@ import {IMediaProxyController} from "../../proxy/controllers/ProxyController";
 import {IMediaController} from "../controllers/MediaController";
 import Authorized from "../../auth/middleware/authorized";
 import multer from "multer";
-import path from "path";
 
 const upload = multer({ dest: 'uploads/' })
 
@@ -43,3 +42,5 @@ export class MediaRouter extends BaseRouter {
 		);
 	}
 }
+
+MediaRouter.register();
