@@ -33,6 +33,7 @@ import {SingleUserInterface} from "../../user/types";
 import {IQueue} from "../../../common/types";
 import {PrepareNotifyFollowersNewUploadPayload} from "../jobs/PrepareNotifyFollowersNewUpload";
 import SocketManager from "../../../common/services/SocketManager";
+import {v4} from "uuid";
 
 export interface ITrackService extends IServiceInterface {
     all(data: FetchTracksRequest): Promise<PaginationResult<TrackInterface>>
@@ -372,9 +373,11 @@ class TrackService extends Service implements ITrackService {
             const noteService = container.resolve<INoteService>("NoteService")
 
             const note = await noteService.create({
+                uuid: v4(),
                 content: data.note!,
                 authID: data.authID,
-                trackID: track.id
+                trackID: track.id,
+                attachments: []
             })
         }
 

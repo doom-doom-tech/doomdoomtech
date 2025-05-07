@@ -21,7 +21,7 @@ class MediaUpdateService extends Service implements IMediaUpdateService {
 
     public update = async (data: UpdateSourceRequest) => {
         // Find the media
-        const media = await this.db.media.findFirst({
+        const media = await this.db.media.findUnique({
             where: {
                 uuid: data.uuid
             }

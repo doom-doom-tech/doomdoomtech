@@ -457,7 +457,7 @@ enum MediaType {
 
 model Media {
     id   Int    @id @default(autoincrement())
-    uuid String @default(uuid())
+    uuid String @unique @default(uuid())
 
     url  String
     type MediaType
