@@ -15,10 +15,10 @@ export interface LikeNoteRequest extends NoteIDRequest, AuthenticatedRequest
 {}
 
 export interface CreateNoteRequest {
-    uuid?: string
+    uuid: string
     content: string
     trackID?: number
-    attachments?: Array<{ url: string, type: $Enums.MediaType }>
+    attachments: Array<{ url: string, type: $Enums.MediaType }>
 }
 
 export interface CreateNoteMediaRequest {

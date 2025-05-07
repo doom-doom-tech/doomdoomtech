@@ -9,7 +9,7 @@ import {formatMutationResponse, formatSuccessResponse} from "../../../common/uti
 import {ICommentService} from "../../comment/services/CommentService";
 import {EncodedCursorInterface} from "../../../common/types/pagination";
 import {AuthenticatedRequest} from "../../auth/types/requests";
-import {FormData, SearchQueryInterface} from "../../../common/types";
+import {SearchQueryInterface} from "../../../common/types";
 import _ from "lodash";
 import ValidationError from "../../../common/classes/errors/ValidationError";
 
@@ -19,7 +19,7 @@ export interface INoteController {
     single(req: Request<{ noteID: number }>, res: Response): Promise<void>;
     like(req: Request<{ noteID: number }>, res: Response): Promise<void>;
     unlike(req: Request<{ noteID: number }>, res: Response): Promise<void>;
-    create(req: Request<any, any, FormData<CreateNoteRequest>>, res: Response): Promise<void>;
+    create(req: Request<any, any, CreateNoteRequest>, res: Response): Promise<void>;
     loop(req: Request<NoteIDRequest, any, AuthenticatedRequest>, res: Response): Promise<void>;
     user(req: Request<{ userID: number }, any, any, FindUserNotesRequest>, res: Response): Promise<void>;
     comments(req: Request<{ noteID: number }, any, any, EncodedCursorInterface>, res: Response): Promise<void>;
@@ -69,7 +69,7 @@ class NoteController extends Controller implements INoteController {
         }
     }
 
-    public create = async (req: Request<any, any,  FormData<CreateNoteRequest>>, res: Response): Promise<void> => {
+    public create = async (req: Request<any, any,  CreateNoteRequest>, res: Response): Promise<void> => {
         try {
             const noteService = container.resolve<INoteService>("NoteService")
 
@@ -77,11 +77,11 @@ class NoteController extends Controller implements INoteController {
                 uuid: req.body.uuid,
                 content: req.body.content,
                 authID: Context.get('authID'),
-                attachments: req.body.attachments ? JSON.parse(req.body.attachments) : []
+                attachments: req.body.attachments ? req.body.attachments : []
             }
 
             if(req.body.trackID) {
-                _.set(requestObject, 'trackID', parseInt(req.body.trackID))
+                _.set(requestObject, 'trackID', req.body.trackID)
             }
 
             const note = await noteService.create(requestObject)
