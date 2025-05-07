@@ -1,4 +1,4 @@
-import {FlatList, FlatListProps, Text, View, ViewStyle} from "react-native";
+import {FlatList, FlatListProps, Text, View, ViewabilityConfig, ViewStyle, ViewToken} from "react-native";
 import {ReactElement, RefObject, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {InfiniteData, UseInfiniteQueryResult, UseQueryResult} from "@tanstack/react-query";
 import {palette, spacing} from "@/theme";
@@ -30,6 +30,8 @@ export interface ListProps<T> extends Omit<FlatListProps<T>, 'data'>{
     contentContainerStyle?: ViewStyle
     query?: UseQueryResult<Array<T>> | UseInfiniteQueryResult<InfiniteData<PaginatedQueryResponse<T>, unknown>, Error>
     renderItem: ({ item, index }: ListRenderItemPropsInterface<T>) => ReactElement
+    onViewableItemsChanged?: (info: { viewableItems: Array<ViewToken>, changed: Array<ViewToken> }) => void
+    viewabilityConfig?: ViewabilityConfig
 }
 
 export interface ListRenderItemPropsInterface<T> {
@@ -69,10 +71,9 @@ const List = <T,>({
     const [hasInitialFetch, setHasInitialFetch] = useState<boolean>(false)
     const prevDataRef = useRef<Array<T> | undefined>()
 
-    // Update internal refreshing state when refreshing prop changes
     useEffect(() => {
         if (rest.refreshing !== undefined) {
-            setRefreshing(rest.refreshing)
+            setRefreshing(rest.refreshing ?? false)
         }
     }, [rest.refreshing])
 

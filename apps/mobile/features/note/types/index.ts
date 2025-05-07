@@ -4,7 +4,7 @@ import {CommentInterface} from "@/features/comment/types";
 import {MediaInterface} from "@/features/media/types";
 
 export interface NoteAttachmentInterface {
-    type: "Video" | "Image" | "file"
+    type: "Video" | "Image" | "File"
     url: string
 }
 

@@ -1,4 +1,4 @@
-import {ActivityIndicator, FlatList, StyleSheet, Text, View} from 'react-native'
+import {ActivityIndicator, FlatList, StyleSheet, Text, View, ViewabilityConfig, ViewToken} from 'react-native'
 import {Fragment, useCallback, useMemo, useRef, useState} from "react";
 import useFeedRandom from "@/features/feed/hooks/useFeedRandom";
 import {FeedItemEntity} from "@/features/feed/types";
@@ -11,6 +11,7 @@ import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import FeedPersonalizationTrigger from "@/features/feed/components/FeedPersonalizationTrigger";
 import {palette, spacing} from "@/theme";
 import {useUploadProgressStoreSelectors} from "@/features/upload/store/upload-progress";
+import _ from 'lodash';
 
 const RandomFeed = () => {
 
@@ -23,6 +24,8 @@ const RandomFeed = () => {
     const flatListReference = useRef<FlatList>(null)
 
     const [isRefreshing, setIsRefreshing] = useState(false)
+
+    const [visibleIDs, setVisibleIDs] = useState<Set<number>>(new Set())
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -38,8 +41,8 @@ const RandomFeed = () => {
     }, [])
 
     const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<FeedItemEntity>) => (
-        <FeedRenderItem item={item} index={index} />
-    ), [])
+        <FeedRenderItem item={item} index={index} visible={item.getID && visibleIDs.has(item.getID())} />
+    ), [visibleIDs])
 
     const ListHeaderComponent = useMemo(() => {
         if(!user) return <Fragment />
@@ -66,6 +69,20 @@ const RandomFeed = () => {
         setTimeout(() => setIsRefreshing(false), 500)
     }, [randomFeedQuery])
 
+    const viewabilityConfig: ViewabilityConfig = {
+        itemVisiblePercentThreshold: 50,
+    }
+
+    const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
+        const ids = new Set<number>()
+        viewableItems.forEach(({ item }: { item: FeedItemEntity }) => {
+            if (_.isFunction(item.getID)) {
+                ids.add(item.getID())
+            }
+        })
+        setVisibleIDs(ids)
+    }).current
+
     useEventListener('feed:refetch', randomFeedQuery.refetch)
     useEventListener('feed:top', handleScrollToTop)
 
@@ -82,6 +99,8 @@ const RandomFeed = () => {
                 contentContainerStyle={styles.container}
                 ListHeaderComponent={ListHeaderComponent}
                 ListFooterComponent={ListFooterComponent}
+                viewabilityConfig={viewabilityConfig}
+                onViewableItemsChanged={onViewableItemsChanged}
             />
         </Queueable>
     )

@@ -100,7 +100,7 @@ export const convertToQueryResult = <T>(data: Array<T>) => ({
 }) as UseQueryResult<Array<T>, any>
 
 
-export const extractTypeFromMimetype = (mimetype: string): string => {
+export const extractTypeFromMimetype = (mimetype: string): "File" | "Video" | "Image" => {
     const mimeType = mimetype.toLowerCase();
 
     switch (true) {

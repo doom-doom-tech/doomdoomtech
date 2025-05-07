@@ -7,20 +7,14 @@ import CreateNoteAttachments from "@/features/note/components/create-note/Create
 import CreateNoteTracks from "@/features/note/components/create-note/CreateNoteTracks";
 import {palette, spacing} from "@/theme";
 import ActionText from "@/common/components/ActionText";
-import {extractTypeFromMimetype, formatServerErrorResponse, wait} from "@/common/services/utilities";
+import {extractTypeFromMimetype, formatServerErrorResponse, uploadFile, wait} from "@/common/services/utilities";
 import {TOASTCONFIG} from "@/common/constants";
 import Toast from "react-native-root-toast";
-import {API_BASE_URL, STORAGE_KEYS} from "@/common/services/api";
 import useNoteCreate from "@/features/note/hooks/useNoteCreate";
 import {useCreateNoteValues} from "@/features/note/store/create-note";
 import {router} from "expo-router";
 import CreateNoteTrack from "@/features/note/components/create-note/CreateNoteTrack";
-import {DocumentPickerAsset} from "expo-document-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
-import _ from "lodash";
 import * as Crypto from "expo-crypto";
-import {ImagePickerAsset} from "expo-image-picker";
 
 const CreateNote = () => {
 
@@ -45,28 +39,6 @@ const CreateNote = () => {
         });
     }, []);
 
-    const uploadFile = useCallback(async (file: DocumentPickerAsset | ImagePickerAsset, uuid: string) => {
-        try {
-            const bearer = await AsyncStorage.getItem(STORAGE_KEYS.AUTH)
-
-            const endpoint = `/media/upload?uuid=${uuid}&purpose=note.attachment`
-
-            const response = await FileSystem.uploadAsync(API_BASE_URL + endpoint, file.uri, {
-                httpMethod: 'PUT',
-                fieldName: 'file',
-                uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-                headers: {
-                    'Authorization': String(bearer),
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            return _.get(JSON.parse(response.body), 'data.upload.url', '')
-        } catch (error) {
-
-        }
-    }, [])
-
     const handleCreateNote = useCallback(async () => {
         try {
             setLoading(true)
@@ -77,24 +49,26 @@ const CreateNote = () => {
 
             const uuid = Crypto.randomUUID()
 
-            const payload = new FormData()
-
             let attachments = []
 
             for(let attachment of createNoteValues.attachments) {
                 attachments.push({
-                    url: await uploadFile(attachment, uuid) || '',
+                    url: await uploadFile(attachment, uuid, 'note.attachment') || '',
                     type: extractTypeFromMimetype(attachment.mimeType as string),
                 })
             }
 
-            payload.append('attachments', JSON.stringify(attachments));
+            console.log('finished upload')
+            console.log('constructing payload...')
 
-            payload.append('content', createNoteValues.content)
-
-            if(createNoteValues.track) {
-                payload.append('trackID', String(createNoteValues.track.getID()))
+            const payload = {
+                uuid: uuid,
+                attachments,
+                content: createNoteValues.content,
+                trackID: createNoteValues.track?.getID()
             }
+
+            console.log('calling mutation with payload: ', payload)
 
             await createNoteMutation.mutateAsync(payload)
 

@@ -12,20 +12,21 @@ import Album from "@/features/album/classes/Album";
 import FeedAlbum from "@/features/album/components/feed-album/FeedAlbum";
 import Advertisement from "@/features/advertising/components/advertisement/Advertisement";
 import SuggestedUsers from "@/features/user/components/SuggestedUsers";
+import VisiblityContextProvider from "@/common/context/VisiblityContextProvider";
 
 interface FeedRenderItemProps extends ListRenderItemPropsInterface<FeedItemEntity> {
-
+    visible: boolean
 }
 
-const FeedRenderItem = ({item, index}: FeedRenderItemProps) => {
-
-    console.log(item.getType())
-
+const FeedRenderItem = ({item, index, visible}: FeedRenderItemProps) => {
     switch (item.getType()) {
         case "Track": return (
-            <TrackContextProvider track={item as Track} key={item.getID() + index}>
-                <FeedTrack key={item.getID() + index} />
-            </TrackContextProvider>
+            <VisiblityContextProvider value={visible}>
+                <TrackContextProvider track={item as Track} key={item.getID() + index}>
+                    <FeedTrack key={item.getID() + index} />
+                </TrackContextProvider>
+            </VisiblityContextProvider>
+
         )
 
         case "Note": return (

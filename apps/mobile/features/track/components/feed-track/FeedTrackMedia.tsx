@@ -12,6 +12,7 @@ import {TOASTCONFIG} from "@/common/constants";
 import Toast from "react-native-root-toast";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import {router} from "expo-router";
+import {useVisiblityContext} from "@/common/context/VisiblityContextProvider";
 
 interface FeedTrackMediaProps {
 
@@ -24,6 +25,8 @@ const FeedTrackMedia = ({}: FeedTrackMediaProps) => {
     const user = useGlobalUserContext()
 
     const { width } = useWindowDimensions()
+
+    const visible = useVisiblityContext()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -49,7 +52,7 @@ const FeedTrackMedia = ({}: FeedTrackMediaProps) => {
     return(
         <GestureDetector gesture={doubleTap}>
             <View style={styles.wrapper}>
-                <TrackCover size={width} />
+                <TrackCover size={width} visible={visible} />
                 <FeedTrackShadow />
                 <FeedTrackInformation />
                 <FeedTrackAction />

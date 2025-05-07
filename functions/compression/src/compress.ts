@@ -9,6 +9,8 @@ import sharp from "sharp";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 
+require('dotenv').config()
+
 // Initialize AWS S3 client for DigitalOcean Spaces
 const s3Client = new S3Client({
     endpoint: 'https://ams3.digitaloceanspaces.com',

@@ -1,4 +1,4 @@
-import {Redirect, SplashScreen} from "expo-router";
+import {Redirect} from "expo-router";
 import {StatusBar} from "expo-status-bar";
 import {Fragment, useEffect} from "react";
 import {LogBox} from "react-native";
@@ -12,10 +12,6 @@ Notifications.setNotificationHandler({
         shouldSetBadge: true,
     }),
 });
-
-SplashScreen.hideAsync()
-
-// Platform.OS === 'android' && SplashScreen.hide()
 
 // Ignore all log notifications
 LogBox.ignoreAllLogs(true);
@@ -31,6 +27,8 @@ const APIKeys = {
 export default function Index() {
 
     const { checkForUpdates } = useExpoUpdates();
+
+    console.log('???')
 
     useEffect(() => {
         checkForUpdates();
