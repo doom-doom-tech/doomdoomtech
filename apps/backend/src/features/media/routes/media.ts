@@ -4,7 +4,7 @@ import BaseRouter from "../../../common/routes/BaseRouter";
 import {container} from "../../../common/utils/tsyringe";
 import {IMediaProxyController} from "../../proxy/controllers/ProxyController";
 import {IMediaController} from "../controllers/MediaController";
-import Authorized from "../../auth/middleware/authorized";
+import Authorized from "../../auth/middleware/Authorized";
 import multer from "multer";
 
 const upload = multer({ dest: 'uploads/' })
@@ -30,10 +30,8 @@ export class MediaRouter extends BaseRouter {
 		this.router.put(
 			'/upload',
 			Authorized,
-			//@ts-ignore
 			(upload as any).single('file'),
-			//@ts-ignore
-			mediaController.upload
+			mediaController.upload as any
 		);
 
 		this.router.get(

@@ -47,7 +47,6 @@ export interface ITrackService extends IServiceInterface {
     latestVideos(data: FetchRankedListRequest): Promise<PaginationResult<TrackInterface>>
     mostPopular(data: FetchRankedListRequest): Promise<PaginationResult<TrackInterface>>
     delete(data: TrackIDRequest): Promise<void>
-    update(data: Prisma.TrackUpdateArgs): Promise<TrackInterface>
 }
 
 @singleton()
@@ -614,14 +613,6 @@ class TrackService extends Service implements ITrackService {
                 deleted: true
             }
         })
-    }
-
-    public async update(data: Prisma.TrackUpdateArgs) {
-        const track = await this.db.track.update({
-            ...data, select: TrackMapper.getSelectableFields()
-        })
-        await this.deleteFromCache(`tracks:${track.id}`)
-        return TrackMapper.format(track)
     }
 
     private async formatAdditionalWhereClause(data: FetchRankedListRequest): Promise<Prisma.TrackWhereInput> {

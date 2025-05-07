@@ -7,9 +7,9 @@ import {INoteController} from "../../note/controllers/NoteController";
 import {IFollowController} from "../../follow/controllers/FollowController";
 import {IListTrackController} from "../../list/controllers/ListController";
 import UserBlockRouter from "./UserBlockRouter";
-import Authorized from "../../auth/middleware/authorized";
-import authorized from "../../auth/middleware/authorized";
-import Subscribed from "../../auth/middleware/subscribed";
+import Authorized from "../../auth/middleware/Authorized";
+import authorized from "../../auth/middleware/Authorized";
+import Subscribed from "../../auth/middleware/Subscribed";
 
 @injectable()
 export class UserRouter extends BaseRouter {

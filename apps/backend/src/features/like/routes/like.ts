@@ -2,7 +2,7 @@ import {Router} from "express";
 import {injectable} from "tsyringe";
 import BaseRouter from "../../../common/routes/BaseRouter";
 import {container} from "../../../common/utils/tsyringe";
-import Authorized from "../../auth/middleware/authorized";
+import Authorized from "../../auth/middleware/Authorized";
 import {ILikeController} from "../controllers/LikeController";
 
 @injectable()

@@ -12,6 +12,7 @@ import Cachable from "./common/classes/cache/Cachable";
 import {RefreshSession} from "./features/session/middleware/RefreshSession";
 import QueueWorkerManager from "./common/queues/QueueWorkerManager";
 import {CronJobService} from "./common/services/CronjobService";
+import {MediaCompressionQueue} from "./features/media/queues/MediaCompressionQueue";
 
 require('dotenv').config()
 
@@ -124,6 +125,14 @@ async function bootstrap() {
             apiKey: "f1cb2c553f196d0caec92ac9b081f2f4-us12",
             server: "us12",
         });
+
+        const t = () => {
+            const mq = container.resolve<MediaCompressionQueue>("MediaCompressionQueue")
+            mq.addJob("compressVideo", {hello: 'world'})
+            console.log('added video compression job')
+        }
+
+        t()
 
         console.log('emitting')
         await new SocketManager(io).emitToRoom(`user_14`, 'track:upload:complete', {})

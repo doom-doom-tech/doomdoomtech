@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {injectable} from "tsyringe";
 import BaseRouter from "../../../common/routes/BaseRouter";
-import Authorized from "../../auth/middleware/authorized";
+import Authorized from "../../auth/middleware/Authorized";
 import {container} from "../../../common/utils/tsyringe";
 import {ICollabController} from "../controllers/CollabController";
 

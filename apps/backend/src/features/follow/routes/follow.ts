@@ -3,7 +3,7 @@ import {injectable} from "tsyringe";
 import {IFollowController} from "../controllers/FollowController";
 import BaseRouter from "../../../common/routes/BaseRouter";
 import {container} from "../../../common/utils/tsyringe";
-import Authorized from "../../auth/middleware/authorized";
+import Authorized from "../../auth/middleware/Authorized";
 
 @injectable()
 export class FollowRouter extends BaseRouter {

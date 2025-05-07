@@ -3,7 +3,7 @@ import {container, injectable, Lifecycle} from "tsyringe";
 import {IBaseRouter} from "./BaseRouter";
 import ContextHandler from "../middleware/context";
 import {IAlgoliaController} from "../controllers/AlgoliaController";
-import authorized from "../../features/auth/middleware/authorized";
+import authorized from "../../features/auth/middleware/Authorized";
 
 export interface IMainRouter {
     getRouter(): Router;
@@ -36,6 +36,7 @@ class MainRouter implements IMainRouter {
         { path: '/label', identifier: "LabelRouter" },
         { path: '/report', identifier: "ReportRouter" },
         { path: '/subscription', identifier: "SubscriptionRouter" },
+        { path: '/webhooks', identifier: "WebhookRouter" },
     ];
 
     constructor() {

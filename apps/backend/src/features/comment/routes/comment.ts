@@ -1,11 +1,11 @@
-import {Request, Response, Router} from "express";
+import {Router} from "express";
 import {injectable} from "tsyringe";
 import BaseRouter from "../../../common/routes/BaseRouter";
 import createDynamicRateLimiter from "../../../common/middleware/limiter";
 import {formatErrorResponse} from "../../../common/utils/responses";
 import {container} from "../../../common/utils/tsyringe";
 import {ICommentController} from "../controllers/CommentController";
-import Authorized from "../../auth/middleware/authorized";
+import Authorized from "../../auth/middleware/Authorized";
 
 @injectable()
 export class CommentRouter extends BaseRouter {

@@ -1,4 +1,5 @@
-import {Storage} from "@google-cloud/storage";
+import {S3Client} from "@aws-sdk/client-s3";
+import {Upload} from "@aws-sdk/lib-storage";
 import {singleton} from "tsyringe";
 import {container} from "../../../common/utils/tsyringe";
 import Service, {IServiceInterface} from "../../../common/services/Service";
@@ -7,6 +8,8 @@ import {MediaInterface} from "../types";
 import {v4 as uuid} from "uuid";
 import {IMediaCompressionService} from "./MediaCompressionService";
 import axios from "axios";
+import fs from "fs/promises";
+import {IQueue} from "../../../common/types"; // Node.js fs module for reading files
 
 export interface IMediaService extends IServiceInterface {
     upload(data: UploadMediaRequest): Promise<string>;
@@ -29,8 +32,16 @@ export interface MediaUploadResponse {
 @singleton()
 class MediaService extends Service implements IMediaService {
 
-    private storage = new Storage({ keyFilename: 'prf-d-pwa-8b7a.json' })
-    private bucket = this.storage.bucket('ddt-app')
+    private s3Client = new S3Client({
+        endpoint: 'https://ams3.digitaloceanspaces.com',
+        region: 'ams3',
+        credentials: {
+            accessKeyId: process.env.SPACES_KEY as string,
+            secretAccessKey: process.env.SPACES_SECRET as string
+        }
+    })
+
+    private bucketName = 'ddt'
 
     public extractTypeFromMimetype(mimetype: string): string {
         const mimeType = mimetype.toLowerCase();
@@ -77,9 +88,12 @@ class MediaService extends Service implements IMediaService {
     public upload = async (data: UploadMediaRequest) => {
         console.log('starting upload process')
 
-        const buffer = await this.compressFile(data.file)
+        const filePath = data.file.path; // Multer provides the path to the file on disk
+        const mimetype = data.file.mimetype;
 
-        console.log('compressed file')
+        const fileBuffer = await fs.readFile(data.file.path);
+
+        console.log('preparing file for upload')
 
         let filename: string
 
@@ -92,39 +106,58 @@ class MediaService extends Service implements IMediaService {
 
         console.log('saving to bucket')
 
-        await this.bucket
-            .file(`${data.uuid}/${filename}`)
-            .save(buffer, {
-                metadata: {
-                    cacheControl: 'public, max-age=31536000'
-                }
-            })
+        const key = `${data.uuid}/${filename}`
 
-        const [url] = await this.bucket
-            .file(`${data.uuid}/${filename}`)
-            .getSignedUrl({
-                action: 'read',
-                expires: '01-01-2050',
-            });
+        const upload = new Upload({
+            client: this.s3Client,
+            params: {
+                Bucket: this.bucketName,
+                Key: key,
+                Body: fileBuffer,
+                ContentType: data.file.mimetype,
+                ACL: 'public-read'
+            }
+        })
 
-        return url
+        await upload.done()
+
+        await fs.unlink(filePath).catch((err) => {
+            console.error(`Failed to delete temporary file ${filePath}: ${err.message}`);
+        });
+
+        // Queue compression job
+        const mediaCompressionQueue = container.resolve<IQueue>("MediaCompressionQueue")
+        mediaCompressionQueue.addJob('compress', {
+            uuid: data.uuid,
+            filename: filename,
+            purpose: data.purpose
+        })
+
+        // Return the URL of the uncompressed file
+        return `https://${this.bucketName}.ams3.digitaloceanspaces.com/${key}`
     }
 
     public uploadBuffer = async (buffer: Buffer, fileName: string, targetFolder: string, mimetype = 'audio/mpeg') => {
-        const destination = `${targetFolder}/${fileName}`;
+        const key = `${targetFolder}/${fileName}`;
 
-        await this.bucket
-            .file(destination)
-            .save(buffer, {
-                contentType: mimetype
-            });
+        // Ensure buffer is a proper Buffer object
+        const properBuffer = Buffer.from(buffer);
 
-        const [url] = await this.bucket
-            .file(destination)
-            .getSignedUrl({
-                action: 'read',
-                expires: '01-01-2050',
-            });
+        const upload = new Upload({
+            client: this.s3Client,
+            params: {
+                Bucket: this.bucketName,
+                Key: key,
+                Body: properBuffer,
+                ContentType: mimetype,
+                ACL: 'private'
+            }
+        });
+
+        await upload.done();
+
+        // Return the URL of the file
+        const url = `https://${this.bucketName}.ams3.digitaloceanspaces.com/${key}`;
 
         return url
     }

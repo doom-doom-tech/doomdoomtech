@@ -1,6 +1,7 @@
 import Redis from "ioredis";
 import express from 'express';
-import {Worker} from 'bullmq';
+import {Job, Worker} from 'bullmq';
+import compress, {CompressMediaRequest} from "./compress";
 
 require('dotenv').config()
 
@@ -26,16 +27,13 @@ redis.on('connect', () => console.log('Connected to Redis'));
 
 const worker = new Worker(
 	"MediaCompressionQueue",
-	async (job) => {
-		if (job.name === "compressImage") {
-			console.log('image job fired')
-		}
-
-		if (job.name === "compressVideo") {
-			console.log('video job fired')
-		}
+	async (job: Job<CompressMediaRequest>) => {
+		if (job.name === "compress") compress(job.data)
 	},
-	{ connection: redis, concurrency: 2 }
+	{
+		connection: redis,
+		concurrency: 2
+	}
 );
 
 // Error handling

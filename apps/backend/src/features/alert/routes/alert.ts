@@ -1,6 +1,6 @@
 import {Router} from "express";
-import {inject, injectable} from "tsyringe";
-import Authorized from "../../auth/middleware/authorized";
+import {injectable} from "tsyringe";
+import Authorized from "../../auth/middleware/Authorized";
 import {IAlertController} from "../controllers/AlertController";
 import BaseRouter from "../../../common/routes/BaseRouter";
 import {EncodedCursorInterface} from "../../../common/types/pagination";

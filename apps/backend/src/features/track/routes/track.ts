@@ -1,10 +1,10 @@
-import {Request, Response, Router} from "express";
+import {Router} from "express";
 import {injectable} from "tsyringe";
 import BaseRouter from "../../../common/routes/BaseRouter";
 import {container} from "../../../common/utils/tsyringe";
 import {ITrackController} from "../controllers/TrackController";
 import {ICommentController} from "../../comment/controllers/CommentController";
-import Authorized from "../../auth/middleware/authorized";
+import Authorized from "../../auth/middleware/Authorized";
 import {ValidateSession} from "../../session/middleware/ValidateSession";
 import {ITrackActionController} from "../controllers/TrackActionController";
 import createDynamicRateLimiter from "../../../common/middleware/limiter";

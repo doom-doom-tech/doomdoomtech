@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {injectable} from "tsyringe";
-import Authorized from "../../auth/middleware/authorized";
+import Authorized from "../../auth/middleware/Authorized";
 import {IBlockController} from "../controllers/BlockUserController";
 import BaseRouter from "../../../common/routes/BaseRouter";
 import {container} from "../../../common/utils/tsyringe";

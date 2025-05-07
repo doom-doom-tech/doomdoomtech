@@ -1,29 +1,23 @@
-import {execSync} from "child_process";
-
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-const { Upload } = require('@aws-sdk/lib-storage');
-const ffmpeg = require('fluent-ffmpeg');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-
-// Set FFmpeg and FFprobe paths
-const ffmpegPath = path.join(__dirname, 'bin', 'ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegPath);
-console.log(`Using FFmpeg binary at: ${ffmpegPath}`);
+import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3';
+import {Upload} from '@aws-sdk/lib-storage';
+import ffmpeg from 'fluent-ffmpeg';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import {Readable} from 'stream';
 
 // Initialize AWS S3 client for DigitalOcean Spaces
 const s3Client = new S3Client({
     endpoint: 'https://ams3.digitaloceanspaces.com',
     region: 'ams3',
     credentials: {
-        accessKeyId: 'DO801U2WW73VPT78GVKP',
-        secretAccessKey: 'FjGoNkh9ONPeMk75wprKqZ5xW4RueK9latwl87WZ0V0'
+        accessKeyId: process.env.SPACES_KEY as string,
+        secretAccessKey: process.env.SPACES_SECRET as string
     }
 });
 
 // Helper function to save stream to temporary file
-async function streamToFile(inputStream, filePath) {
+async function streamToFile(inputStream: Readable, filePath: string): Promise<string> {
     return new Promise((resolve, reject) => {
         const fileStream = fs.createWriteStream(filePath);
         inputStream.pipe(fileStream);
@@ -33,8 +27,31 @@ async function streamToFile(inputStream, filePath) {
     });
 }
 
-// Main serverless function
-async function main(args) {
+interface Arguments {
+    inputKey: string;
+}
+
+interface ResponseBody {
+    status: 'success' | 'error';
+    message?: string;
+    url?: string;
+}
+
+interface Response {
+    body: ResponseBody;
+    statusCode: number;
+}
+
+interface FFmpegProgress {
+    percent?: number;
+    [key: string]: any;
+}
+
+interface FFmpegCodecData {
+    [key: string]: any;
+}
+
+async function main(args: Arguments): Promise<Response> {
     const { inputKey } = args;
 
     if (!inputKey) {
@@ -44,10 +61,12 @@ async function main(args) {
         };
     }
 
-    let tempInputFile;
-    let tempOutputFile;
+    let tempInputFile: string | undefined = undefined;
+    let tempOutputFile: string | undefined = undefined;
+
     try {
         const [uuid] = inputKey.split('/');
+
         if (!uuid) {
             return {
                 body: { status: 'error', message: 'Invalid UUID in inputKey' },
@@ -57,18 +76,23 @@ async function main(args) {
 
         const outputKey = `${uuid}/video-compressed.mp4`;
 
-        // Download file from DigitalOcean Spaces using AWS SDK
-        console.log(`Downloading input file from Spaces: ${inputKey}`);
         const getCommand = new GetObjectCommand({
             Bucket: 'ddt',
             Key: inputKey
         });
+
         const { Body } = await s3Client.send(getCommand);
+
+        if (!Body || !(Body instanceof Readable)) {
+            throw new Error('Invalid response from S3');
+        }
+
         tempInputFile = path.join(os.tmpdir(), `input-${uuid}.mp4`);
+
         await streamToFile(Body, tempInputFile);
+
         console.log(`Input file saved to: ${tempInputFile}`);
 
-        // Verify input file exists and is not empty
         if (!fs.existsSync(tempInputFile) || fs.statSync(tempInputFile).size === 0) {
             throw new Error('Input file is missing or empty');
         }
@@ -77,7 +101,6 @@ async function main(args) {
         const inputFileSize = fs.statSync(tempInputFile).size;
         console.log(`Input file size: ${inputFileSize} bytes (${(inputFileSize / 1024 / 1024).toFixed(2)} MB)`);
 
-        // Set temporary output file path
         tempOutputFile = path.join(os.tmpdir(), `output-${uuid}.mp4`);
 
         // Set timeout for FFmpeg processing (5 minutes)
@@ -97,17 +120,9 @@ async function main(args) {
             tmpdir: os.tmpdir()
         });
 
-        // Test FFmpeg binary
-        try {
-            const { execSync } = require('child_process');
-            console.log('FFmpeg version:', execSync(`${ffmpegStatic} -version`).toString().split('\n')[0]);
-        } catch (e) {
-            console.error('Failed to execute FFmpeg binary:', e.message);
-        }
-
         // Process video with FFmpeg, saving to temporary file
         console.log('Starting FFmpeg processing');
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             ffmpeg(tempInputFile)
                 .inputOptions(['-analyzeduration 2000000', '-probesize 2000000']) // Reduced values
                 .outputOptions([
@@ -120,15 +135,10 @@ async function main(args) {
                     '-movflags +faststart',
                     '-vf scale=1280:-2' // Add scaling to reduce resource usage
                 ])
-                .on('start', (cmd) => console.log('FFmpeg command:', cmd))
-                .on('codecData', (data) => console.log('Input codec data:', data))
-                .on('progress', (progress) => console.log(`Progress: ${progress.percent || 'unknown'}%`))
-                .on('stderr', (stderrLine) => console.log('FFmpeg stderr:', stderrLine))
-                .on('error', (err, stdout, stderr) => {
-                    console.error('FFmpeg error:', err.message, 'Stderr:', stderr);
-                    clearTimeout(timeout);
-                    reject(new Error(`FFmpeg error: ${err.message}. Stderr: ${stderr}`));
-                })
+                .on('start', (cmd: string) => console.log('FFmpeg command:', cmd))
+                .on('codecData', (data: FFmpegCodecData) => console.log('Input codec data:', data))
+                .on('progress', (progress: FFmpegProgress) => console.log(`Progress: ${progress.percent || 'unknown'}%`))
+                .on('stderr', (stderrLine: string) => console.log('FFmpeg stderr:', stderrLine))
                 .on('end', () => {
                     console.log('FFmpeg completed');
                     clearTimeout(timeout);
@@ -137,16 +147,11 @@ async function main(args) {
                 .save(tempOutputFile);
         });
 
-        // Verify output file exists and is not empty
         if (!fs.existsSync(tempOutputFile) || fs.statSync(tempOutputFile).size === 0) {
             throw new Error('Output file is missing or empty');
         }
 
-        // Log output file size and compression ratio
         const outputFileSize = fs.statSync(tempOutputFile).size;
-        const compressionRatio = (inputFileSize / outputFileSize).toFixed(2);
-        console.log(`Output file size: ${outputFileSize} bytes (${(outputFileSize / 1024 / 1024).toFixed(2)} MB)`);
-        console.log(`Compression ratio: ${compressionRatio}x (${compressionRatio > 1 ? 'smaller' : 'larger'})`);
 
         let fileToUpload = tempOutputFile;
 
@@ -170,12 +175,12 @@ async function main(args) {
                     }
                 });
                 await upload.done();
-            } catch (uploadErr) {
+            } catch (uploadErr: any) {
                 console.error('Upload error details:', uploadErr);
                 throw new Error(`Failed to upload to Spaces: ${uploadErr.message}. Code: ${uploadErr.$metadata?.httpStatusCode || 'Unknown'}`);
             }
         } else {
-            console.log("Output file is larger than input, skipping upload")
+            console.log("Output file is larger than input, skipping upload");
         }
 
         console.log('Upload completed');
@@ -186,7 +191,7 @@ async function main(args) {
             },
             statusCode: 200
         };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error:', error);
         return {
             body: { status: 'error', message: error.message || 'Unknown error occurred' },
@@ -200,11 +205,11 @@ async function main(args) {
                     fs.unlinkSync(file);
                     console.log(`Cleaned up temporary file: ${file}`);
                 } catch (err) {
-                    console.error('Failed to clean up temporary file:', err.message);
+                    console.error('Failed to clean up temporary file:', err instanceof Error ? err.message : 'Unknown error');
                 }
             }
         }
     }
 }
 
-module.exports = { main };
+export { main };
