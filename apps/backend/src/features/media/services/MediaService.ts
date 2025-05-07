@@ -6,7 +6,6 @@ import Service, {IServiceInterface} from "../../../common/services/Service";
 import {CreateMediaRequest, ProcessAttachmentRequest, UploadMediaRequest} from "../types/requests";
 import {MediaInterface} from "../types";
 import {v4 as uuid} from "uuid";
-import {IMediaCompressionService} from "./MediaCompressionService";
 import axios from "axios";
 import fs from "fs/promises";
 import {IQueue} from "../../../common/types"; // Node.js fs module for reading files
@@ -125,7 +124,7 @@ class MediaService extends Service implements IMediaService {
             console.error(`Failed to delete temporary file ${filePath}: ${err.message}`);
         });
 
-        // Queue compression job
+        // Queue async compression job
         const mediaCompressionQueue = container.resolve<IQueue>("MediaCompressionQueue")
         mediaCompressionQueue.addJob('compress', {
             uuid: data.uuid,
@@ -160,17 +159,6 @@ class MediaService extends Service implements IMediaService {
         const url = `https://${this.bucketName}.ams3.digitaloceanspaces.com/${key}`;
 
         return url
-    }
-
-    private async compressFile(file: Express.Multer.File): Promise<Buffer> {
-        const mediaCompressionService = container.resolve<IMediaCompressionService>("MediaCompressionService")
-
-        switch (true) {
-            case file.mimetype.startsWith('audio'): return await mediaCompressionService.audio(file.path);
-            case file.mimetype.startsWith('video'): return await mediaCompressionService.video(file.path);
-            case file.mimetype.startsWith('image'): return await mediaCompressionService.image(file.path);
-            default: throw new Error(`Unsupported file type: ${file.mimetype}`);
-        }
     }
 
     private async getFilenameByPurpose(purpose: ProcessAttachmentRequest['purpose']) {

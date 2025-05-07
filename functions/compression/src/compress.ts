@@ -132,7 +132,7 @@ async function compressVideo({ uuid, purpose }: Partial<CompressMediaRequest>) {
                         Key: outputKey,
                         Body: fileBuffer,
                         ContentType: 'video/mp4',
-                        ACL: 'private'
+                        ACL: 'public-read'
                     }
                 });
 
@@ -301,13 +301,16 @@ async function callWebhookAfterCompression({uuid, purpose, source}: UpdateEntity
 
     switch (purpose) {
         case "track.audio": return
-        case "track.cover": return url = `${process.env.BASE_URL}/webhooks/track/update-cover`
-        case "track.video": return url = `${process.env.BASE_URL}/webhooks/track/update-video`
+        case "note.attachment": return url = `/webhooks/track/update-media`
+        case "track.cover": return url = `/webhooks/track/update-cover`
+        case "track.video": return url = `/webhooks/track/update-video`
+        case "user.avatar": return url = `/webhooks/user/update-avatar`
+        case "user.banner": return url = `/webhooks/user/update-banner`
     }
 
     if(!url) return
 
-    await axios.put(url, {
+    await axios.put((process.env.BASE_URL as string).concat(url), {
         uuid, source
     }, {
         headers: {

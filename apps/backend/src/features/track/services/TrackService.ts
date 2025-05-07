@@ -30,7 +30,6 @@ import {ITrackBoostService} from "./TrackBoostService";
 import {ITrackWaveformService} from "./TrackWaveformService";
 import {IAlgoliaService} from "../../../common/services/AlgoliaService";
 import {SingleUserInterface} from "../../user/types";
-import {TrackQueue} from "../queues/TrackQueue";
 import {IQueue} from "../../../common/types";
 import {PrepareNotifyFollowersNewUploadPayload} from "../jobs/PrepareNotifyFollowersNewUpload";
 import SocketManager from "../../../common/services/SocketManager";
