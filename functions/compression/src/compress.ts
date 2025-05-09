@@ -170,14 +170,15 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
                 console.error('Upload error details:', uploadErr);
                 throw new Error(`Failed to upload to Spaces: ${uploadErr.message}. Code: ${uploadErr.$metadata?.httpStatusCode || 'Unknown'}`);
             }
+
+            console.log('Calling webhook after compression');
+            callWebhookAfterCompression({
+                uuid, purpose, filename, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
+            })
+
         } else {
             console.log("Output file is larger than input, skipping upload");
         }
-
-        console.log('Calling webhook after compression');
-        callWebhookAfterCompression({
-            uuid, purpose, filename, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
-        })
 
         return {
             body: {
