@@ -17,7 +17,7 @@ export class MediaUpdateController extends Controller implements IMediaUpdateCon
 
     public updateMediaSource = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { uuid, source } = req.body;
+            const { uuid, source, filename } = req.body;
 
             if (!uuid || !source) {
                 res.status(400).json(formatErrorResponse("UUID and source are required."));
@@ -25,7 +25,7 @@ export class MediaUpdateController extends Controller implements IMediaUpdateCon
             }
 
             await this.mediaUpdateService.update({
-                uuid, source
+                uuid, source, filename
             });
 
             res.status(200).json(formatMutationResponse("Media updated"));
