@@ -141,7 +141,7 @@ class MediaService extends Service implements IMediaService {
     }
 
     public delete = async (data: SimpleIDInterface) => {
-        await this.db.media.delete({
+        await this.db.media.deleteMany({
             where: {
                 id: data.id
             }
