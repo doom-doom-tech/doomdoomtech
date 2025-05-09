@@ -168,7 +168,6 @@ class MediaService extends Service implements IMediaService {
             case "track.video": return 'video.mp4'
             case "user.avatar": return 'avatar.webp'
             case "user.banner": return 'banner.webp'
-            case "note.attachment": return 'banner.webp'
             default: return uuid()
         }
     }

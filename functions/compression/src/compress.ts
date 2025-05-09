@@ -53,12 +53,15 @@ async function streamToFile(inputStream: Readable, filePath: string): Promise<st
     });
 }
 
-async function compressVideo({ uuid, purpose }: Partial<CompressMediaRequest>) {
+async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) {
     // Ensure we have the necessary data
     if(!uuid || !purpose) return
 
-    const inputKey = `${uuid}/video.mp4`;
-    const outputKey = `${uuid}/video-compressed.mp4`;
+    const name = filename.split('.').shift()
+    const extension = filename.split('.').pop()
+
+    const inputKey = `${uuid}/${filename}`;
+    const outputKey = `${uuid}/${name}-compressed.${extension}`;
 
     let tempInputFile: string | undefined = undefined;
     let tempOutputFile: string | undefined = undefined;
@@ -181,16 +184,14 @@ async function compressVideo({ uuid, purpose }: Partial<CompressMediaRequest>) {
     }
 }
 
-async function compressImage({uuid, purpose}: Partial<CompressMediaRequest>) {
+async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) {
     // Ensure we have the necessary data
     if(!uuid || !purpose) return
-
-    const filename = getFilenameByPurpose({purpose})
 
     const name = filename.split('.').shift()
     const extension = filename.split('.').pop()
 
-    const inputKey = `${uuid}/${getFilenameByPurpose({purpose})}`;
+    const inputKey = `${uuid}/${filename}`;
     const outputKey = `${uuid}/${name}-compressed.${extension}`;
 
     let tempInputFile: string | undefined = undefined;
@@ -283,21 +284,9 @@ export default function compress({uuid, purpose, filename}: CompressMediaRequest
     if(!uuid || !purpose || !filename) return
 
     if(["track.audio"].includes(purpose)) return
-    if(['track.video'].includes(purpose)) return compressVideo({ uuid })
+    if(['track.video'].includes(purpose)) return compressVideo({uuid, purpose, filename})
 
-    return compressImage({uuid, purpose})
-}
-
-function getFilenameByPurpose({purpose}: Partial<CompressMediaRequest>) {
-    switch (purpose) {
-        case "track.audio": return 'audio.mp3'
-        case "track.cover": return 'cover.webp'
-        case "track.video": return 'video.mp4'
-        case "user.avatar": return 'avatar.webp'
-        case "user.banner": return 'banner.webp'
-        case "note.attachment": return 'banner.webp'
-        default: return 'unknown.webp'
-    }
+    return compressImage({uuid, purpose, filename})
 }
 
 async function callWebhookAfterCompression({uuid, purpose, source}: UpdateEntityRequest) {
