@@ -28,8 +28,6 @@ export default function Index() {
 
     const { checkForUpdates } = useExpoUpdates();
 
-    console.log('???')
-
     useEffect(() => {
         checkForUpdates();
     }, []);

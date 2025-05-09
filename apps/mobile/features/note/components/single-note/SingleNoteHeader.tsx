@@ -2,7 +2,6 @@ import {StyleSheet, View} from 'react-native'
 import {useCallback, useMemo} from "react";
 import {useNoteContext} from "@/features/note/context/NoteContextProvider";
 import User from "@/features/user/classes/User";
-import {spacing} from "@/theme";
 import UserRow from "@/features/user/components/user-row/UserRow";
 import UserContextProvider from "@/features/user/context/UserContextProvider";
 import {router} from "expo-router";
@@ -18,7 +17,7 @@ const SingleNoteHeader = ({}: SingleNoteHeaderProps) => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                paddingHorizontal: spacing.m
+
             },
         })
     }, []);

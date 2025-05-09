@@ -92,6 +92,8 @@ const CreateNoteTracks = ({}: CreateNoteTrackProps) => {
         removeSearchHistoryQuery(query)
     }, [removeSearchHistoryQuery])
 
+    if(track) return <View />
+
     return (
         <View style={styles.wrapper}>
             <Text style={styles.title}>

@@ -48,6 +48,8 @@ class UserService extends Service implements IUserService {
     public find = async (data: FindUserRequest) => {
         const userBlockService = container.resolve<IUserBlockService>("UserBlockService")
 
+        console.log(data)
+
 	    const user = await this.db.user.findFirst({
 		    where: {
                 id: data.userID,
@@ -61,7 +63,10 @@ class UserService extends Service implements IUserService {
                     }
                 ]
             },
-		    select: SingleUserMapper.getSelectableFields()
+		    select: {
+                ...SingleUserMapper.getSelectableFields(),
+                settings: data.userID === data.authID,
+            }
 	    })
 
 	    if (!user) throw new EntityNotFoundError("User");

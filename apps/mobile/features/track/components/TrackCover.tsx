@@ -55,8 +55,6 @@ const TrackCover = ({ size = 100, visible = true }: TrackCoverProps) => {
         const diff = Math.abs(videoPosition - trackPosition);
 
         if (diff > SYNC_THRESHOLD) {
-            console.log(`Syncing video: TrackPlayer at ${trackPosition}s, Video at ${videoPosition}s`);
-            // setPositionAsync expects milliseconds
             await videoRef.current.setPositionAsync(trackPosition * 1000);
         }
     }, [track, trackPosition]);

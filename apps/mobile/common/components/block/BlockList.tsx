@@ -18,7 +18,6 @@ const BlockList = <T extends any>({...rest}: ListProps<T>) => {
         })
     }, []);
 
-
     return(
         <List
             <T>
@@ -28,7 +27,8 @@ const BlockList = <T extends any>({...rest}: ListProps<T>) => {
             directionalLockEnabled
             removeClippedSubviews
             contentContainerStyle={styles.container}
-            {...rest} />
+            {...rest}
+        />
     )
 }
 

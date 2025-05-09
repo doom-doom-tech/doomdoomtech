@@ -15,6 +15,7 @@ import {useCreateNoteValues} from "@/features/note/store/create-note";
 import {router} from "expo-router";
 import CreateNoteTrack from "@/features/note/components/create-note/CreateNoteTrack";
 import * as Crypto from "expo-crypto";
+import CreateNoteLimit from "@/features/note/components/create-note/CreateNoteLimit";
 
 const CreateNote = () => {
 
@@ -30,7 +31,8 @@ const CreateNote = () => {
                 flex: 1
             },
             content: {
-                flex: 1
+                flex: 1,
+                position: 'relative',
             },
             buttonContainer: {
                 padding: spacing.m,
@@ -58,17 +60,12 @@ const CreateNote = () => {
                 })
             }
 
-            console.log('finished upload')
-            console.log('constructing payload...')
-
             const payload = {
                 uuid: uuid,
                 attachments,
                 content: createNoteValues.content,
                 trackID: createNoteValues.track?.getID()
             }
-
-            console.log('calling mutation with payload: ', payload)
 
             await createNoteMutation.mutateAsync(payload)
 
@@ -98,6 +95,7 @@ const CreateNote = () => {
                 <CreateNoteHeader/>
                 <CreateNoteInput/>
                 <CreateNoteAttachments/>
+                <CreateNoteLimit />
                 <CreateNoteTrack />
                 <CreateNoteTracks/>
             </View>

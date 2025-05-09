@@ -1,9 +1,10 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, useWindowDimensions, View} from 'react-native'
 import {Fragment, useCallback, useMemo} from "react";
 import {useCreateNoteStoreSelectors} from "@/features/note/store/create-note";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
 import TrackRow from "@/features/track/components/track-row/TrackRow";
 import {spacing} from "@/theme";
+import CreateNoteTrackConfig from "@/features/note/components/create-note/CreateNoteTrackConfig";
 
 interface CreateNoteTrackProps {
 
@@ -13,12 +14,14 @@ const CreateNoteTrack = ({}: CreateNoteTrackProps) => {
 
     const track = useCreateNoteStoreSelectors.track()
 
+    const { width } = useWindowDimensions()
+
     const setCreateNoteState = useCreateNoteStoreSelectors.setState()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                padding: spacing.m
+                paddingVertical: spacing.m
             },
         })
     }, []);
@@ -33,6 +36,7 @@ const CreateNoteTrack = ({}: CreateNoteTrackProps) => {
         <View style={styles.wrapper}>
             <TrackContextProvider track={track}>
                 <TrackRow type={'remove'} onRemove={handleDeselectTrack} />
+                <CreateNoteTrackConfig />
             </TrackContextProvider>
         </View>
     )

@@ -196,6 +196,8 @@ async function compressImage({uuid, purpose}: Partial<CompressMediaRequest>) {
     let tempInputFile: string | undefined = undefined;
     let tempOutputFile: string | undefined = undefined;
 
+    console.log('preparing to download: ', inputKey, 'outputkey: ', outputKey, 'uuid: ', uuid, 'purpose: ', purpose, 'filename: ', filename, 'name: ', name, 'extension: ', extension)
+
     try {
         const getCommand = new GetObjectCommand({
             Bucket: 'ddt',

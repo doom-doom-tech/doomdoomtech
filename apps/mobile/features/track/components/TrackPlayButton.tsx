@@ -52,9 +52,6 @@ const TrackPlayButton = () => {
         DeviceEventEmitter.emit('notes:mute')
 
         if(current?.getID() !== track.getID()) {
-
-            console.log('??')
-
             // First emit the queue:construct event to ensure the queue is properly constructed
             DeviceEventEmitter.emit('queue:construct', { listUUID });
 

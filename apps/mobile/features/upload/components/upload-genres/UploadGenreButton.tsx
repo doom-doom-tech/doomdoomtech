@@ -31,7 +31,6 @@ const UploadGenreButton = ({subgenre}: UploadGenreButtonProps) => {
     }, [selected]);
 
     const handleSelectSubgenre = useCallback(() => {
-        console.log(subgenre)
         setUploadState({ genre: subgenre })
     }, [subgenre])
 

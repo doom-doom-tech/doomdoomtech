@@ -10,6 +10,7 @@ import {useTabContext} from "@/common/context/TabBarContextProvider";
 import _ from 'lodash';
 import Plus from "@/assets/icons/Plus";
 import Heart from "@/assets/icons/Heart";
+import Search from '@/assets/icons/Search';
 
 interface BottomNavigationProps {
 
@@ -53,7 +54,7 @@ const BottomNavigation = ({}: BottomNavigationProps) => {
             active: false
         },
         {
-            icon: <Icon name={'logo'} pack={'custom'} color={'offwhite'} size={40} />,
+            icon: <Search />,
             label: 'Search',
             active: false
         },
@@ -118,15 +119,11 @@ const BottomNavigation = ({}: BottomNavigationProps) => {
             }
         }
 
-
-
         const event = navigation.emit({
             type: 'tabPress',
             target: mappedRoutes[item.label as keyof typeof mappedRoutes].key,
             canPreventDefault: true,
         })
-
-        console.log(item.label, focused)
 
         if(item.label === "Feed" && focused) {
             DeviceEventEmitter.emit('feed:top')

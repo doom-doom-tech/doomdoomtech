@@ -66,7 +66,7 @@ const ManageSubscription = ({}: ManageSubscriptionProps) => {
                         if (supported) {
                             await Linking.openURL(url);
                         } else {
-                            console.log("Cannot open URL:", url);
+
                         }
                     }
                 }

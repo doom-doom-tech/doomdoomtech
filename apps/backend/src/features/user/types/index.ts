@@ -33,10 +33,10 @@ export interface SingleUserInterface {
     following: boolean
     invite_code: string
     tracks_count: number
-    settings: UserSettings
     followers_count: number
     following_count: number
     avatar_url: string | null
     banner_url: string | null
+    settings: UserSettings | null
     socials: Array<SocialPlatformInterface>
 }

@@ -84,7 +84,7 @@ const useMediaActions = () => {
             setMediaState({ current: track, state: State.Playing })
             setStreamState({ track, playtime: 0 })
         } catch (error: any) {
-            console.log(error)
+
             throw error;
         }
     }, [removeTrackFromQueue, findTrackIndexInQueue])

@@ -56,7 +56,6 @@ const ManageAlbumCover = ({}: ManageAlbumCoverProps) => {
 
             setAlbumState({ cover: result.assets[0] })
         } catch (error: any) {
-            console.log('Upload cancelled')
         }
     }, [])
 

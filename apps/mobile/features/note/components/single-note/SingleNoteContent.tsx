@@ -27,7 +27,7 @@ const SingleNoteContent = ({}: SingleNoteContentProps) => {
         return StyleSheet.create({
             wrapper: {
                 gap: spacing.m,
-                padding: note.looped() ? spacing.m : 0,
+                paddingVertical: note.looped() ? spacing.m : 0,
                 marginHorizontal: note.looped() ? spacing.m : 0,
             },
             content: {

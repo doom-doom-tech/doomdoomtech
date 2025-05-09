@@ -10,6 +10,7 @@ export interface UserInviteCode {
 
 export interface UserSettings {
     events: number
+    daily_notes: number
 }
 
 export interface UserInterface {

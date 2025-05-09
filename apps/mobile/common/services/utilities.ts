@@ -135,7 +135,7 @@ export const uploadFile = async (file: DocumentPickerAsset | ImagePickerAsset, u
 
         return _.get(JSON.parse(response.body), 'data.upload.url', '')
     } catch (error) {
-        console.log(error)
+
     }
 }
 

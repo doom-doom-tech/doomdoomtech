@@ -90,7 +90,9 @@ model UserSettings {
     user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
     userID Int  @unique
 
-    events           Int     @default(0)
+    events      Int @default(0)
+    daily_notes Int @default(0)
+
     invite_code_used String?
 
     @@map(name: "user_settings")

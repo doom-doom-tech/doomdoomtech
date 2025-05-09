@@ -14,7 +14,6 @@ export class SingleUserMapper {
             credits: true,
             username: true,
             verified: true,
-            settings: true,
             tracks_count: true,
             followers_count: true,
             following_count: true,
@@ -66,9 +65,11 @@ export class SingleUserMapper {
         };
     }
 
-    private static formatSettings(settings: Record<string, any>) {
+    private static formatSettings(settings: Record<string, any> | null) {
+        if(!settings) return null
         return{
-            events: _.get(settings, 'events', 0)
+            events: _.get(settings, 'events', 0),
+            daily_notes: _.get(settings, 'daily_notes', 0),
         }
     }
 }

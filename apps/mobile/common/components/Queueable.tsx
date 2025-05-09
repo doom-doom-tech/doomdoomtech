@@ -29,8 +29,10 @@ const Queueable = ({query, children}: QueueableProps) => {
         if (data.listUUID !== listUUID) return
 
         if(assertInfiniteQuery(query)) {
-            // @ts-ignore - TODO: fix this
-            return await fillQueue(extractItemsFromInfinityQuery(query.data).filter(item => item.getType() == 'Track'))
+            return await fillQueue(
+                extractItemsFromInfinityQuery<Track>(query.data)
+                    .filter(item => item.getType() == 'Track')
+            )
         }
 
         if(query.data) {

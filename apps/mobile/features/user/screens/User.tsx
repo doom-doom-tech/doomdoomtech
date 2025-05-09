@@ -16,11 +16,7 @@ import UserSocials from "@/features/user/components/UserSocials";
 import UserActions from "@/features/user/components/user-actions/UserActions";
 import UserLists from "@/features/user/components/user-lists/UserLists";
 
-interface UserProps {
-
-}
-
-const User = ({}: UserProps) => {
+const User = () => {
 
     const user = useGlobalUserContext()
 

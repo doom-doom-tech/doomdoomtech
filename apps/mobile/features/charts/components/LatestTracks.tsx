@@ -29,7 +29,7 @@ const LatestTracks = () => {
     ), [])
 
     const routeAdditionalTracks = useCallback(() => {
-        router.push('/list/bestRatedTracks')
+        router.push('/list/latestReleases')
     }, [])
 
     useEventListener('charts:refetch', latestTracksQuery.refetch)
