@@ -197,8 +197,6 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
     let tempInputFile: string | undefined = undefined;
     let tempOutputFile: string | undefined = undefined;
 
-    console.log('preparing to download: ', inputKey, 'outputkey: ', outputKey, 'uuid: ', uuid, 'purpose: ', purpose, 'filename: ', filename, 'name: ', name, 'extension: ', extension)
-
     try {
         const getCommand = new GetObjectCommand({
             Bucket: 'ddt',
@@ -211,7 +209,7 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
             throw new Error('Invalid response from S3');
         }
 
-        tempInputFile = path.join(os.tmpdir(), `input-${uuid}.mp4`);
+        tempInputFile = path.join(os.tmpdir(), `input-${filename}`);
 
         await streamToFile(Body, tempInputFile);
 
@@ -223,7 +221,7 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
             throw new Error('FFmpeg processing timed out after 5 minutes');
         }, PROCESS_TIMEOUT_MS);
 
-        tempOutputFile = path.join(os.tmpdir(), `output-${uuid}.mp4`) as string;
+        tempOutputFile = path.join(os.tmpdir(), `output-${filename}`) as string;
 
         await sharp(tempInputFile)
             .webp({ quality: 80 })
@@ -294,7 +292,7 @@ async function callWebhookAfterCompression({uuid, purpose, source}: UpdateEntity
 
     switch (purpose) {
         case "track.audio": return
-        case "note.attachment": return url = `/webhooks/track/update-media`
+        case "note.attachment": return url = `/webhooks/media/update-media`
         case "track.cover": return url = `/webhooks/track/update-cover`
         case "track.video": return url = `/webhooks/track/update-video`
         case "user.avatar": return url = `/webhooks/user/update-avatar`

@@ -31,12 +31,13 @@ export class WebhookRouter extends BaseRouter {
         const userUpdateController = container.resolve<IUserUpdateController>("UserUpdateController");
 
         // Track update routes
-        this.router.post('/track/update-media', WebhookAuthorized, mediaUpdateController.updateMediaSource);
-        this.router.post('/track/update-video', WebhookAuthorized, trackUpdateController.updateVideoSource);
-        this.router.post('/track/update-cover', WebhookAuthorized, trackUpdateController.updateCoverSource);
+        this.router.put('/media/update-media', WebhookAuthorized, mediaUpdateController.updateMediaSource);
+
+        this.router.put('/track/update-video', WebhookAuthorized, trackUpdateController.updateVideoSource);
+        this.router.put('/track/update-cover', WebhookAuthorized, trackUpdateController.updateCoverSource);
 
         // User update routes
-        this.router.post('/user/update-avatar', WebhookAuthorized, userUpdateController.updateAvatarUrl);
-        this.router.post('/user/update-banner', WebhookAuthorized, userUpdateController.updateBannerUrl);
+        this.router.put('/user/update-avatar', WebhookAuthorized, userUpdateController.updateAvatarUrl);
+        this.router.put('/user/update-banner', WebhookAuthorized, userUpdateController.updateBannerUrl);
     }
 }
