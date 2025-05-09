@@ -346,7 +346,7 @@ class NoteService extends Service implements INoteService {
             //delete relevant media
             for(let media of note.media) {
                 await mediaService.delete({
-                    id: media.id,
+                    id: media.mediaID,
                 })
             }
 
