@@ -6,7 +6,7 @@ import compress, {CompressMediaRequest} from "./compress";
 require('dotenv').config()
 
 const app = express();
-const port = 3005;
+const port = 3000;
 
 const redis = new Redis({
 	host: process.env.REDIS_HOST,

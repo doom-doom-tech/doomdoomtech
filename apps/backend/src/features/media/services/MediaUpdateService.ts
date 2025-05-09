@@ -30,7 +30,9 @@ class MediaUpdateService extends Service implements IMediaUpdateService {
             }
         });
 
-        if (!media) throw new EntityNotFoundError('Track');
+        console.log('querying media record for ', `${data.uuid}/${data.filename}`)
+
+        if (!media) throw new EntityNotFoundError('Media');
 
         await this.db.media.update({
             where: {

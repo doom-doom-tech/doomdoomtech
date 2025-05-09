@@ -300,6 +300,8 @@ async function callWebhookAfterCompression({uuid, purpose, source, filename}: Up
         case "user.banner": return url = `/webhooks/user/update-banner`
     }
 
+    console.log('calling webhook', { url, uuid, source, filename })
+
     if(!url) return
 
     await axios.put((process.env.BASE_URL as string).concat(url), {

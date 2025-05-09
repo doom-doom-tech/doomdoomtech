@@ -353,6 +353,9 @@ class NoteService extends Service implements INoteService {
 
             await Cachable.deleteMany(["notes:*"]);
             note && await Cachable.deleteMany([`users:${note.userID}:notes`]);
+        }, {
+            maxWait: 60000,
+            timeout: 60000
         })
     }
 
