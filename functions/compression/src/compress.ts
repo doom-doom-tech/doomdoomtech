@@ -31,6 +31,7 @@ export interface UpdateEntityRequest {
     uuid: string
     purpose: string
     source: string
+    filename: string
 }
 
 interface FFmpegProgress {
@@ -153,7 +154,7 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
         console.log('Upload completed');
 
         callWebhookAfterCompression({
-            uuid, purpose, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
+            uuid, purpose, filename, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
         })
 
         return {
@@ -252,7 +253,7 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
                 await upload.done();
 
                 callWebhookAfterCompression({
-                    uuid, purpose, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
+                    uuid, purpose, filename, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
                 })
             } catch (uploadErr: any) {
                 console.error('Upload error details:', uploadErr);
@@ -287,7 +288,7 @@ export default function compress({uuid, purpose, filename}: CompressMediaRequest
     return compressImage({uuid, purpose, filename})
 }
 
-async function callWebhookAfterCompression({uuid, purpose, source}: UpdateEntityRequest) {
+async function callWebhookAfterCompression({uuid, purpose, source, filename}: UpdateEntityRequest) {
     let url: string | undefined = undefined
 
     switch (purpose) {
@@ -302,7 +303,7 @@ async function callWebhookAfterCompression({uuid, purpose, source}: UpdateEntity
     if(!url) return
 
     await axios.put((process.env.BASE_URL as string).concat(url), {
-        uuid, source
+        uuid, source, filename
     }, {
         headers: {
             'Authorization': jwt.sign('token', process.env.TOKEN_SECRET as string),

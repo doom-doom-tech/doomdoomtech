@@ -106,6 +106,7 @@ class NoteService extends Service implements INoteService {
             const n = await db.note.create({
                 select: NoteMapper.getSelectableFields(),
                 data: {
+                    uuid: data.uuid,
                     content: data.content,
                     userID: data.authID,
                     trackID: data.trackID,

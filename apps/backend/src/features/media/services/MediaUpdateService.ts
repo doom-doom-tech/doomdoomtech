@@ -6,6 +6,7 @@ import EntityNotFoundError from "../../../common/classes/errors/EntityNotFoundEr
 export interface UpdateSourceRequest {
     uuid: string;
     source: string;
+    filename: string;
 }
 
 export interface IMediaUpdateService extends IServiceInterface {
@@ -21,9 +22,11 @@ class MediaUpdateService extends Service implements IMediaUpdateService {
 
     public update = async (data: UpdateSourceRequest) => {
         // Find the media
-        const media = await this.db.media.findUnique({
+        const media = await this.db.media.findFirst({
             where: {
-                uuid: data.uuid
+                url: {
+                    contains: `${data.uuid}/${data.filename}`
+                }
             }
         });
 
