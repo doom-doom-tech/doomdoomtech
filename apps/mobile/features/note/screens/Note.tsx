@@ -85,7 +85,7 @@ const Note = () => {
         } catch (error: any) {
             Toast.show(formatServerErrorResponse(error), TOASTCONFIG.error)
         }
-    }, [])
+    }, [noteQuery.data])
 
     const handleTriggerReport = useCallback(async () => {
         if(!noteQuery.data) return

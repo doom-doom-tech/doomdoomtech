@@ -1,6 +1,7 @@
 import {$Enums} from "@prisma/client";
 import {Request} from "express";
 
+
 export interface UploadMediaRequest {
     uuid: string
     file: Express.Multer.File;

@@ -1,6 +1,4 @@
 import {ReactElement, ReactNode} from 'react'
-import ListTrack from "@/features/tracks/classes/ListTrack";
-import {SocketConfig} from "@/common/types/socket";
 
 export type TODO = any
 
@@ -21,7 +19,7 @@ export interface NamedSheetRequest {
 }
 
 export interface MediaActionEventInterface {
-    track: ListTrack
+    track: any
     action: 'play' | 'pause' | 'mute' | 'unmute' | 'stop' | 'seek' | 'metadata'
     data?: Record<string, any>
 }
@@ -35,6 +33,13 @@ export interface SimpleUUIDInterface {
 }
 
 export type SimpleSpread <T> = Record<string, T>
+
+export interface SocketConfig {
+    reconnection: boolean;
+    reconnectionAttempts: number;
+    reconnectionDelay: number;
+    timeout: number;
+}
 
 export const DEFAULT_SOCKET_CONFIG: SocketConfig = {
     reconnection: true,

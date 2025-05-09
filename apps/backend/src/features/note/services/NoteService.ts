@@ -300,34 +300,59 @@ class NoteService extends Service implements INoteService {
     };
 
     public async delete(data: NoteIDRequest): Promise<void> {
-
-        const alertService = container.resolve<IAlertService>("AlertService")
-        const algoliaService = container.resolve<IAlgoliaService>("AlgoliaService")
-
-        await alertService.deleteWithEntity({
-            entityType: "Note",
-            entityID: data.noteID
-        })
-
         const note = await this.db.note.findFirst({
             where: {
                 id: data.noteID
+            },
+            select: {
+                id: true,
+                media: true,
+                userID: true,
             }
         })
 
-        await this.db.note.deleteMany({
-            where: {
-                id: data.noteID
+        if(!note) throw new EntityNotFoundError("Note")
+
+        await this.db.$transaction(async (client) => {
+            const db = client as ExtendedPrismaClient
+
+            const mediaService = container
+                .resolve<IMediaService>("MediaService")
+                .bindTransactionClient(db)
+
+            const alertService = container
+                .resolve<IAlertService>("AlertService")
+                .bindTransactionClient(db)
+
+            const algoliaService = container
+                .resolve<IAlgoliaService>("AlgoliaService")
+
+            await alertService.deleteWithEntity({
+                entityType: "Note",
+                entityID: data.noteID
+            })
+
+            await db.note.deleteMany({
+                where: {
+                    id: data.noteID
+                }
+            })
+
+            await algoliaService.deleteRecord(
+                data.noteID,
+                "Note"
+            )
+
+            //delete relevant media
+            for(let media of note.media) {
+                await mediaService.delete({
+                    id: media.id,
+                })
             }
+
+            await Cachable.deleteMany(["notes:*"]);
+            note && await Cachable.deleteMany([`users:${note.userID}:notes`]);
         })
-
-        await algoliaService.deleteRecord(
-            data.noteID,
-            "Note"
-        )
-
-        await Cachable.deleteMany(["notes:*"]);
-        note && await Cachable.deleteMany([`users:${note.userID}:notes`]);
     }
 
     private formatAdditionalWhereClause(data: FetchRankedListRequest): Prisma.NoteWhereInput {
