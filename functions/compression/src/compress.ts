@@ -45,16 +45,21 @@ interface FFmpegCodecData {
 
 // Helper function to save stream to temporary file
 async function streamToFile(inputStream: Readable, filePath: string): Promise<string> {
+    console.log(`Starting streamToFile with filePath: ${filePath}`);
     return new Promise((resolve, reject) => {
         const fileStream = fs.createWriteStream(filePath);
         inputStream.pipe(fileStream);
         inputStream.on('error', (err) => reject(new Error(`Input stream error: ${err.message}`)));
         fileStream.on('error', (err) => reject(new Error(`File write error: ${err.message}`)));
-        fileStream.on('finish', () => resolve(filePath));
+        fileStream.on('finish', () => {
+            console.log(`streamToFile completed for: ${filePath}`);
+            resolve(filePath);
+        });
     });
 }
 
 async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) {
+    console.log(`Starting compressVideo with uuid: ${uuid}, purpose: ${purpose}, filename: ${filename}`);
     // Ensure we have the necessary data
     if(!uuid || !purpose) return
 
@@ -63,6 +68,8 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
 
     const inputKey = `${uuid}/${filename}`;
     const outputKey = `${uuid}/${name}-compressed.${extension}`;
+
+    console.log(`Input key: ${inputKey}, Output key: ${outputKey}`);
 
     let tempInputFile: string | undefined = undefined;
     let tempOutputFile: string | undefined = undefined;
@@ -73,6 +80,7 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
             Key: inputKey
         });
 
+        console.log('Sending S3 GetObjectCommand');
         const { Body } = await s3Client.send(getCommand);
 
         if (!Body || !(Body instanceof Readable)) {
@@ -80,6 +88,7 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
         }
 
         tempInputFile = path.join(os.tmpdir(), `input-${uuid}.mp4`);
+        console.log(`Temporary input file path: ${tempInputFile}`);
 
         await streamToFile(Body, tempInputFile);
 
@@ -91,20 +100,25 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
             throw new Error('FFmpeg processing timed out after 5 minutes');
         }, PROCESS_TIMEOUT_MS);
 
-        tempOutputFile = path.join(os.tmpdir(), `output-${uuid}.mp4`) as string;
+        tempOutputFile = path.join(os.tmpdir(), `output-${uuid}.mp4`);
+        console.log(`Temporary output file path: ${tempOutputFile}`);
 
         await new Promise<void>((resolve, reject) => {
+            if (!tempOutputFile) {
+                reject(new Error('Temporary output file path is undefined'));
+                return;
+            }
             ffmpeg(tempInputFile)
-                .inputOptions(['-analyzeduration 2000000', '-probesize 2000000']) // Reduced values
+                .inputOptions(['-analyzeduration 2000000', '-probesize 2000000'])
                 .outputOptions([
                     '-c:v libx264',
-                    '-preset ultrafast', // Keep this for speed
+                    '-preset ultrafast',
                     '-crf 30',
                     '-c:a aac',
                     '-b:a 128k',
                     '-f mp4',
                     '-movflags +faststart',
-                    '-vf scale=1280:-2' // Add scaling to reduce resource usage
+                    '-vf scale=1280:-2'
                 ])
                 .on('start', (cmd: string) => console.log('FFmpeg command:', cmd))
                 .on('codecData', (data: FFmpegCodecData) => console.log('Input codec data:', data))
@@ -115,7 +129,12 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
                     clearTimeout(timeout);
                     resolve();
                 })
-                .save(path.join(os.tmpdir(), `output-${uuid}.mp4`));
+                .on('error', (err) => {
+                    console.error('FFmpeg error:', err);
+                    clearTimeout(timeout);
+                    reject(err);
+                })
+                .save(tempOutputFile);
         });
 
         if (!fs.existsSync(tempOutputFile) || fs.statSync(tempOutputFile).size === 0) {
@@ -124,10 +143,12 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
 
         const inputFileSize = fs.statSync(tempInputFile).size;
         const outputFileSize = fs.statSync(tempOutputFile).size;
+        console.log(`Input file size: ${inputFileSize} bytes, Output file size: ${outputFileSize} bytes`);
 
         let fileToUpload = tempOutputFile;
 
         if (outputFileSize < inputFileSize) {
+            console.log('Output file is smaller, proceeding with upload');
             try {
                 const fileBuffer = fs.readFileSync(fileToUpload);
 
@@ -142,7 +163,9 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
                     }
                 });
 
+                console.log('Starting S3 upload');
                 await upload.done();
+                console.log('S3 upload completed');
             } catch (uploadErr: any) {
                 console.error('Upload error details:', uploadErr);
                 throw new Error(`Failed to upload to Spaces: ${uploadErr.message}. Code: ${uploadErr.$metadata?.httpStatusCode || 'Unknown'}`);
@@ -151,8 +174,7 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
             console.log("Output file is larger than input, skipping upload");
         }
 
-        console.log('Upload completed');
-
+        console.log('Calling webhook after compression');
         callWebhookAfterCompression({
             uuid, purpose, filename, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
         })
@@ -165,7 +187,7 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
             statusCode: 200
         };
     } catch (error: any) {
-        console.error('Error:', error);
+        console.error('Error in compressVideo:', error);
         return {
             body: { status: 'error', message: error.message || 'Unknown error occurred' },
             statusCode: 500
@@ -186,6 +208,7 @@ async function compressVideo({ uuid, purpose, filename }: CompressMediaRequest) 
 }
 
 async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) {
+    console.log(`Starting compressImage with uuid: ${uuid}, purpose: ${purpose}, filename: ${filename}`);
     // Ensure we have the necessary data
     if(!uuid || !purpose) return
 
@@ -194,6 +217,8 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
 
     const inputKey = `${uuid}/${filename}`;
     const outputKey = `${uuid}/${name}-compressed.${extension}`;
+
+    console.log(`Input key: ${inputKey}, Output key: ${outputKey}`);
 
     let tempInputFile: string | undefined = undefined;
     let tempOutputFile: string | undefined = undefined;
@@ -204,6 +229,7 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
             Key: inputKey
         });
 
+        console.log('Sending S3 GetObjectCommand for image');
         const { Body } = await s3Client.send(getCommand);
 
         if (!Body || !(Body instanceof Readable)) {
@@ -211,36 +237,41 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
         }
 
         tempInputFile = path.join(os.tmpdir(), `input-${filename}`);
+        console.log(`Temporary input file path: ${tempInputFile}`);
 
         await streamToFile(Body, tempInputFile);
 
-        // Set timeout for FFmpeg processing (5 minutes)
+        // Set timeout for image processing (5 minutes)
         const PROCESS_TIMEOUT_MS = 5 * 60 * 1000;
 
         const timeout = setTimeout(() => {
-            console.error('FFmpeg processing timed out');
-            throw new Error('FFmpeg processing timed out after 5 minutes');
+            console.error('Image processing timed out');
+            throw new Error('Image processing timed out after 5 minutes');
         }, PROCESS_TIMEOUT_MS);
 
-        tempOutputFile = path.join(os.tmpdir(), `output-${filename}`) as string;
+        tempOutputFile = path.join(os.tmpdir(), `output-${filename}`);
+        console.log(`Temporary output file path: ${tempOutputFile}`);
 
         await sharp(tempInputFile)
             .webp({ quality: 80 })
             .rotate()
             .on('end', () => {
+                console.log('Sharp processing completed');
                 clearTimeout(timeout);
             })
             .toFile(tempOutputFile)
 
         const inputFileSize = fs.statSync(tempInputFile).size;
         const outputFileSize = fs.statSync(tempOutputFile).size;
+        console.log(`Input image size: ${inputFileSize} bytes, Output image size: ${outputFileSize} bytes`);
 
         if (outputFileSize < inputFileSize) {
+            console.log('Output image is smaller, proceeding with upload');
             try {
                 const buffer = fs.readFileSync(tempOutputFile);
 
                 const upload = new Upload({
-                    client: s3Client,
+                    client:s3Client,
                     params: {
                         Bucket: 'ddt',
                         Key: outputKey,
@@ -250,8 +281,11 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
                     }
                 });
 
+                console.log('Starting S3 image upload');
                 await upload.done();
+                console.log('S3 image upload completed');
 
+                console.log('Calling webhook after image compression');
                 callWebhookAfterCompression({
                     uuid, purpose, filename, source: `https://ddt.ams3.digitaloceanspaces.com/${outputKey}`
                 })
@@ -260,10 +294,10 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
                 throw new Error(`Failed to upload to Spaces: ${uploadErr.message}. Code: ${uploadErr.$metadata?.httpStatusCode || 'Unknown'}`);
             }
         } else {
-            console.log("Output file is larger than input, skipping upload");
+            console.log("Output image is larger than input, skipping upload");
         }
     } catch (error: any) {
-        console.log(error)
+        console.error('Error in compressImage:', error);
     } finally {
         for (const file of [tempInputFile, tempOutputFile]) {
             if (file && fs.existsSync(file)) {
@@ -279,36 +313,66 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
 }
 
 export default function compress({uuid, purpose, filename}: CompressMediaRequest) {
-    // Ensure we have the necessary data
-    if(!uuid || !purpose || !filename) return
+    console.log(`Starting compress with uuid: ${uuid}, purpose: ${purpose}, filename: ${filename}`);
 
-    if(["track.audio"].includes(purpose)) return
-    if(['track.video'].includes(purpose)) return compressVideo({uuid, purpose, filename})
+    if(!uuid || !purpose || !filename) {
+        return
+    }
+
+    if(["track.audio"].includes(purpose)) {
+        return
+    }
+
+    if(filename.includes('.mp4')) {
+        return compressVideo({uuid, purpose, filename})
+    }
 
     return compressImage({uuid, purpose, filename})
 }
 
 async function callWebhookAfterCompression({uuid, purpose, source, filename}: UpdateEntityRequest) {
+    console.log(`Starting callWebhookAfterCompression with uuid: ${uuid}, purpose: ${purpose}, source: ${source}, filename: ${filename}`);
     let url: string | undefined = undefined
 
     switch (purpose) {
-        case "track.audio": return
-        case "note.attachment": return url = `/webhooks/media/update-media`
-        case "track.cover": return url = `/webhooks/track/update-cover`
-        case "track.video": return url = `/webhooks/track/update-video`
-        case "user.avatar": return url = `/webhooks/user/update-avatar`
-        case "user.banner": return url = `/webhooks/user/update-banner`
+        case "track.audio":
+            console.log('Purpose is track.audio, skipping webhook');
+            return
+        case "note.attachment":
+            url = `/webhooks/media/update-media`;
+            break;
+        case "track.cover":
+            url = `/webhooks/track/update-cover`;
+            break;
+        case "track.video":
+            url = `/webhooks/track/update-video`;
+            break;
+        case "user.avatar":
+            url = `/webhooks/user/update-avatar`;
+            break;
+        case "user.banner":
+            url = `/webhooks/user/update-banner`;
+            break;
     }
 
-    console.log('calling webhook', { url, uuid, source, filename })
+    console.log('Webhook URL determined:', url);
 
-    if(!url) return
+    if(!url) {
+        console.log('No webhook URL, exiting');
+        return
+    }
 
-    await axios.put((process.env.BASE_URL as string).concat(url), {
-        uuid, source, filename
-    }, {
-        headers: {
-            'Authorization': jwt.sign('token', process.env.TOKEN_SECRET as string),
-        }
-    })
+    try {
+        console.log('Sending webhook request');
+        await axios.put((process.env.BASE_URL as string).concat(url), {
+            uuid, source, filename
+        }, {
+            headers: {
+                'Authorization': jwt.sign('token', process.env.TOKEN_SECRET as string),
+            }
+        });
+        console.log('Webhook request completed successfully');
+    } catch (error: any) {
+        console.error('Webhook request failed:', error.message);
+    }
 }

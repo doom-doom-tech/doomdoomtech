@@ -134,8 +134,10 @@ class MediaService extends Service implements IMediaService {
             purpose: data.purpose
         })
 
+        const url = `https://${this.bucketName}.ams3.digitaloceanspaces.com/${key}`
+
         // Return the URL of the uncompressed file
-        return `https://${this.bucketName}.ams3.digitaloceanspaces.com/${key}`
+        return url
     }
 
     public delete = async (data: SimpleIDInterface) => {
