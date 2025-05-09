@@ -21,6 +21,7 @@ export interface IAlgoliaService {
     personalize(data: PersonalizeRequest): Promise<void>
     pushEvent(data: AlgoliaEventRequest & AuthenticatedRequest): Promise<void>
     pushRecord(data: TrackInterface | NoteInterface): Promise<void>
+    deleteRecord(id: number, type: "Track" | "Note"): Promise<void>
 }
 
 class AlgoliaService extends Cachable implements IAlgoliaService {
@@ -184,6 +185,20 @@ class AlgoliaService extends Cachable implements IAlgoliaService {
             case "Note": client.saveObjects({
                 indexName: 'feed-items',
                 objects: [NoteMapper.searchable(data as NoteInterface)]
+            }); break
+        }
+    }
+
+    public async deleteRecord(id: number, type: "Track" | "Note") {
+        switch (type) {
+            case "Track": await client.deleteObjects({
+                indexName: 'feed-items',
+                objectIDs: ['track-' + id]
+            }); break
+
+            case "Note": await client.deleteObjects({
+                indexName: 'feed-items',
+                objectIDs: ['note-' + id]
             }); break
         }
     }

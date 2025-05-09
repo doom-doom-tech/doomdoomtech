@@ -34,6 +34,8 @@ import {IQueue} from "../../../common/types";
 import {PrepareNotifyFollowersNewUploadPayload} from "../jobs/PrepareNotifyFollowersNewUpload";
 import SocketManager from "../../../common/services/SocketManager";
 import {v4} from "uuid";
+import {IAlertService} from "../../alert/services/AlertService";
+import Cachable from "../../../common/classes/cache/Cachable";
 
 export interface ITrackService extends IServiceInterface {
     all(data: FetchTracksRequest): Promise<PaginationResult<TrackInterface>>
@@ -607,6 +609,17 @@ class TrackService extends Service implements ITrackService {
     }
 
     public async delete(data: TrackIDRequest) {
+        const alertService = container.resolve<IAlertService>("AlertService")
+        const algoliaService = container.resolve<IAlgoliaService>("AlgoliaService")
+
+        const track = await this.db.track.findFirst({
+            where: {
+                id: data.trackID
+            }
+        })
+
+        if(!track) throw new EntityNotFoundError('Track')
+
         await this.db.track.update({
             where: {
                 id: data.trackID
@@ -615,6 +628,20 @@ class TrackService extends Service implements ITrackService {
                 deleted: true
             }
         })
+
+        // delete alerts
+        await alertService.deleteWithEntity({
+            entityType: "Track",
+            entityID: data.trackID
+        })
+
+        // delete algolia records
+        await algoliaService.deleteRecord(
+            data.trackID,
+            "Track"
+        )
+
+        await Cachable.deleteMany(["tracks:*"]);
     }
 
     private async formatAdditionalWhereClause(data: FetchRankedListRequest): Promise<Prisma.TrackWhereInput> {

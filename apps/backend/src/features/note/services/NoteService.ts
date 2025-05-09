@@ -302,6 +302,7 @@ class NoteService extends Service implements INoteService {
     public async delete(data: NoteIDRequest): Promise<void> {
 
         const alertService = container.resolve<IAlertService>("AlertService")
+        const algoliaService = container.resolve<IAlgoliaService>("AlgoliaService")
 
         await alertService.deleteWithEntity({
             entityType: "Note",
@@ -319,6 +320,11 @@ class NoteService extends Service implements INoteService {
                 id: data.noteID
             }
         })
+
+        await algoliaService.deleteRecord(
+            data.noteID,
+            "Note"
+        )
 
         await Cachable.deleteMany(["notes:*"]);
         note && await Cachable.deleteMany([`users:${note.userID}:notes`]);
