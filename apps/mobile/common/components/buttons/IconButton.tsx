@@ -11,16 +11,19 @@ interface IconButtonProps {
     fill: keyof typeof palette
     premium?: boolean
     callback: (...args: Array<any>) => unknown
+    disabled?: boolean
+    size?: number
 }
 
-const IconButton = ({notify, premium, icon, fill, callback}: IconButtonProps) => {
+const IconButton = ({disabled, notify, premium, icon, fill, callback, size = 50}: IconButtonProps) => {
 
     const { premiumMember } = usePaymentContext()
 
     const styles = StyleSheet.create({
         wrapper: {
             borderRadius: 4,
-            width: 50, height: 50,
+            width: size, height: size,
+            opacity: disabled ? 0.5 : 1,
             backgroundColor: (premium && !premiumMember) ? palette[fill].concat('50') : palette[fill]
         },
         touchable: {

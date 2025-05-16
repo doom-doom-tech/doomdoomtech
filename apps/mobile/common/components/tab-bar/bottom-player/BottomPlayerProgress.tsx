@@ -2,10 +2,10 @@ import {Dimensions, StyleSheet, View} from 'react-native'
 import {useCallback, useEffect, useMemo} from "react";
 import Animated, {runOnJS, useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
 import {Gesture, GestureDetector} from "react-native-gesture-handler";
-import {useMediaStoreSelectors} from "@/common/store/media";
 import {palette} from "@/theme";
 import TrackPlayer, {useProgress} from "react-native-track-player"
 import MediaEventEmitter from "@/common/classes/MediaEventEmitter";
+import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 
 const { width: screenWidth } = Dimensions.get('window')
 
@@ -13,8 +13,7 @@ const BottomPlayerProgress = () => {
 
     const progress = useProgress()
 
-    const current = useMediaStoreSelectors.current()
-    const duration = useMediaStoreSelectors.duration()
+    const current = useCurrentTrack()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -51,7 +50,7 @@ const BottomPlayerProgress = () => {
         'worklet';
 
         const percentage = Math.floor((currentWidth / screenWidth) * 100);
-        const seconds = Math.floor(duration * (percentage / 100));
+        const seconds = Math.floor(progress.duration * (percentage / 100));
 
         runOnJS(handleSeek)(seconds)
     };
@@ -103,7 +102,7 @@ const BottomPlayerProgress = () => {
     }))
 
     useEffect(() => {
-        width.value = withTiming((progress.position / duration) * screenWidth)
+        width.value = withTiming((progress.position / progress.duration) * screenWidth)
     }, [progress]);
 
     return(

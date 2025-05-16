@@ -5,7 +5,13 @@ import {AuthenticatedRequest} from "../../auth/types/requests";
 import NoteMapper, {SelectableNoteFields} from "../mappers/NoteMapper";
 import {NoteInterface} from "../types";
 import {Note, Prisma} from "@prisma/client";
-import {CreateNoteRequest, FetchNotesRequest, FindUserNotesRequest, LikeNoteRequest, NoteIDRequest} from "../types/requests";
+import {
+    CreateNoteRequest,
+    FetchNotesRequest,
+    FindUserNotesRequest,
+    LikeNoteRequest,
+    NoteIDRequest
+} from "../types/requests";
 import {EncodedCursorInterface, PaginationResult} from "../../../common/types/pagination";
 import PaginationHandler from "../../../common/classes/api/PaginationHandler";
 import {ILikeService} from "../../like/services/LikeService";
@@ -22,6 +28,7 @@ import {IMediaService} from "../../media/services/MediaService";
 import {IAlertService} from "../../alert/services/AlertService";
 import {IAlgoliaService} from "../../../common/services/AlgoliaService";
 import Cachable from "../../../common/classes/cache/Cachable";
+import {IUserService} from "../../user/services/UserService";
 
 interface FetchNoteRequest extends
     NoteIDRequest,
@@ -97,6 +104,7 @@ class NoteService extends Service implements INoteService {
     public async create(data: CreateNoteRequest & AuthenticatedRequest) {
         let note: NoteInterface = {} as NoteInterface;
 
+        const userService = container.resolve<IUserService>("UserService")
         const algoliaService = container.resolve<IAlgoliaService>("AlgoliaService")
 
         // Step 1: Create the Note and FeedItem in a transaction
@@ -157,6 +165,21 @@ class NoteService extends Service implements INoteService {
                 });
             }
         }
+
+        await userService.update({
+            where: {
+                id: data.authID
+            },
+            data: {
+                settings: {
+                    update: {
+                        daily_notes: {
+                            increment: 1
+                        }
+                    }
+                }
+            }
+        })
 
         await Cachable.deleteMany(["notes:*"]);
         await Cachable.deleteMany([`users:${data.authID}:notes`]);

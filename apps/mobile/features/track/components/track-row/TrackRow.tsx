@@ -15,6 +15,7 @@ import _ from 'lodash';
 import useMediaActions from "@/common/hooks/useMediaActions";
 import Drag from "@/assets/icons/Drag";
 import {useQueueContext} from "@/common/components/Queueable";
+import TrackOptionsTrigger from "@/features/track/components/track-options/TrackOptionsTrigger";
 
 
 interface TrackRowProps {
@@ -26,7 +27,7 @@ interface TrackRowProps {
     onDragStart?: () => unknown
     onRemove?: (track: Track) => unknown
     onSelect?: (track: Track) => unknown
-    type: 'route' | 'drag' | 'remove' | 'no-action'
+    type: 'route' | 'drag' | 'remove' | 'no-action' | 'options'
 }
 
 const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noop, onRemove = _.noop, numbered, index, type}: TrackRowProps) => {
@@ -92,6 +93,10 @@ const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noo
                 </TouchableOpacity>
             )
 
+            case 'options': return (
+                <TrackOptionsTrigger />
+            )
+
             default: return (
                 <Fragment />
             )
@@ -116,6 +121,8 @@ const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noo
     const ContentWrapper = useMemo(() => {
         switch (type) {
             case "route": return TouchableOpacity
+                break;
+            case "options": return TouchableOpacity
                 break;
             case "drag": return View
                 break;

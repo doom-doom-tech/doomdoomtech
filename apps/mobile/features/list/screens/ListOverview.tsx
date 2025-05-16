@@ -1,5 +1,5 @@
-import {StyleSheet, useWindowDimensions, View} from 'react-native'
-import {useMemo} from "react";
+import {DeviceEventEmitter, StyleSheet, useWindowDimensions, View} from 'react-native'
+import {useCallback, useMemo} from "react";
 import Screen from "@/common/components/Screen";
 import TopPicksHeader from "@/features/list/components/TopPicksHeader";
 import TopPicksTracks from "@/features/list/components/TopPicksTracks";
@@ -7,12 +7,16 @@ import {ImageBackground} from "expo-image";
 import TopPicksBackground from "@/assets/images/top-picks.png";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import TopPicksTitle from "@/features/list/components/TopPicksTitle";
+import {useFocusEffect} from "expo-router";
+import {useQueryClient} from "@tanstack/react-query";
 
 interface ListOverviewProps {
 
 }
 
 const ListOverview = ({}: ListOverviewProps) => {
+
+    const queryClient = useQueryClient()
 
     const { width, height } = useWindowDimensions()
     const { top } = useSafeAreaInsets()
@@ -34,6 +38,13 @@ const ListOverview = ({}: ListOverviewProps) => {
             }
         })
     }, [width, top]);
+
+    const initializeListCount = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['list', 'count'] })
+        DeviceEventEmitter.emit('list:count:reset')
+    }, [])
+
+    useFocusEffect(initializeListCount)
 
     return(
         <Screen>

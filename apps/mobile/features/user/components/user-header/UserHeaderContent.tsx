@@ -92,7 +92,7 @@ const UserHeaderContent = ({}: UserHeaderContentProps) => {
             </TouchableOpacity>
         )
 
-        if(premiumMember) return (
+        if(user.isPremium()) return (
             <TouchableOpacity activeOpacity={0.5} style={styles.premiumCircle} onPress={handleEditUser}>
                 <PremiumFeature color={palette.offwhite} />
             </TouchableOpacity>

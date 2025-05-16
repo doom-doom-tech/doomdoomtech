@@ -5,38 +5,38 @@ import Pause from "@/assets/icons/Pause";
 import Play from "@/assets/icons/Play";
 import Animated, {FadeIn} from 'react-native-reanimated'
 import {WithChildren} from "@/common/types/common";
-import {useMediaStoreSelectors} from "@/common/store/media";
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
-import TrackPlayer, {State, usePlaybackState} from "react-native-track-player"
+import TrackPlayer, {State, useActiveTrack, usePlaybackState} from "react-native-track-player"
 import useMediaActions from "@/common/hooks/useMediaActions";
 import {useQueueStoreSelectors} from "@/common/store/queue";
 import {useQueueContext} from "@/common/components/Queueable";
-import useTrackPlay from "@/features/track/hooks/useTrackPlay";
 
-const TrackPlayButton = () => {
+interface TrackPlayButtonProps {
+    size?: number
+}
+
+const TrackPlayButton = ({ size = 50 }: TrackPlayButtonProps) => {
 
     const track = useTrackContext()
     const state = usePlaybackState()
     const listUUID = useQueueContext()
 
     const queue = useQueueStoreSelectors.queue()
-    const current = useMediaStoreSelectors.current()
-
-    const trackPlayMutation = useTrackPlay()
+    const current = useActiveTrack()
 
     const { loadTrack } = useMediaActions()
 
     const active = useMemo(() => {
-        return state.state === State.Playing && current?.getID() === track.getID()
+        return state.state === State.Playing && current?.id === track.getID()
     }, [state, current])
 
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
                 backgroundColor: palette.rose,
-                width: 50,
-                height: 50,
-                borderRadius: 4,
+                width: size,
+                height: size,
+                borderRadius: 1000,
                 justifyContent: 'center',
                 alignItems: 'center'
             },
@@ -45,19 +45,18 @@ const TrackPlayButton = () => {
                 height: 24
             }
         })
-    }, []);
+    }, [size]);
 
     const handlePlayRequest = useCallback(async () => {
 
         DeviceEventEmitter.emit('notes:mute')
 
-        if(current?.getID() !== track.getID()) {
-            // First emit the queue:construct event to ensure the queue is properly constructed
+        if(current?.id !== track.getID()) {
             DeviceEventEmitter.emit('queue:construct', { listUUID });
 
             // Then load and play the track
             await loadTrack(track)
-            trackPlayMutation.mutate({ trackID: track.getID() })
+
             return
         }
 

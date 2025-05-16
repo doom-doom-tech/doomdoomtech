@@ -1,54 +1,63 @@
 import {createContext, useCallback, useContext, useRef} from "react";
-import {InfiniteData, UseInfiniteQueryResult, UseQueryResult} from "@tanstack/react-query";
+import {InfiniteData, UseInfiniteQueryResult, UseQueryResult,} from "@tanstack/react-query";
 import Track from "@/features/track/classes/Track";
+import Note from "@/features/note/classes/Note";
 import {WithChildren} from "@/common/types/common";
 import * as Crypto from "expo-crypto";
-import {extractItemsFromInfinityQuery} from "@/common/services/utilities";
+import {assertInfiniteQuery, extractItemsFromInfinityQuery} from "@/common/services/utilities";
 import useEventListener from "@/common/hooks/useEventListener";
 import useMediaActions from "@/common/hooks/useMediaActions";
 import {PaginatedQueryResponse} from "@/common/services/buildPaginatedQuery";
 
+// Define the union type for queue items
+type QueueItem = Track | Note;
+
+// Define specific types for query results
+type InfiniteQueryResult = UseInfiniteQueryResult<
+    InfiniteData<PaginatedQueryResponse<QueueItem>, unknown>,
+    Error
+>;
+type RegularQueryResult = UseQueryResult<QueueItem[], Error>;
+
+// Update the interface to use the union of query types
 interface QueueableProps extends WithChildren {
-    query: UseInfiniteQueryResult<InfiniteData<PaginatedQueryResponse<Track>, unknown>, Error> | UseQueryResult<Array<Track>>
+    query: InfiniteQueryResult | RegularQueryResult;
 }
 
-const QueueableContext = createContext<string>('');
+const QueueableContext = createContext<string>("");
 
-const Queueable = ({query, children}: QueueableProps) => {
+const Queueable = ({ query, children }: QueueableProps) => {
 
     const { fillQueue } = useMediaActions();
-
-    const { current: listUUID} = useRef(Crypto.randomUUID())
-
-    const assertInfiniteQuery = useCallback((query: QueueableProps['query']): query is UseInfiniteQueryResult<InfiniteData<PaginatedQueryResponse<Track>, unknown>, Error> => {
-        if(query === undefined) return false
-        return 'fetchNextPage' in query
-    }, [])
+    const listUUIDRef = useRef(Crypto.randomUUID());
 
     const handleFillQueue = useCallback(async (data: { listUUID: string }) => {
-        if (data.listUUID !== listUUID) return
+        if (data.listUUID !== listUUIDRef.current) return;
 
-        if(assertInfiniteQuery(query)) {
+        if (assertInfiniteQuery(query)) {
             return await fillQueue(
-                extractItemsFromInfinityQuery<Track>(query.data)
-                    .filter(item => item.getType() == 'Track')
-            )
+                extractItemsFromInfinityQuery<QueueItem>(query.data).filter(
+                    (item): item is Track => item.getType() === "Track"
+                )
+            );
         }
 
-        if(query.data) {
-            return await fillQueue(query.data)
+        if (query.data) {
+            return await fillQueue(
+                query.data.filter((item): item is Track => item.getType() === "Track")
+            );
         }
-    }, [listUUID, query.data, fillQueue]);
+    }, [query, fillQueue]);
 
-    useEventListener('queue:construct', handleFillQueue);
+    useEventListener("queue:construct", handleFillQueue);
 
-    return(
-        <QueueableContext.Provider value={listUUID}>
+    return (
+        <QueueableContext.Provider value={listUUIDRef.current}>
             {children}
         </QueueableContext.Provider>
-    )
-}
+    );
+};
 
-export const useQueueContext = () => useContext(QueueableContext)
+export const useQueueContext = () => useContext(QueueableContext);
 
-export default Queueable
+export default Queueable;

@@ -38,7 +38,7 @@ const ChartsTitle = ({}: ChartsTitleProps) => {
     return(
         <View style={styles.wrapper}>
             <Text style={styles.title}>
-                Top Picks
+                Favorites
             </Text>
             <Text style={styles.subtitle}>
                 Rate • Add • Support

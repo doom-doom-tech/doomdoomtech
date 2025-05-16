@@ -1,8 +1,9 @@
-import {StyleSheet, View} from 'react-native'
-import {useCallback, useMemo} from "react";
+import {StyleSheet, TextInput, View} from 'react-native'
+import {useCallback, useMemo, useRef} from "react";
 import Input from "@/common/components/inputs/Input";
 import {palette} from "@/theme";
 import {useCreateNoteStoreSelectors} from "@/features/note/store/create-note";
+import {useFocusEffect} from "expo-router";
 
 interface CreateNoteInputProps {
 
@@ -30,10 +31,17 @@ const CreateNoteInput = ({}: CreateNoteInputProps) => {
         setCreateNoteState({ content })
     }, [])
 
+    const inputReference = useRef<TextInput>(null)
+
+    useFocusEffect(() => {
+        inputReference.current?.focus()
+    })
+
     return(
         <View style={styles.wrapper}>
             <Input
                 multiline
+                ref={inputReference}
                 maxLength={200}
                 numberOfLines={0}
                 inputStyle={styles.input}

@@ -1,72 +1,41 @@
-import {useCallback, useState} from "react";
+import {useCallback} from "react";
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
 import Animated, {useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
-import Track from "@/features/track/classes/Track";
-import Toast from "react-native-root-toast";
-import {TOASTCONFIG} from "@/common/constants";
 import useEventListener from "@/common/hooks/useEventListener";
 import TrackRate from "@/features/track/components/TrackRate";
-import {DeviceEventEmitter} from "react-native";
-import {router} from "expo-router";
 
-interface NowPlayingRateProps {
-
-}
-
-const NowPlayingRate = ({}: NowPlayingRateProps) => {
+const NowPlayingRate = () => {
 
     const track = useTrackContext()
 
     const opacity = useSharedValue(0)
     const translate = useSharedValue(20)
 
-    const [liked, setLiked] = useState<boolean>(track.liked())
-    const [active, setActive] = useState<boolean>(false)
-
     const wrapperStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,
         transform: [{ translateY: translate.value }],
         position: 'absolute',
         alignSelf: 'center',
-        top: '35%',
+        top: '20%',
         alignItems: 'center',
     }))
 
     const activate = useCallback(() => {
-        setActive(true)
         opacity.value = withTiming(1)
         translate.value = withTiming(0)
     }, [])
 
-    const handleTriggerRating = useCallback((t: Track) => {
-        if(track.getID() === t.getID()) {
-            if(liked) return Toast.show('You have already rated this track', TOASTCONFIG.warning)
-            activate()
-        }
-    }, [liked, activate])
-
-    const handleIncreaseRating = useCallback((t: Track) => {
-        if(track.getID() !== t.getID()) return
-        activate()
-    }, [activate])
-
-    const handleCompleteRating = useCallback(async (amount: number) => {
-        setLiked(true)
-        setActive(false)
-
+    const deactivate = useCallback(async () => {
         opacity.value = withTiming(0)
         translate.value = withTiming(20)
-
-        DeviceEventEmitter.emit('track:rate', track)
-        router.back()
     }, [track])
 
-    useEventListener('track:rate:trigger', handleTriggerRating)
-    useEventListener('track:rate:increase', handleIncreaseRating)
+    useEventListener('track:rate:start', activate)
+    useEventListener('track:rate:fired', deactivate)
 
     return(
         <Animated.View style={wrapperStyle}>
-            <TrackRate onCompleteRating={handleCompleteRating} />
+            <TrackRate />
         </Animated.View>
     )
 }

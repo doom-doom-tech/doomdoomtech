@@ -1,15 +1,14 @@
 import {ActivityIndicator, StyleSheet, TouchableOpacity} from "react-native";
 import {Fragment, useCallback, useMemo} from "react";
-import {useMediaStoreSelectors} from "@/common/store/media";
 import Play from "@/assets/icons/Play";
 import Pause from "@/assets/icons/Pause";
 import {palette, spacing} from "@/theme";
-import TrackPlayer, {State, usePlaybackState} from "react-native-track-player"
+import TrackPlayer, {State, useActiveTrack, usePlaybackState} from "react-native-track-player"
 import _ from "lodash";
 
 const BottomPlayerAction = () => {
 
-    const current = useMediaStoreSelectors.current();
+    const current = useActiveTrack()
 
     const state = usePlaybackState()
 

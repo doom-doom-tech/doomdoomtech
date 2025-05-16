@@ -1,9 +1,9 @@
 import {StyleSheet, View} from 'react-native'
 import {useMemo} from "react";
-import {useMediaStoreSelectors} from "@/common/store/media";
 import {Image} from "expo-image";
 import {useVideoPlayer, VideoView} from "expo-video";
 import _ from "lodash";
+import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 
 interface BottomPlayerCoverProps {
 
@@ -11,7 +11,7 @@ interface BottomPlayerCoverProps {
 
 const BottomPlayerCover = ({}: BottomPlayerCoverProps) => {
 
-    const current = useMediaStoreSelectors.current()
+    const current = useCurrentTrack()
 
     const styles = useMemo(() => {
         return StyleSheet.create({

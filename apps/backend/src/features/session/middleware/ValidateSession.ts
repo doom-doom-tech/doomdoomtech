@@ -25,7 +25,7 @@ export const ValidateSession = async (req: Request<unknown, unknown, unknown, un
         const validatedSession = await sessionService.validate(sessionID, authID, deviceID)
 
         if (!validatedSession) {
-            return res.status(401).json({ error: "Unauthorized: Invalid or expired session" });
+            return res.status(440).json({ error: "Unauthorized: Invalid or expired session" });
         }
 
         // Store session information in the Context for downstream handlers.

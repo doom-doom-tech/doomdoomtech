@@ -56,7 +56,10 @@ const FeedTrackInformation = ({}: FeedTrackInformationProps) => {
                 {track.getArtists().map((artist, index) => (
                     <View key={artist.getID()} style={{ flexDirection: 'row' }}>
                         <TouchableOpacity
-                            onPress={() => router.push(`/user/${artist.getID()}`)}
+                            onPress={(event) => {
+                                event.stopPropagation(); // Prevent event from bubbling up
+                                router.push(`/user/${artist.getID()}`);
+                            }}
                         >
                             <Text style={styles.artist}>
                                 {artist.getUsername()}

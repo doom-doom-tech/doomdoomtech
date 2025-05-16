@@ -1,22 +1,25 @@
 import {StyleSheet, View} from 'react-native'
 import {Fragment, useCallback} from "react";
-import {useQueueStoreSelectors} from "@/common/store/queue";
 import Track from "@/features/track/classes/Track";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
-import TrackRow from "@/features/track/components/track-row/TrackRow";
-import BlockHeader from "@/common/components/block/BlockHeader";
-import {router} from "expo-router";
-import {wait} from "@/common/services/utilities";
-import List, {ListRenderItemPropsInterface} from "@/common/components/List";
+import {ListRenderItemPropsInterface} from "@/common/components/List";
 import {spacing} from "@/theme";
-import Animated, {FadeOutUp} from "react-native-reanimated";
-
+import TrackTile from "@/features/track/components/track-tile/TrackTile";
+import _ from "lodash";
+import {useQueueStoreSelectors} from "@/common/store/queue";
+import Block from "@/common/components/block/Block";
+import type {Track as NativeTrack} from "react-native-track-player"
+import {useActiveTrack} from "react-native-track-player"
 
 interface NowPlayingQueueProps {}
 
 const NowPlayingQueue = ({}: NowPlayingQueueProps) => {
 
     const queue = useQueueStoreSelectors.queue()
+
+    const activeNativeTrack: NativeTrack | undefined = useActiveTrack()
+
+    const upcomingTracks = activeNativeTrack ? queue.slice(queue.findIndex(track => track.getID() === activeNativeTrack.id) + 1) : [];
 
     const KeyExtractor = useCallback((item: Track) => {
         return String(item.getID())
@@ -31,35 +34,27 @@ const NowPlayingQueue = ({}: NowPlayingQueueProps) => {
         }
     })
 
-    const RenderItem = useCallback(({item, index}: ListRenderItemPropsInterface<Track>) => (
-        <Animated.View exiting={FadeOutUp}>
-            <TrackContextProvider track={item} key={item.getID() + index}>
-                <TrackRow type={'no-action'} />
+    const renderItem = useCallback(({item}: ListRenderItemPropsInterface<Track>) => {
+        return (
+            <TrackContextProvider track={item} key={item.getID()}>
+                <TrackTile />
             </TrackContextProvider>
-        </Animated.View>
-    ), [])
-
-    const handleRouteQueue = useCallback(async () => {
-        router.back()
-        await wait(200)
-        router.push('/queue')
+        )
     }, [])
-    
-    if(queue.length === 0 || queue.length === 1) return <Fragment />
+
+    if(upcomingTracks.length === 0 || upcomingTracks.length === 1) return <Fragment />
 
     return(
         <View style={styles.wrapper}>
-            <BlockHeader
-                style={styles.header}
-                title={"Next up"}
-                subtitle={"Edit"}
-                callback={handleRouteQueue}
-            />
-
-            <List
-                data={queue.slice(1)}
+            <Block
+                horizontal
+                subtitle={""}
+                callback={_.noop}
+                title={"Now playing"}
+                data={upcomingTracks}
+                renderItem={renderItem}
                 keyExtractor={KeyExtractor}
-                renderItem={RenderItem}
+                contentContainerStyle={{ paddingLeft: spacing.m, gap: spacing.m }}
             />
         </View>
     )

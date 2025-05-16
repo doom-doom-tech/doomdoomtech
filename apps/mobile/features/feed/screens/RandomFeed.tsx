@@ -12,6 +12,7 @@ import FeedPersonalizationTrigger from "@/features/feed/components/FeedPersonali
 import {palette, spacing} from "@/theme";
 import {useUploadProgressStoreSelectors} from "@/features/upload/store/upload-progress";
 import _ from 'lodash';
+import FeedNoteTrigger from "@/features/feed/components/FeedNoteTrigger";
 
 const RandomFeed = () => {
 
@@ -46,7 +47,7 @@ const RandomFeed = () => {
 
     const ListHeaderComponent = useMemo(() => {
         if(!user) return <Fragment />
-        if(user.getSettings().events >= 100) return <Fragment />
+        if(user.getSettings().events >= 100) return <FeedNoteTrigger />
         return <FeedPersonalizationTrigger />
     }, [user, progressActive])
 
@@ -57,10 +58,14 @@ const RandomFeed = () => {
                     <ActivityIndicator color={palette.olive} />
                 </View>
             )
-        } else {
-            return <Text style={styles.footerText}>That's all for now</Text>
         }
-    }, [randomFeedQuery.isFetchingNextPage])
+
+        if(!randomFeedQuery.isFetchingNextPage && !randomFeedQuery.hasNextPage) {
+            return (
+                <Text style={styles.footerText}>That's all for now</Text>
+            )
+        }
+    }, [randomFeedQuery.isFetchingNextPage, randomFeedQuery.hasNextPage])
 
     const handleScrollToTop = useCallback(async () => {
         flatListReference.current?.scrollToOffset({ animated: true, offset: 0 })

@@ -7,7 +7,7 @@ import {Gesture, GestureDetector} from "react-native-gesture-handler";
 import {runOnJS, useSharedValue, withTiming} from "react-native-reanimated";
 import TrackPlayer, {useProgress} from "react-native-track-player";
 import useWaveform from "@/features/track/hooks/useWaveform";
-import {useMediaStoreSelectors} from "@/common/store/media";
+import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 
 interface CreateNoteTrackConfigProps {
 
@@ -15,7 +15,7 @@ interface CreateNoteTrackConfigProps {
 
 const CreateNoteTrackConfig = ({}: CreateNoteTrackConfigProps) => {
 
-    const track = useMediaStoreSelectors.current()!
+    const track = useCurrentTrack()
 
     const size = 330
 

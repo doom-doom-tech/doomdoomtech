@@ -26,6 +26,12 @@ export class ListRouter extends BaseRouter {
 	protected initializeRoutes(): void {
 		const listTrackController = container.resolve<IListTrackController>("ListTrackController")
 
+		this.router.get(
+			'/count',
+			Authorized,
+			listTrackController.count
+		)
+
 		this.router.post(
 			'',
 			Authorized,

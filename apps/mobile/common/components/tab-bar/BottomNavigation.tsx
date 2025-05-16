@@ -1,7 +1,6 @@
 import {DeviceEventEmitter, Pressable, StyleSheet, useWindowDimensions, View} from 'react-native'
 import {useCallback, useMemo} from "react";
 import {constants, palette} from "@/theme";
-import Icon from "@/common/components/icon/Icon";
 import IconButton from "@/common/components/buttons/IconButton";
 import UserCircle from "@/features/user/components/UserCircle";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
@@ -9,8 +8,9 @@ import {router, usePathname} from "expo-router";
 import {useTabContext} from "@/common/context/TabBarContextProvider";
 import _ from 'lodash';
 import Plus from "@/assets/icons/Plus";
-import Heart from "@/assets/icons/Heart";
 import Search from '@/assets/icons/Search';
+import BottomNavigationFavorites from "@/common/components/tab-bar/BottomNavigationFavorites";
+import Home from "@/assets/icons/Home";
 
 interface BottomNavigationProps {
 
@@ -47,9 +47,10 @@ const BottomNavigation = ({}: BottomNavigationProps) => {
         'Search' : state.routes[3],
     }), [state])
 
+
     const items = [
         {
-            icon: <Icon name={'home'} pack={'material'} color={'offwhite'} />,
+            icon: <Home />,
             label: 'Feed',
             active: false
         },
@@ -64,7 +65,7 @@ const BottomNavigation = ({}: BottomNavigationProps) => {
             active: false,
         },
         {
-            icon: <Heart />,
+            icon: <BottomNavigationFavorites />,
             label: 'List',
             active: false
         },

@@ -90,7 +90,7 @@ const VerticalList = ({}: VerticalListProps) => {
 
             case "Track": return (
                 <TrackContextProvider track={item as Track} key={item.getID()}>
-                    <TrackRow numbered index={index + 1} type={'route'} />
+                    <TrackRow numbered index={index + 1} type={'options'} />
                 </TrackContextProvider>
             )
 

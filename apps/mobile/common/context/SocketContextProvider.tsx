@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {createContext, useCallback, useContext, useEffect, useState, useRef} from "react";
+import {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {io, Socket} from "socket.io-client";
 import {DEFAULT_SOCKET_CONFIG, WithChildren} from "@/common/types/common";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
@@ -45,27 +45,27 @@ const SocketContextProvider = ({ children }: SocketContextProviderProps) => {
 
 		// Setup reconnection event listeners
 		newSocket.on('connect', () => {
-			console.log('Socket connected');
+			// console.log('Socket connected');
 		});
 
 		newSocket.on('disconnect', () => {
-			console.log('Socket disconnected');
+			// console.log('Socket disconnected');
 		});
 
 		newSocket.on('reconnect', (attemptNumber) => {
-			console.log(`Socket reconnected after ${attemptNumber} attempts`);
+			// console.log(`Socket reconnected after ${attemptNumber} attempts`);
 		});
 
 		newSocket.on('reconnect_attempt', (attemptNumber) => {
-			console.log(`Socket reconnection attempt ${attemptNumber}`);
+			// console.log(`Socket reconnection attempt ${attemptNumber}`);
 		});
 
 		newSocket.on('reconnect_error', (error) => {
-			console.error('Socket reconnection error:', error);
+			// console.error('Socket reconnection error:', error);
 		});
 
 		newSocket.on('reconnect_failed', () => {
-			console.error('Socket reconnection failed');
+			// console.error('Socket reconnection failed');
 			// Try to initialize a new socket after all reconnection attempts fail
 			setTimeout(() => handleInitializeSocket(), DEFAULT_SOCKET_CONFIG.reconnectionDelay);
 		});

@@ -12,8 +12,7 @@ import RadioSelected from "@/assets/icons/RadioSelected";
 import Radio from "@/assets/icons/Radio";
 import Track from "@/features/track/classes/Track";
 import _ from 'lodash';
-import {useQueueContext} from "@/common/components/Queueable";
-
+import TrackOptionsTrigger from "@/features/track/components/track-options/TrackOptionsTrigger";
 
 interface TrackRowProps {
     index?: number
@@ -24,7 +23,7 @@ interface TrackRowProps {
     onDragStart?: () => unknown
     onRemove?: (track: Track) => unknown
     onSelect?: (track: Track) => unknown
-    type: 'route' | 'drag' | 'remove' | 'no-action'
+    type: 'route' | 'drag' | 'remove' | 'no-action' | 'options'
 }
 
 const TrackRow = ({selected, selectable, onDragStart, onDragEnd, onRemove = _.noop, numbered, index, type}: TrackRowProps) => {
@@ -52,8 +51,6 @@ const TrackRow = ({selected, selectable, onDragStart, onDragEnd, onRemove = _.no
         })
     }, []);
 
-    const listUUID = useQueueContext()
-
     const handleRouteTrack = useCallback(() => {
         router.push(`/track/${track.getID()}`)
     }, [])
@@ -74,6 +71,10 @@ const TrackRow = ({selected, selectable, onDragStart, onDragEnd, onRemove = _.no
                 <Animated.View entering={FadeInDown} key={type}>
                     <DashCircle color={palette.error} onPress={handleRemoveTrack} />
                 </Animated.View>
+            )
+
+            case 'options': return(
+                <TrackOptionsTrigger />
             )
 
             case 'no-action': return (

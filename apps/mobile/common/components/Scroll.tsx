@@ -1,35 +1,31 @@
-import {RefreshControl, ScrollView, ScrollViewProps, StyleSheet} from 'react-native'
-import {useMemo} from "react";
+import {RefreshControl, ScrollViewProps} from 'react-native';
+import {useMemo} from 'react';
+import Animated from 'react-native-reanimated';
 
 interface ScrollProps extends ScrollViewProps {
-    refreshing?: boolean
-    onRefresh?: () => void
-    disableRefresh?: boolean
+    refreshing?: boolean;
+    onRefresh?: () => void;
+    disableRefresh?: boolean;
 }
 
-const Scroll = ({children, onRefresh, refreshing, disableRefresh, ...rest}: ScrollProps) => {
+const Scroll = ({ children, onRefresh, refreshing, disableRefresh, ...rest }: ScrollProps) => {
 
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
+    const RefreshControlComponent = useMemo(
+        () => <RefreshControl onRefresh={onRefresh} refreshing={Boolean(refreshing)} />,
+        [onRefresh, refreshing, disableRefresh]
+    );
 
-            },
-        })
-    }, []);
-
-    const RefreshControlComponent = useMemo(() => (
-        <RefreshControl onRefresh={onRefresh} refreshing={Boolean(refreshing)} />
-    ), [onRefresh, refreshing, disableRefresh])
-
-    return(
-        <ScrollView
+    return (
+        <Animated.ScrollView
             {...rest}
+            scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
-            refreshControl={disableRefresh ? undefined : RefreshControlComponent}>
+            refreshControl={disableRefresh ? undefined : RefreshControlComponent}
+        >
             {children}
-        </ScrollView>
-    )
-}
+        </Animated.ScrollView>
+    );
+};
 
-export default Scroll
+export default Scroll;

@@ -1,6 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {ReactElement, useCallback, useMemo} from "react";
-import {palette, spacing, styling} from "@/theme";
+import {palette, styling} from "@/theme";
 import Switch from "@/common/components/inputs/Switch";
 
 interface SwitchConsentProps {
@@ -17,7 +17,6 @@ const SwitchConsent = ({icon, label, value, callback}: SwitchConsentProps) => {
         return StyleSheet.create({
             wrapper: {
                 flexDirection: 'row',
-                paddingHorizontal: spacing.m,
                 justifyContent: 'space-between',
             },
             label: {

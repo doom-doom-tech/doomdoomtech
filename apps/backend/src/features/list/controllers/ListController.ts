@@ -13,7 +13,8 @@ export interface IListTrackController {
 	add(req: Request<any, any, AddListTrackRequest>, res: Response): Promise<void>
 	tracks(req: Request<UserIDRequest, any, any, FetchListTracksRequest>, res: Response): Promise<void>
 	remove(req: Request<any, any, DeleteListTrackRequest>, res: Response): Promise<void>
-	update(req: Request<any, any, MutateListTracksRequest>, res: Response): Promise<void>  // Add missing update method
+	update(req: Request<any, any, MutateListTracksRequest>, res: Response): Promise<void>
+	count(req: Request<any, any, MutateListTracksRequest>, res: Response): Promise<void>
 }
 
 @singleton()
@@ -22,6 +23,17 @@ class ListTrackController extends Controller implements IListTrackController {
 	public constructor(
 		@inject("ListService") private listService: IListService
 	) { super() }
+
+	public count = async (req: Request, res: Response) => {
+		try {
+			const listTrackService = container.resolve<IListTrackService>("ListTrackService")
+
+			const count = await listTrackService.count(Context.get('authID'));
+			res.status(200).json(formatSuccessResponse("Count", count));
+		} catch (error: any) {
+			this.handleError(error, req, res);
+		}
+	};
 
 	public tracks = async (req: Request<UserIDRequest, any, any, FetchListTracksRequest>, res: Response) => {
 		try {

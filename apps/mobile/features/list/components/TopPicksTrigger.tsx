@@ -68,8 +68,8 @@ const TopPicksTrigger = ({}: TopPicksTriggerProps) => {
         if(trackID === track.getID()) setSaved(false)
     }, [track])
 
-    useEventListener('track:save', catchSaveTrackEvent)
-    useEventListener('track:remove', catchRemoveTrackEvent)
+    useEventListener('list:track:save', catchSaveTrackEvent)
+    useEventListener('list:track:remove', catchRemoveTrackEvent)
 
     return(
         <TouchableOpacity style={styles.wrapper} onPress={manageSaveTrack}>

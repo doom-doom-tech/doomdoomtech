@@ -1,45 +1,43 @@
-import {ActivityIndicator, DeviceEventEmitter, StyleSheet, View} from 'react-native'
+import {DeviceEventEmitter, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {useCallback, useEffect, useMemo, useState} from "react";
 import IconButton from "@/common/components/buttons/IconButton";
 import Flame from "@/assets/icons/Flame";
-import Pause from "@/assets/icons/Pause";
-import Next from "@/assets/icons/Next";
 import {spacing} from "@/theme";
-import {useMediaStoreSelectors} from "@/common/store/media";
 import TrackPlayer, {State, usePlaybackState} from "react-native-track-player";
-import Play from "@/assets/icons/Play";
 import Toast from "react-native-root-toast";
 import {TOASTCONFIG} from "@/common/constants";
 import FlameFilled from "@/assets/icons/FlameFilled";
-import {useQueueStoreSelectors} from "@/common/store/queue";
-import useListSaveTrack from "@/features/list/hooks/useListSaveTrack";
-import useListRemoveTrack from "@/features/list/hooks/useListRemoveTrack";
 import useEventListener from "@/common/hooks/useEventListener";
 import Track from "@/features/track/classes/Track";
 import {router} from "expo-router";
-import More from "@/assets/icons/More";
-import {wait} from "@/common/services/utilities";
-import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
-import TopPicksTrigger from "@/features/list/components/TopPicksTrigger";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
+import {useRatingQueueStoreSelectors} from "@/features/track/store/rating-queue";
+import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
+import TrackPlayButton from "@/features/track/components/TrackPlayButton";
+import Comments from "@/assets/icons/Comments";
+import Share from "@/assets/icons/Share";
+import Queue from "@/assets/icons/Queue";
+import Note from "@/assets/icons/Note";
+import Previous from "@/assets/icons/Previous";
+import Next from "@/assets/icons/Next";
+import useTrackActions from "@/features/track/hooks/useTrackActions";
+import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 
-interface NowPlayingActionsProps {
+const NowPlayingActions = () => {
 
-}
+    const user = useGlobalUserContext()
 
-const NowPlayingActions = ({}: NowPlayingActionsProps) => {
+    const current = useCurrentTrack()
 
-    const current = useMediaStoreSelectors.current()
-    const removeQueueTrack = useQueueStoreSelectors.removeTrack()
+    const currentRatingQueue = useRatingQueueStoreSelectors.current()
+    const eligibleRatingTracks = useRatingQueueStoreSelectors.eligible()
+
+    const {comments, share, queue, note} = useTrackActions(current)
 
     const state = usePlaybackState()
-    const { viewItem } = useAlgoliaEvents()
-
-    const saveTrackMutation = useListSaveTrack()
-    const removeTrackMutation = useListRemoveTrack()
 
     const [saved, setSaved] = useState<boolean>(current?.saved() ?? false)
-    const [liked, setLiked] = useState<boolean>(current?.liked() ?? false)
+    const [rated, setRated] = useState<boolean>(current?.liked() ?? false)
 
     const active = useMemo(() => {
         return state.state === State.Playing
@@ -49,91 +47,105 @@ const NowPlayingActions = ({}: NowPlayingActionsProps) => {
         return state.state === (State.Buffering || State.Loading)
     }, [state])
 
-    const handleTriggerTrackRating = useCallback(() => {
-        if(liked) return Toast.show("You have already rated this track", TOASTCONFIG.warning)
-        DeviceEventEmitter.emit('track:rate:trigger', current)
-    }, [current])
+    const handleTriggerTrackRating = () => {
+        if (!user) return router.push('/auth')
+        if(rated) return Toast.show("You have already rated this track", TOASTCONFIG.warning)
+        if (!eligibleRatingTracks.has(current!.getID())) return Toast.show("Listen 10 seconds before you rate", TOASTCONFIG.warning)
+        DeviceEventEmitter.emit('track:rate:start', current)
+    }
 
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
-                flexDirection: 'row',
-                alignSelf: 'center',
-                gap: spacing.m,
-            },
-        })
-    }, []);
-
-    const handleSave = useCallback(() => {
-        if(!current) return
-        saved ? removeTrackMutation.mutate({ trackID: current.getID() }) : saveTrackMutation.mutate({ trackID: current.getID() })
-        setSaved(prevState => !prevState)
-    }, [current, saved]);
+    const styles = StyleSheet.create({
+        wrapper: {
+            gap: spacing.m,
+        },
+        bottom: {
+            flexDirection: 'row',
+            alignSelf: 'center',
+            gap: spacing.m,
+        },
+        top: {
+            flexDirection: 'row',
+            alignSelf: 'center',
+            alignItems: 'center',
+            gap: spacing.xl,
+        }
+    })
 
     const handleNext = useCallback(async () => {
-        await TrackPlayer.remove([0])
-        await removeQueueTrack(0)
-        await TrackPlayer.play()
+        await TrackPlayer.skipToNext()
     }, [])
 
-    const handleRouteSingle = useCallback(async () => {
-        if(!current) return
-
-        viewItem(current.getID(), 'track')
-
-        router.back()
-        await wait(200)
-        router.push(`/track/${current.getID()}`)
-    }, [])
-
-    const togglePlayback = useCallback(async () => {
-        active
-            ? await TrackPlayer.pause()
-            : await TrackPlayer.play()
-    }, [active])
-
-    const catchRatingEvent = useCallback((t: Track) => {
-        if(current?.getID() !== t.getID()) return
-        setLiked(true)
+    const handlePrevious = useCallback(async () => {
+        await TrackPlayer.skipToPrevious()
     }, [])
 
     useEffect(() => {
         setSaved(current?.saved() ?? false)
-        setLiked(current?.liked() ?? false)
+        setRated(current?.liked() ?? false)
     }, [current]);
 
-    useEventListener('track:rate', catchRatingEvent)
+    const handleCompleteRating = useCallback((t: Track) => {
+        if(current && t.getID() === current.getID()) setRated(true)
+    }, [current])
+
+    const handleShare = useCallback(async () => {
+
+    }, [])
+
+    const handleQueue = useCallback(async () => {
+
+    }, [])
+
+    const currentlyRatingActive = (current && currentRatingQueue)
+        && currentRatingQueue.id === current.getID()
+
+    useEventListener('track:rate:complete', handleCompleteRating)
 
     if(!current) return <View />
 
     return(
         <View style={styles.wrapper}>
             <TrackContextProvider track={current}>
-                <IconButton
-                    icon={<TopPicksTrigger />}
-                    fill={'darkgrey'}
-                    callback={handleSave}
-                />
-                <IconButton
-                    icon={liked ? <FlameFilled /> : <Flame />}
-                    fill={'darkgrey'}
-                    callback={handleTriggerTrackRating}
-                />
-                <IconButton
-                    icon={buffering ? <ActivityIndicator /> : active ? <Pause /> : <Play />}
-                    fill={'rose'}
-                    callback={togglePlayback}
-                />
-                <IconButton
-                    icon={<Next />}
-                    fill={'darkgrey'}
-                    callback={handleNext}
-                />
-                <IconButton
-                    icon={<More />}
-                    fill={'darkgrey'}
-                    callback={handleRouteSingle}
-                />
+                <View style={styles.top}>
+                    <TouchableOpacity onPress={handlePrevious}>
+                        <Previous />
+                    </TouchableOpacity>
+
+                    <TrackPlayButton size={50} />
+
+                    <TouchableOpacity onPress={handleNext}>
+                        <Next />
+                    </TouchableOpacity>
+                </View>
+
+                <View  style={styles.bottom}>
+                    <IconButton
+                        disabled={!eligibleRatingTracks.has(current.getID())}
+                        icon={(rated || currentlyRatingActive) ? <FlameFilled /> : <Flame />}
+                        fill={'darkgrey'}
+                        callback={handleTriggerTrackRating}
+                    />
+                    <IconButton
+                        icon={<Comments />}
+                        fill={'darkgrey'}
+                        callback={comments}
+                    />
+                    <IconButton
+                        icon={<Share />}
+                        fill={'darkgrey'}
+                        callback={share}
+                    />
+                    <IconButton
+                        icon={<Queue />}
+                        fill={'darkgrey'}
+                        callback={queue}
+                    />
+                    <IconButton
+                        icon={<Note />}
+                        fill={'darkgrey'}
+                        callback={note}
+                    />
+                </View>
             </TrackContextProvider>
         </View>
     )

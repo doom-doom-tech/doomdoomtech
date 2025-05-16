@@ -15,7 +15,7 @@ import Toast from "react-native-root-toast";
 import {TOASTCONFIG} from "@/common/constants";
 import {formatServerErrorResponse} from "@/common/services/utilities";
 import {useQueryClient} from "@tanstack/react-query";
-import {useMediaStoreSelectors} from "@/common/store/media";
+import {useActiveTrack} from "react-native-track-player";
 
 interface FollowingFeedEmptyProps {
     onFollow: () => unknown
@@ -24,7 +24,7 @@ interface FollowingFeedEmptyProps {
 const FollowingFeedEmpty = ({onFollow}: FollowingFeedEmptyProps) => {
     const queryClient = useQueryClient()
 
-    const current = useMediaStoreSelectors.current()
+    const current = useActiveTrack()
 
     const [loading, setLoading] = useState<boolean>(false)
     const [selected, setSelected] = useState<Array<User | SingleUser>>([]);

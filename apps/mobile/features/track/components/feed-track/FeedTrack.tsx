@@ -38,7 +38,7 @@ const FeedTrack = ({}: FeedTrackProps) => {
 
     useEffect(() => {
         currentUser && viewTrackMutation.mutate({ trackID: track.getID() })
-    }, [currentUser]);
+    }, []);
 
     return(
         <View style={styles.wrapper}>

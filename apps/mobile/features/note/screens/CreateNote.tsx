@@ -1,4 +1,4 @@
-import {ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet, View} from 'react-native'
+import {KeyboardAvoidingView, Platform, StyleSheet, View} from 'react-native'
 import {useCallback, useMemo, useState} from "react";
 import Header from "@/common/components/header/Header";
 import CreateNoteHeader from "@/features/note/components/create-note/CreateNoteHeader";
@@ -16,6 +16,8 @@ import {router} from "expo-router";
 import CreateNoteTrack from "@/features/note/components/create-note/CreateNoteTrack";
 import * as Crypto from "expo-crypto";
 import CreateNoteLimit from "@/features/note/components/create-note/CreateNoteLimit";
+import {usePaymentContext} from "@/common/context/PaymentContextProvider";
+import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 
 const CreateNote = () => {
 
@@ -24,6 +26,12 @@ const CreateNote = () => {
     const createNoteMutation = useNoteCreate()
 
     const [loading, setLoading] = useState<boolean>(false)
+
+    const { premiumMember } = usePaymentContext()
+    const user = useGlobalUserContext()
+
+    const DAILY_LIMIT = premiumMember ? 10 : 3
+    const POSTED_COUNT = user?.getSettings().daily_notes ?? 0
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -43,6 +51,9 @@ const CreateNote = () => {
 
     const handleCreateNote = useCallback(async () => {
         try {
+            if(DAILY_LIMIT - POSTED_COUNT === 0)
+                return router.push('/paywall')
+
             setLoading(true)
 
             if(!createNoteValues.content) {
@@ -77,13 +88,16 @@ const CreateNote = () => {
         } finally {
             setLoading(false)
         }
-    }, [createNoteValues])
+    }, [createNoteValues, DAILY_LIMIT, POSTED_COUNT])
 
-    const HeaderRightComponent = useCallback(() => {
-        return loading
-            ? <ActivityIndicator color={palette.olive} />
-            : <ActionText label={"Post"} callback={handleCreateNote}/>
-    }, [loading, handleCreateNote])
+    const HeaderRightComponent = () => {
+        return <ActionText
+            disabled={DAILY_LIMIT - POSTED_COUNT === 0}
+            loading={loading}
+            label={"Post"}
+            callback={handleCreateNote}
+        />
+    }
 
     return (
         <KeyboardAvoidingView

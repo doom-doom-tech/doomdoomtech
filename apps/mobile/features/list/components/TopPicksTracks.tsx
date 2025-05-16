@@ -122,8 +122,8 @@ const TopPicksTracks = () => {
         [updated]
     );
 
-    useEventListener('track:save', topPicksQuery.refetch);
-    useEventListener('track:remove', topPicksQuery.refetch);
+    useEventListener('list:track:save', topPicksQuery.refetch);
+    useEventListener('list:track:remove', topPicksQuery.refetch);
     useEventListener('top-picks:refetch', topPicksQuery.refetch);
 
     return (

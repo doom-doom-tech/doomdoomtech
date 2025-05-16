@@ -26,7 +26,7 @@ const SingleTrackMedia = ({}: SingleTrackMediaProps) => {
 
     return(
         <View style={styles.wrapper}>
-            <TrackCover size={250} />
+            <TrackCover size={200} />
             <SingleTrackRating />
         </View>
     )

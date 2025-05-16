@@ -1,16 +1,17 @@
-import {StyleSheet, TouchableOpacity, useWindowDimensions} from 'react-native'
+import {StyleSheet, useWindowDimensions} from 'react-native'
 import React, {Fragment, useCallback, useMemo, useRef} from "react";
 import BottomSheet, {BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView} from "@gorhom/bottom-sheet";
 import {palette, spacing} from "@/theme";
 import useEventListener from "@/common/hooks/useEventListener";
-import Close from "@/assets/icons/Close";
-import SingleTrackActions from "@/features/track/components/single-track/SingleTrackActions";
+import TrackOptionsItems from "@/features/track/components/track-options/TrackOptionsItems";
+import {useTrackStoreSelectors} from "@/features/track/store/track";
+import TrackOptionsHeader from "@/features/track/components/track-options/TrackOptionsHeader";
+import TrackContextProvider from "@/features/track/context/TrackContextProvider";
+import {useFocusEffect} from "expo-router"
 
-interface TrackOptionsProps {
+const TrackOptions = () => {
 
-}
-
-const TrackOptions = ({}: TrackOptionsProps) => {
+    const track = useTrackStoreSelectors.track()
 
     const { height } = useWindowDimensions()
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -57,8 +58,9 @@ const TrackOptions = ({}: TrackOptionsProps) => {
                 position: "absolute",
                 top: spacing.s,
                 right: spacing.m,
-                padding: spacing.m,
+                padding: spacing.s,
                 borderRadius: 400,
+                backgroundColor: palette.granite
             }
         })
     }, []);
@@ -71,21 +73,29 @@ const TrackOptions = ({}: TrackOptionsProps) => {
         />
     ), []);
 
-    const handleCloseSheet = useCallback(() => {
-        bottomSheetRef.current?.close()
-    }, [])
-
     const sheetEventListener = useCallback(({ name }: { name: string }) => {
-        if(name === 'TrackOptions') {
-            bottomSheetRef.current?.snapToIndex(0)
+        // Only respond to the event if it's not the initial mount
+        if (name === 'TrackOptions') {
+            bottomSheetRef.current?.snapToIndex(0);
         }
-    }, [])
+    }, []);
 
     const sheetCloseListener = useCallback(({ name }: { name: string }) => {
         if(name === 'TrackOptions') {
             bottomSheetRef.current?.close()
         }
     }, [])
+
+    useFocusEffect(
+        useCallback(() => {
+            bottomSheetRef.current?.snapToIndex(-1);
+
+            return () => {
+                bottomSheetRef.current?.close();
+            };
+        }, [])
+    );
+
 
     useEventListener('sheet:expand', sheetEventListener)
     useEventListener('sheet:close', sheetCloseListener)
@@ -96,18 +106,20 @@ const TrackOptions = ({}: TrackOptionsProps) => {
             snapPoints={snapPoints}
             enablePanDownToClose
             ref={bottomSheetRef}
-            index={-1} // Start closed
+            index={-1}
             backdropComponent={renderBackdrop}
             handleComponent={() => <Fragment/>}
             onChange={handleSheetChanges}>
             <BottomSheetView style={styles.contentContainer}>
-                <TouchableOpacity style={styles.close} onPress={handleCloseSheet}>
-                    <Close color={palette.offwhite} />
-                </TouchableOpacity>
-                <SingleTrackActions />
+                { track && (
+                    <TrackContextProvider track={track}>
+                        <TrackOptionsHeader />
+                        <TrackOptionsItems track={track} />
+                    </TrackContextProvider>
+                )}
             </BottomSheetView>
         </BottomSheet>
-    );
+    )
 }
 
 export default TrackOptions

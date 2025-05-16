@@ -5,6 +5,7 @@ export interface SocialPlatformInterface {
 
 export interface UserSettings {
     events: number
+    daily_notes: number
 }
 
 export interface UserInterface {

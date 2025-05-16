@@ -4,7 +4,6 @@ import {useCreateNoteStoreSelectors} from "@/features/note/store/create-note";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
 import TrackRow from "@/features/track/components/track-row/TrackRow";
 import {spacing} from "@/theme";
-import CreateNoteTrackConfig from "@/features/note/components/create-note/CreateNoteTrackConfig";
 
 interface CreateNoteTrackProps {
 
@@ -36,7 +35,7 @@ const CreateNoteTrack = ({}: CreateNoteTrackProps) => {
         <View style={styles.wrapper}>
             <TrackContextProvider track={track}>
                 <TrackRow type={'remove'} onRemove={handleDeselectTrack} />
-                <CreateNoteTrackConfig />
+                {/*<CreateNoteTrackConfig />*/}
             </TrackContextProvider>
         </View>
     )

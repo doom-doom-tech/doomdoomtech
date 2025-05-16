@@ -3,23 +3,14 @@ import Animated, {useAnimatedStyle, useSharedValue, withTiming} from "react-nati
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
 import TrackRate from "@/features/track/components/TrackRate";
 import Track from "@/features/track/classes/Track";
-import Toast from "react-native-root-toast";
-import {TOASTCONFIG} from "@/common/constants";
 import useEventListener from "@/common/hooks/useEventListener";
 
-interface FeedTrackRateProps {
+const FeedTrackRate = () => {
+    const track = useTrackContext();
 
-}
-
-const FeedTrackRate = ({}: FeedTrackRateProps) => {
-
-    const track = useTrackContext()
-
-    const opacity = useSharedValue(0)
-    const translate = useSharedValue(20)
-
-    const [liked, setLiked] = useState<boolean>(track.liked())
-    const [active, setActive] = useState<boolean>(false)
+    const opacity = useSharedValue(0);
+    const translate = useSharedValue(20);
+    const [isActive, setIsActive] = useState(false); // New state to track active status
 
     const wrapperStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,
@@ -28,45 +19,36 @@ const FeedTrackRate = ({}: FeedTrackRateProps) => {
         alignSelf: 'center',
         top: '35%',
         alignItems: 'center',
-    }))
+    }));
 
     const activate = useCallback(() => {
-        setActive(true)
-        opacity.value = withTiming(1)
-        translate.value = withTiming(0)
-    }, [])
+        setIsActive(true);
+        opacity.value = withTiming(1);
+        translate.value = withTiming(0);
+    }, [track]);
+
+    const deactivate = useCallback(() => {
+        setIsActive(false);
+        opacity.value = withTiming(0);
+        translate.value = withTiming(20);
+    }, [track]);
 
     const handleTriggerRating = useCallback((t: Track) => {
-        if(track.getID() === t.getID()) {
-            if(liked) return Toast.show('You have already rated this track', TOASTCONFIG.warning)
-            activate()
-        }
-    }, [liked, activate])
+        if (track.getID() === t.getID()) activate();
+    }, [track, activate]);
 
-    const handleIncreaseRating = useCallback((t: Track) => {
-        if(track.getID() === t.getID()) {
-            if(liked) return Toast.show('You have already rated this track', TOASTCONFIG.warning)
-            activate()
-        }
-    }, [activate])
+    const handleFiredRating = useCallback((t: Track) => {
+        if (track.getID() === t.getID()) deactivate();
+    }, [track, deactivate]);
 
-    const handleCompleteRating = useCallback(async (amount: number) => {
-        setLiked(true)
-        setActive(false)
+    useEventListener('track:rate:start', handleTriggerRating);
+    useEventListener('track:rate:fired', handleFiredRating);
 
-        opacity.value = withTiming(0)
-        translate.value = withTiming(20)
-    }, [track])
-
-    useEventListener('track:rate:start', handleIncreaseRating)
-    useEventListener('track:rate:trigger', handleTriggerRating)
-    useEventListener('track:rate:increase', handleIncreaseRating)
-
-    return(
-        <Animated.View style={wrapperStyle}>
-            <TrackRate onCompleteRating={handleCompleteRating} />
+    return (
+        <Animated.View style={wrapperStyle} pointerEvents={isActive ? 'auto' : 'none'}>
+            <TrackRate />
         </Animated.View>
-    )
-}
+    );
+};
 
-export default FeedTrackRate
+export default FeedTrackRate;

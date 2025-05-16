@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {AxiosError} from "axios";
-import {UseQueryResult} from "@tanstack/react-query";
+import {UseInfiniteQueryResult, UseQueryResult} from "@tanstack/react-query";
 import {DocumentPickerAsset} from "expo-document-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {API_BASE_URL, STORAGE_KEYS} from "@/common/services/api";
@@ -17,6 +17,10 @@ export const wait = (ms: number): Promise<void> => {
     return new Promise((resolve) => {
         setTimeout(resolve, ms)
     })
+}
+
+export const assertInfiniteQuery = (query: UseQueryResult | UseInfiniteQueryResult): query is UseInfiniteQueryResult => {
+    return "fetchNextPage" in query;
 }
 
 export const formatPositionMillis = (positionMillis: number): string => {
@@ -98,6 +102,20 @@ export const convertToQueryResult = <T>(data: Array<T>) => ({
     isLoading: false,
     isRefetching: false,
 }) as UseQueryResult<Array<T>, any>
+
+export const convertToInfiniteQueryResult = <T>(data: Array<T>) => ({
+    data: {
+        pages: [{ cursor: null, items: data, previous: null }],
+        pageParams: []
+    },
+    refetch: async () => {},
+    isError: false,
+    isLoading: false,
+    isFetchingMore: false,
+    hasNextPage: false,
+    fetchMore: _.noop,
+    canFetchMore: false
+}) as unknown as UseInfiniteQueryResult<T, any>
 
 
 export const extractTypeFromMimetype = (mimetype: string): "File" | "Video" | "Image" => {
@@ -183,3 +201,9 @@ export const formatReadableDate = (date: Date) => {
 
     return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
+
+export const secondsToTimeFormat = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}

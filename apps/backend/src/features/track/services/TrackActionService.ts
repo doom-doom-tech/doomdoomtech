@@ -71,7 +71,7 @@ class TrackActionService extends Singleton implements ITrackActionService {
             const sessionID = Context.get('sessionID')
 
             if(await this.redis.sismember(`${sessionID}:views`, data.trackID)) {
-                return
+                throw new ValidationError('View already processed in this session')
             }
 
             const trackStatisticsService = container

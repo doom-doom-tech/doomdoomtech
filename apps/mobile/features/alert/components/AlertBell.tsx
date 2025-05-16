@@ -4,8 +4,9 @@ import {palette} from "@/theme";
 import Bell from "@/assets/icons/Bell";
 import {router} from "expo-router";
 import useAlertCount from "@/features/alert/hooks/useAlertCount";
-import BellMasked from "@/assets/icons/BellMasked";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
+import Text from "@/common/components/Text";
+import millify from 'millify';
 
 interface AlertBellProps {
 
@@ -19,16 +20,21 @@ const AlertBell = ({}: AlertBellProps) => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                position: 'relative'
+                position: 'relative',
             },
             notify: {
                 position: 'absolute',
-                width: 12,
-                height: 12,
-                top: -2,
-                right: -4,
+                bottom: -4,
+                alignSelf: 'center',
+                paddingHorizontal: 2,
                 backgroundColor: palette.error,
-                borderRadius: 16,
+                borderRadius: 2,
+                justifyContent: 'center',
+                alignItems: 'center'
+            },
+            count: {
+                fontSize: 8,
+                color: palette.offwhite
             }
         })
     }, []);
@@ -46,13 +52,14 @@ const AlertBell = ({}: AlertBellProps) => {
 
     return(
         <TouchableOpacity onPress={routeAlerts} style={styles.wrapper}>
-            { shouldNotify
-                ? <BellMasked color={palette.offwhite} />
-                : <Bell color={palette.offwhite} />
-            }
+            <Bell color={palette.offwhite} />
 
             { shouldNotify && (
-                <View style={styles.notify} />
+                <View style={styles.notify}>
+                    <Text style={styles.count}>
+                        {millify(alertsCountQuery.data)}
+                    </Text>
+                </View>
             )}
         </TouchableOpacity>
     )

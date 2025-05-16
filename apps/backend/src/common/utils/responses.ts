@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-export const formatSuccessResponse = (entity: string, data: Record<string, any>) => {
+export const formatSuccessResponse = (entity: string, data: Record<string, any> | number | string) => {
 	return {
 		message : `${ entity } fetched`,
 		data : {

@@ -4,6 +4,7 @@ import BaseRouter from "../../../common/routes/BaseRouter";
 import {container} from "../../../common/utils/tsyringe";
 import {INoteController} from "../controllers/NoteController";
 import Authorized from "../../auth/middleware/Authorized";
+import LimitNoteCount from "../middleware/LimitNoteCount";
 
 
 @injectable()
@@ -31,6 +32,7 @@ export class NoteRouter extends BaseRouter {
         this.router.post(
             "/",
             Authorized,
+            LimitNoteCount,
             noteController.create
         );
 

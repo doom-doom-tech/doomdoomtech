@@ -18,7 +18,7 @@ const TrackTileInformation = ({center}: TrackTileInformationProps) => {
 
     return(
         <View style={styles.wrapper}>
-            <TrackInformation center={center} />
+            <TrackInformation center={center} truncate />
         </View>
     )
 }

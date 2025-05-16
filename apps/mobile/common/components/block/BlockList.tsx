@@ -21,7 +21,6 @@ const BlockList = <T extends any>({...rest}: ListProps<T>) => {
     return(
         <List
             <T>
-            infinite
             horizontal
             disableRefresh
             directionalLockEnabled

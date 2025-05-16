@@ -62,6 +62,7 @@ class TrackActionController extends Controller implements ITrackActionController
 
             res.status(200).json(formatMutationResponse("Play added"))
         } catch (error: any) {
+            console.log(error)
             this.handleError(error, req, res)
         }
     }

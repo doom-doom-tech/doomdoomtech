@@ -11,7 +11,14 @@ import {FetchRankedListRequest} from "../../../common/services/RankedListService
 import Service, {IServiceInterface} from "../../../common/services/Service";
 import EntityNotFoundError from "../../../common/classes/errors/EntityNotFoundError";
 import {SingleUserInterface, UserInterface} from "../types";
-import {CreateUserRequest, FetchLabelsRequest, FindUserRequest, FindUserTracksRequest, UpdateUserSocialsRequest, UserIDRequest} from "../types/requests";
+import {
+    CreateUserRequest,
+    FetchLabelsRequest,
+    FindUserRequest,
+    FindUserTracksRequest,
+    UpdateUserSocialsRequest,
+    UserIDRequest
+} from "../types/requests";
 import {TrackInterface} from "../../track/types";
 import {SearchRequestInterface} from "../../search/types/requests";
 import {AuthenticatedRequest} from "../../auth/types/requests";
@@ -46,35 +53,40 @@ class UserService extends Service implements IUserService {
     }
 
     public find = async (data: FindUserRequest) => {
-        const userBlockService = container.resolve<IUserBlockService>("UserBlockService")
+        const userBlockService = container.resolve<IUserBlockService>("UserBlockService");
 
-        console.log(data)
+        console.log('??? :', data);
 
-	    const user = await this.db.user.findFirst({
-		    where: {
-                id: data.userID,
-                AND: [
-                    {
-                        NOT: {
-                            id: {
-                                in: await userBlockService.getBlockedUsers(data)
+        const cacheKey = `users:${data.userID}`;
+
+        return await this.withCache(
+            cacheKey,
+            async () => {
+                const user = await this.db.user.findFirst({
+                    where: {
+                        id: data.userID,
+                        AND: [
+                            {
+                                NOT: {
+                                    id: {
+                                        in: await userBlockService.getBlockedUsers(data)
+                                    }
+                                }
                             }
-                        }
+                        ]
+                    },
+                    select: {
+                        ...SingleUserMapper.getSelectableFields(),
+                        settings: data.userID === data.authID,
                     }
-                ]
+                });
+
+                if (!user) throw new EntityNotFoundError("User");
+
+                return SingleUserMapper.format(user);
             },
-		    select: {
-                ...SingleUserMapper.getSelectableFields(),
-                settings: data.userID === data.authID,
-            }
-	    })
-
-	    if (!user) throw new EntityNotFoundError("User");
-
-	    return await this.withCache(
-		    `users:${data.userID}`,
-		    async () => SingleUserMapper.format(user)
-	    )
+            { ttl: 3600 } // Optional: Set a TTL of 1 hour for the cache entry
+        );
     }
 
     public delete = async (data: AuthenticatedRequest) => {

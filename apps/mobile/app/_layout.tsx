@@ -19,7 +19,15 @@ SplashScreen.setOptions({
     fade: true,
 });
 
-const queryClient = new QueryClient({})
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: Infinity,
+            refetchOnWindowFocus: false,
+            retry: false,
+        }
+    }
+})
 
 const defaultSheetOptions: NativeStackNavigationOptions = {
     headerTitleStyle: {
@@ -37,7 +45,7 @@ export default function RootLayout() {
 
     const sheetOptions = useCallback(({route}: TODO): NativeStackNavigationOptions => {
 
-        const gestureDisabledRoutes = ['upload', 'album', 'now-playing']
+        const gestureDisabledRoutes = ['upload', 'album']
 
         return {
             headerShown: false,

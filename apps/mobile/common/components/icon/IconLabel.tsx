@@ -4,15 +4,17 @@ import {palette, spacing} from "@/theme";
 import Animated, {FadeInDown, FadeInUp, FadeOutDown, FadeOutUp, useAnimatedStyle, useSharedValue, withTiming,} from "react-native-reanimated";
 
 interface IconLabelProps {
-    direction?: "row" | "column";
-    icon: ReactElement;
     label: string;
+    disabled?: boolean
+    icon: ReactElement;
     callback: () => void;
+    direction?: "row" | "column";
 }
 
-const IconLabel = ({ direction = "row", icon, label, callback }: IconLabelProps) => {
+const IconLabel = ({ disabled, direction = "row", icon, label, callback }: IconLabelProps) => {
     const styles = StyleSheet.create({
         wrapper: {
+            opacity: disabled ? 0.5 : 1,
             flexDirection: direction,
             alignItems: "center",
             gap: spacing.s,

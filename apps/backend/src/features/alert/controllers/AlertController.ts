@@ -23,7 +23,7 @@ class AlertController extends Controller implements IAlertController {
 	public count = async (req: Request, res: Response) => {
 		try {
 			const count = await this.alertService.count(Context.get('authID'));
-			res.status(200).json(formatSuccessResponse("Count", { count }));
+			res.status(200).json(formatSuccessResponse("Count", count));
 		} catch (error: any) {
 			this.handleError(error, req, res);
 		}

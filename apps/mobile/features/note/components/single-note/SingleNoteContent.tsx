@@ -9,9 +9,8 @@ import NoteGradientBackground from "@/features/note/components/NoteGradientBackg
 import Loop from "@/assets/icons/Loop";
 import _ from "lodash";
 import useMediaActions from "@/common/hooks/useMediaActions";
-import {useMediaStoreSelectors} from "@/common/store/media";
 import Track from "@/features/track/classes/Track";
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer, {useActiveTrack} from "react-native-track-player";
 
 interface SingleNoteContentProps {
 
@@ -21,7 +20,7 @@ const SingleNoteContent = ({}: SingleNoteContentProps) => {
 
     const note = useNoteContext()
     const { loadTrack } = useMediaActions()
-    const current = useMediaStoreSelectors.current()
+    const current = useActiveTrack()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -45,7 +44,7 @@ const SingleNoteContent = ({}: SingleNoteContentProps) => {
     // Play the pinned track
     useEffect(() => {
         if(note.getTrack()) {
-            if(current && current.getID() === note.getTrack()!.getID()) {
+            if(current && current.id === note.getTrack()!.getID()) {
                 TrackPlayer.play()
                 return
             }

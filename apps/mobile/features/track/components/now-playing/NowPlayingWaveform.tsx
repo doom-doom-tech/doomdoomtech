@@ -3,18 +3,21 @@ import {StyleSheet, useWindowDimensions, View} from 'react-native';
 import {runOnJS, useSharedValue, withTiming} from 'react-native-reanimated';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {palette, spacing} from '@/theme';
-import Text from '@/common/components/Text';
 import useWaveform from '@/features/track/hooks/useWaveform';
-import {useMediaStoreSelectors} from '@/common/store/media';
-import {formatPositionMillis} from '@/common/services/utilities';
 import TrackPlayer, {useProgress} from 'react-native-track-player';
 import WaveformRenderer from '@/features/track/components/waveform/WaveformRenderer';
+import Text from "@/common/components/Text";
+import {secondsToTimeFormat} from "@/common/services/utilities";
+import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 
 const NowPlayingWaveform = () => {
-    const track = useMediaStoreSelectors.current()!;
+
+    const track = useCurrentTrack()
     const { width: responsiveWidth } = useWindowDimensions();
 
     const size = useMemo(() => responsiveWidth, [responsiveWidth]);
+
+    const currentProgress = useProgress()
 
     const [progress, setProgress] = useState<number>(0);
 
@@ -27,7 +30,7 @@ const NowPlayingWaveform = () => {
 
     const [waveform, setWaveform] = useState();
 
-    const waveformQuery = useWaveform(track.getWaveformSource());
+    const waveformQuery = useWaveform(track?.getWaveformSource());
 
     useEffect(() => {
         if (waveformQuery.isLoading || waveformQuery.isError || waveform) return;
@@ -40,7 +43,6 @@ const NowPlayingWaveform = () => {
             height: 50,
             alignItems: 'flex-start',
             justifyContent: 'center',
-            backgroundColor: palette.grey,
         },
         durations: {
             flexDirection: 'row',
@@ -51,6 +53,15 @@ const NowPlayingWaveform = () => {
         duration: {
             fontSize: 24,
         },
+        times: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            padding: spacing.m
+        },
+        time: {
+            color: palette.offwhite,
+            fontSize: 18
+        }
     });
 
     const emitSeekAction = useCallback(async (millis: number) => {
@@ -85,26 +96,39 @@ const NowPlayingWaveform = () => {
         height.value = withTiming(50);
     };
 
-    const gesture = Gesture.Simultaneous(
-        Gesture.Tap()
-            .onStart((event) => {
-                'worklet';
-                const relativeX = calculateProgressWorklet(event.absoluteX);
-                finishSeekWorklet(relativeX);
-            }),
-        Gesture.Pan()
-            .onStart(() => {
-                'worklet';
+    const tapGesture = Gesture.Tap()
+        .onStart((event) => {
+            'worklet';
+            const relativeX = calculateProgressWorklet(event.absoluteX);
+            finishSeekWorklet(relativeX);
+        });
+
+    const panGesture = Gesture.Pan()
+        .onUpdate((event) => {
+            'worklet';
+            const dx = Math.abs(event.translationX);
+            const dy = Math.abs(event.translationY);
+
+            if (!seeking.value && dx > dy) {
                 seeking.value = true;
-            })
-            .onUpdate((event) => {
-                'worklet';
+            }
+
+            if (seeking.value) {
                 calculateProgressWorklet(event.absoluteX);
-            })
-            .onEnd(() => {
-                'worklet';
+            }
+        })
+        .onEnd(() => {
+            'worklet';
+            if (seeking.value) {
                 finishSeekWorklet();
-            })
+                seeking.value = false;
+            }
+        });
+
+// Combine gestures to only activate Pan if it wins
+    const gesture = Gesture.Exclusive(
+        panGesture,
+        tapGesture
     );
 
     // Refactor useEffect to avoid reading seeking.value in render
@@ -126,17 +150,20 @@ const NowPlayingWaveform = () => {
                     <WaveformRenderer
                         waveformData={waveformQuery.data}
                         width={size}
-                        height={120}
+                        height={100}
                         color={palette.lightgrey}
                         playedColor={palette.olive}
                         progress={progress / duration}
                     />
                 </View>
             </GestureDetector>
-
-            <View style={styles.durations}>
-                <Text style={styles.duration}>{formatPositionMillis(position)}</Text>
-                <Text style={styles.duration}>{formatPositionMillis(duration)}</Text>
+            <View style={styles.times}>
+                <Text style={styles.time}>
+                    { secondsToTimeFormat(Math.floor(currentProgress.position)) }
+                </Text>
+                <Text style={styles.time}>
+                    { secondsToTimeFormat(Math.floor(currentProgress.duration)) }
+                </Text>
             </View>
         </View>
     );

@@ -34,10 +34,6 @@ const Feed = () => {
         following: FollowingFeed,
     })
 
-    // useEffect(() => {
-    //     DeviceEventEmitter.emit('sheet:expand', { name: 'SubscriptionPresentation' })
-    // }, [])
-
     return(
         <Screen>
             <FeedHeader />

@@ -3,7 +3,7 @@ import LottieView from "lottie-react-native";
 import {usePlaybackState} from "react-native-track-player";
 import Animated, {useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
-import {useMediaStoreSelectors} from "@/common/store/media";
+import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 
 interface EqualizerAnimationProps {
     size: number
@@ -12,7 +12,7 @@ interface EqualizerAnimationProps {
 const EqualizerAnimation = ({size = 24}: EqualizerAnimationProps) => {
 
     const track = useTrackContext()
-    const currentTrack = useMediaStoreSelectors.current()
+    const currentTrack = useCurrentTrack()
 
     const state = usePlaybackState()
 

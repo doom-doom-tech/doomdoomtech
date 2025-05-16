@@ -56,12 +56,11 @@ const SingleTrackRating = ({}: FeedTrackRateProps) => {
         translate.value = withTiming(20)
     }, [track])
 
-    useEventListener('track:rate:trigger', handleTriggerRating)
-    useEventListener('track:rate:increase', handleIncreaseRating)
+    useEventListener('track:rate:complete', handleCompleteRating)
 
     return(
         <Animated.View style={wrapperStyle}>
-            <TrackRate onCompleteRating={handleCompleteRating} />
+            <TrackRate />
         </Animated.View>
     )
 }

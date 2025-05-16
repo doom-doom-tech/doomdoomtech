@@ -77,7 +77,7 @@ const DraggableTrackRow: React.FC<DraggableTrackRowProps> = ({
                         onRemove={onRemove}
                         numbered
                         index={index + 1}
-                        type={state === 'edit' ? 'remove' : 'drag'}
+                        type={state === 'edit' ? 'remove' : 'options'}
                     />
                 </TrackContextProvider>
             </Animated.View>

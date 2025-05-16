@@ -6,13 +6,15 @@ import Screen from "@/common/components/Screen";
 import SingleTrackHeader from "@/features/track/components/single-track/SingleTrackHeader";
 import SingleTrackInformation from "@/features/track/components/single-track/SingleTrackInformation";
 import {styling} from "@/theme";
-import SingleTrackMetrics from "@/features/track/components/single-track/SingleTrackMetrics";
 import {useLocalSearchParams} from "expo-router";
 import useTrack from "@/features/track/hooks/useTrack";
 import SingleTrackLoading from "@/features/track/screens/SingleTrackLoading";
 import _ from "lodash";
 import Scroll from "@/common/components/Scroll";
-import TrackOptions from "@/features/track/sheets/TrackOptions";
+import NowPlayingMetrics from "@/features/track/components/now-playing/NowPlayingMetrics";
+import SingleTrackMoreFromArtist from "@/features/track/components/single-track/SingleTrackMoreFromArtist";
+import Queueable from "@/common/components/Queueable";
+
 
 const SingleTrack = () => {
 
@@ -37,15 +39,17 @@ const SingleTrack = () => {
 
     return(
         <Screen>
-            <TrackContextProvider track={trackQuery.data}>
-                <SingleTrackHeader />
-                <Scroll onRefresh={trackQuery.refetch} refreshing={trackQuery.isRefetching} contentContainerStyle={styles.container}>
-                    <SingleTrackMedia />
-                    <SingleTrackInformation />
-                    <SingleTrackMetrics />
-                </Scroll>
-                <TrackOptions />
-            </TrackContextProvider>
+            <Queueable query={trackQuery}>
+                <TrackContextProvider track={trackQuery.data}>
+                    <SingleTrackHeader />
+                    <Scroll onRefresh={trackQuery.refetch} refreshing={trackQuery.isRefetching} contentContainerStyle={styles.container}>
+                        <SingleTrackMedia />
+                        <SingleTrackInformation />
+                        <NowPlayingMetrics />
+                        <SingleTrackMoreFromArtist />
+                    </Scroll>
+                </TrackContextProvider>
+            </Queueable>
         </Screen>
     )
 }

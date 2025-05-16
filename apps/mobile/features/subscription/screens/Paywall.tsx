@@ -46,8 +46,8 @@ const Paywall = () => {
             position: 'absolute',
             bottom: 0,
             width: width,
-            height: (height / 2) + 100,
-            backgroundColor: 'black',
+            height: height * 0.75,
+            backgroundColor: palette.black,
             borderTopLeftRadius: 50,
             borderTopRightRadius: 50,
         },
@@ -79,10 +79,11 @@ const Paywall = () => {
             marginVertical: 24,
         },
         usp: {
+            fontSize: 12,
             flexDirection: 'row',
             alignItems: 'center',
             gap: spacing.m,
-            maxWidth: width - 100
+            maxWidth: width - 50
         },
         text: {
             color: palette.granite,
@@ -117,6 +118,10 @@ const Paywall = () => {
         {
             label: "",
             user: "Use up to 5 label tags per upload and spotlight your tracks to your favorite labels."
+        },
+        {
+            label: "",
+            user: "Post up to 10 notes per day instead of 3, and share your latest updates with your fans."
         },
     ]
 

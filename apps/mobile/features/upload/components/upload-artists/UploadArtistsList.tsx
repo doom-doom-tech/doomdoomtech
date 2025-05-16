@@ -1,5 +1,5 @@
 import {StyleSheet, useWindowDimensions, View} from 'react-native'
-import {useCallback, useMemo} from "react";
+import {useCallback, useMemo, useState} from "react";
 import useUserFollowing from "@/features/follow/hooks/useUserFollowing";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import List, {ListRenderItemPropsInterface} from "@/common/components/List";
@@ -10,21 +10,21 @@ import {useUploadStoreSelectors} from "@/features/upload/store/upload";
 import _ from "lodash";
 import Input from "@/common/components/inputs/Input";
 import {spacing} from "@/theme";
+import useUsers from "@/features/user/hooks/useUsers";
+import useSearchUsers from "@/features/search/hooks/useSearchUsers";
 
-interface UploadArtistsOverviewProps {
+const UploadArtistsList = () => {
 
-}
+    const {height} = useWindowDimensions()
 
-const UploadArtistsList = ({}: UploadArtistsOverviewProps) => {
-
-    const { height } = useWindowDimensions()
+    const [query, setQuery] = useState<string>('')
 
     const currentUser = useGlobalUserContext()
 
-    const artists = useUploadStoreSelectors.artists()
-    const { setState: setUploadState } = useUploadStoreSelectors.actions()
+    const usersQuery = useSearchUsers(query)
 
-    const followeesQuery = useUserFollowing({ userID: currentUser?.getID() ?? 0 })
+    const artists = useUploadStoreSelectors.artists()
+    const {setState: setUploadState} = useUploadStoreSelectors.actions()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -39,12 +39,14 @@ const UploadArtistsList = ({}: UploadArtistsOverviewProps) => {
     }, []);
 
     const handleSelectArtist = useCallback((artist: User) => () => {
+        if (artist.getID() === currentUser?.getID()) return
+
         setUploadState({
             artists: _.some(artists, uploadableArtist => uploadableArtist.artist.getID() === artist.getID())
                 ? _.reject(artists, uploadableArtist => uploadableArtist.artist.getID() === artist.getID())
-                : [...artists, { artist, role: 'Artist', royalties: 0 }]
+                : [...artists, {artist, role: 'Artist', royalties: 0}]
         })
-    }, [artists])
+    }, [artists, currentUser])
 
     const selected = useCallback((artist: User) => {
         return _.some(artists, a => a.artist.getID() === artist.getID())
@@ -72,16 +74,18 @@ const UploadArtistsList = ({}: UploadArtistsOverviewProps) => {
         </UserContextProvider>
     ), [currentUser])
 
-    return(
+    return (
         <View style={styles.wrapper}>
-            <Input placeholder={"Search for artists"} />
+            <Input
+                wrapperStyle={{paddingHorizontal: spacing.m}}
+                placeholder={"Search for artists"} onChangeText={setQuery}/>
             <List
                 <User>
                 infinite
                 contentContainerStyle={styles.container}
-                ListHeaderComponent={ListHeaderComponent}
+                ListHeaderComponent={query ? <></> : ListHeaderComponent}
                 renderItem={RenderItem}
-                query={followeesQuery}
+                query={usersQuery}
             />
         </View>
     )

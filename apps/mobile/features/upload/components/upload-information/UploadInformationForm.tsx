@@ -4,6 +4,7 @@ import Input from "@/common/components/inputs/Input";
 import {spacing} from "@/theme";
 import SwitchConsent from "@/common/components/consent/SwitchConsent";
 import {useUploadStoreSelectors} from "@/features/upload/store/upload";
+import UploadDescription from "@/features/upload/components/UploadDescription";
 
 interface UploadInformationFormProps {
 
@@ -17,7 +18,7 @@ const UploadInformationForm = ({}: UploadInformationFormProps) => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                gap: spacing.s,
+                gap: spacing.m,
                 paddingHorizontal: spacing.m
             },
         })
@@ -29,6 +30,10 @@ const UploadInformationForm = ({}: UploadInformationFormProps) => {
 
     return(
         <View style={styles.wrapper}>
+            <UploadDescription
+                description={"Enter your track's title and indicate if it contains explicit content."}
+            />
+
             <Input
                 placeholder={"Track title"}
                 onChangeText={handleChange('title')} />

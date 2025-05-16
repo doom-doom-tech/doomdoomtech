@@ -10,7 +10,7 @@ interface ShareBackgroundProps {
 
 const ShareBackground = ({}: ShareBackgroundProps) => {
 
-    const { width: size } = useWindowDimensions()
+    const { width: size, height } = useWindowDimensions()
 
     const entity = useShareStoreSelectors.entity()
 
@@ -18,15 +18,15 @@ const ShareBackground = ({}: ShareBackgroundProps) => {
         return StyleSheet.create({
             wrapper: {
                 opacity: 0.5,
-                width: size, height: 800,
+                width: size, height: height,
                 ...StyleSheet.absoluteFillObject,
             },
             blurview: {
                 position: 'absolute',
-                width: size, height: 800,
+                width: size, height: height,
             },
             image: {
-                width: size, height: 800,
+                width: size, height: height,
             }
         })
     }, []);

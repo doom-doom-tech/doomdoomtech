@@ -1,26 +1,28 @@
-import {AppState, AppStateStatus, StyleSheet, View} from 'react-native';
-import {Image} from 'expo-image';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useTrackContext} from '@/features/track/context/TrackContextProvider';
 import {useMediaStoreSelectors} from '@/common/store/media';
-import {State, useProgress} from 'react-native-track-player';
+import {State, useActiveTrack, useProgress} from 'react-native-track-player';
 import {ResizeMode, Video} from 'expo-av';
-import {CONFIG} from "@/common/constants";
+import {useVisiblityContext} from "@/common/context/VisiblityContextProvider";
+import CachedImage from "@/common/components/CachedImage";
+import {NativeTrack} from "@/features/queue/types";
 
 interface TrackCoverProps {
-    size: number;
-    visible?: boolean
+    size?: number;
 }
 
 const SYNC_THRESHOLD = 5;
 
-const TrackCover = ({ size = 100, visible = true }: TrackCoverProps) => {
+const TrackCover = ({ size = 100 }: TrackCoverProps) => {
 
     const track = useTrackContext();
     const state = useMediaStoreSelectors.state();
-    const currentTrack = useMediaStoreSelectors.current();
 
-    const [currentAppState, setCurrentAppState] = useState<AppStateStatus>('active');
+    const currentTrack: NativeTrack | undefined = useActiveTrack()
+
+    const visible = useVisiblityContext()
+
     const { position: trackPosition } = useProgress();
 
     // Create a ref for the Video component from expo-av
@@ -63,8 +65,9 @@ const TrackCover = ({ size = 100, visible = true }: TrackCoverProps) => {
      * Handle play/pause logic when the track player state changes
      */
     useEffect(() => {
-        if (!videoRef.current) return;
-        if (track.getUUID() !== currentTrack?.getUUID() || track.getMediaType() !== 'video') return;
+        if (!videoRef.current || !currentTrack) return;
+
+        if (track.getID() !== currentTrack.id || track.getMediaType() !== 'video') return;
 
         const updatePlayerState = async () => {
             if (state === State.Playing) {
@@ -79,28 +82,15 @@ const TrackCover = ({ size = 100, visible = true }: TrackCoverProps) => {
     }, [state, track, currentTrack, syncVideoWithTrackPlayer]);
 
     /**
-     * Watch app state changes (optional if you want to handle background/foreground behavior)
-     */
-    useEffect(() => {
-        const appStateListener = AppState.addEventListener('change', (event) => {
-            setCurrentAppState(event);
-        });
-        return () => {
-            appStateListener.remove();
-        };
-    }, []);
-
-    /**
      * If this is audio, render the cover image
      */
     if (!track.getVideoSource()) {
         return (
-            <Image
-                placeholder={{ blurhash: CONFIG.BLURHASH }}
-                transition={300}
-                contentFit="cover"
-                enableLiveTextInteraction={false}
-                source={track.getCoverSource()}
+            <CachedImage
+                width={size}
+                contentPosition={'center'}
+                contentFit={'cover'}
+                source={track.getCoverSource() as string}
                 style={styles.media}
             />
         );

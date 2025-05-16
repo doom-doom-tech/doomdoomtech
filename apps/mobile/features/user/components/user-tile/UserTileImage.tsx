@@ -69,13 +69,7 @@ const UserTileImage = ({size, selectable, selected, onSelect = _.noop}: UserTile
     }, [user, onSelect])
 
     const SelectionComponent = useCallback(() => {
-        // if(!selectable && user.isPremium()) return (
-        //     <View style={styles.badgeCircle}>
-        //         <PremiumFeature />
-        //     </View>
-        // )
-
-        if(!selectable && !user.isPremium()) return <Fragment />
+        if(!selectable) return <Fragment />
 
         return(
             <View style={styles.selectionCircle}>

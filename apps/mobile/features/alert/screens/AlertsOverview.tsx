@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native'
-import {useCallback, useMemo} from "react";
+import {useCallback, useEffect, useMemo} from "react";
 import Screen from "@/common/components/Screen";
 import Header from "@/common/components/header/Header";
 import List, {ListRenderItemPropsInterface} from "@/common/components/List";
@@ -7,6 +7,7 @@ import Alert from "@/features/alert/classes/Alert";
 import useAlerts from "@/features/alert/hooks/useAlerts";
 import AlertContextProvider from "@/features/alert/context/AlertContextProvider";
 import AlertRow from "@/features/alert/components/alert-row/AlertRow";
+import {useQueryClient} from "@tanstack/react-query";
 
 interface AlertsOverviewProps {
 
@@ -15,6 +16,11 @@ interface AlertsOverviewProps {
 const AlertsOverview = ({}: AlertsOverviewProps) => {
 
     const alertsQuery = useAlerts()
+    const queryClient = useQueryClient()
+
+    useEffect(() => {
+        queryClient.invalidateQueries({ queryKey: ['alerts', 'count'] })
+    }, [queryClient])
 
     const styles = useMemo(() => {
         return StyleSheet.create({

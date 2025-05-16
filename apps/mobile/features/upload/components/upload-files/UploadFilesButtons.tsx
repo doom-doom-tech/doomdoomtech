@@ -1,10 +1,8 @@
 import {StyleSheet, View} from 'react-native'
 import {useMemo} from "react";
 import UploadFilesButton from "@/features/upload/components/upload-files/UploadFilesButton";
-import {palette, spacing} from "@/theme";
-import Text from "@/common/components/Text";
-import Input from "@/common/components/inputs/Input";
-import { useUploadStoreSelectors } from '@/features/upload/store/upload';
+import {spacing} from "@/theme";
+import {useUploadStoreSelectors} from '@/features/upload/store/upload';
 
 interface UploadFilesButtonsProps {
 
@@ -12,6 +10,7 @@ interface UploadFilesButtonsProps {
 
 const UploadFilesButtons = ({}: UploadFilesButtonsProps) => {
 
+    const files = useUploadStoreSelectors.files()
     const { setState: setUploadState } = useUploadStoreSelectors.actions()
 
     const styles = useMemo(() => {
@@ -30,7 +29,7 @@ const UploadFilesButtons = ({}: UploadFilesButtonsProps) => {
     return(
         <View style={styles.wrapper}>
             <UploadFilesButton label={'Audio/Video'} target={'audio-video'} />
-            <UploadFilesButton label={'Cover image'} target={'cover'} />
+            { !files.some(file => file.mimeType?.includes('video')) && <UploadFilesButton label={'Cover image'} target={'cover'} /> }
         </View>
     )
 }

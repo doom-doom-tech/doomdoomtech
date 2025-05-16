@@ -121,6 +121,10 @@ class Track {
         return this.data.saved
     }
 
+    public getReleaseDate() {
+        return '-'
+    }
+
     private getRemainingActivityCount(activity: TrackActivityInterface) {
         switch (activity.type) {
             case "like": return (this.data.metrics?.total_ratings ?? 0) - activity.users.length

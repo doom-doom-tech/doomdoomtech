@@ -16,6 +16,7 @@ import {CREDIT_VALUES} from "../../../common/constants/credits";
 export interface IListTrackService {
     add(data: AddListTrackRequest): Promise<void>
     remove(data: DeleteListTrackRequest): Promise<void>
+    count(authID: number): Promise<number>;
     bulkUpdatePositions(data: BulkUpdateListTrackRequest): Promise<void>
 }
 
@@ -25,6 +26,19 @@ class ListTrackService extends Singleton implements IListTrackService {
     constructor(
         @inject("Database") protected db: ExtendedPrismaClient
     ) { super() }
+
+    public async count(authID: number) {
+        const count =  await this.db.listTrack.count({
+            where: {
+                list: {
+                    userID: authID
+                },
+                read: false
+            }
+        });
+
+        return count
+    }
 
     public async add(data: AddListTrackRequest): Promise<void> {
 

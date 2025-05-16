@@ -3,7 +3,6 @@ import {useCallback, useEffect, useMemo} from "react";
 import UserRow from "@/features/user/components/user-row/UserRow";
 import _ from 'lodash';
 import Input from "@/common/components/inputs/Input";
-import HorizontalOptions, {Option} from "@/common/components/HorizontalOptions";
 import {palette, spacing} from "@/theme";
 import {UploadableArtist, useUploadStoreSelectors} from "@/features/upload/store/upload";
 import UserContextProvider from "@/features/user/context/UserContextProvider";
@@ -44,28 +43,6 @@ const UploadRoyaltiesBlock = ({ artist }: UploadRoyaltiesProps) => {
         });
     }, []);
 
-    // Explicitly type the options array to match the expected type
-    const options = useMemo<Array<Option<"Artist" | "Producer" | "Songwriter">>>(() => {
-        return [
-            {
-                label: 'Artist',
-                value: 'Artist' as const
-            },
-            {
-                label: 'Producer',
-                value: 'Producer' as const
-            },
-            {
-                label: 'Songwriter',
-                value: 'Songwriter' as const
-            },
-            {
-                label: 'Label',
-                value: 'Label' as const
-            }
-        ];
-    }, []);
-
     const handleUpdateArtistRoyalties = useCallback((value: string) => {
         setUploadState({
             artists: _.map(artists, a => {
@@ -73,21 +50,6 @@ const UploadRoyaltiesBlock = ({ artist }: UploadRoyaltiesProps) => {
                     return { ...a, royalties: Number(value) };
                 } else {
                     return a;
-                }
-            })
-        });
-    }, [artists, artist.artist, setUploadState]);
-
-    const handleSelectArtistRole = useCallback((value: typeof options[number]['value']) => {
-
-        if(artist.artist.isLabel()) return
-
-        setUploadState({
-            artists: _.map(artists, a => {
-                if (a.artist.getID() === artist.artist.getID()) {
-                    return { ...a, role: value };
-                } else {
-                    return { ...a, role: a.role };
                 }
             })
         });
@@ -104,15 +66,6 @@ const UploadRoyaltiesBlock = ({ artist }: UploadRoyaltiesProps) => {
                 onChangeText={handleUpdateArtistRoyalties}
                 placeholder={"Royalty percentage"}
             />
-
-            <View style={{ opacity: artist.artist.isLabel() ? 0.5 : 1 }}>
-                <HorizontalOptions
-                    label={"Role"}
-                    selected={(item) => artist.role === item}
-                    onSelect={handleSelectArtistRole}
-                    options={options}
-                />
-            </View>
         </View>
     );
 };

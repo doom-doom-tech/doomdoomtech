@@ -1,8 +1,10 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
 import Text from "@/common/components/Text";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
 import {palette, spacing} from "@/theme";
+import PremiumFeature from "@/assets/icons/PremiumFeature";
+import {router} from "expo-router";
 
 const CreateNoteLimit = () => {
 
@@ -16,12 +18,28 @@ const CreateNoteLimit = () => {
         wrapper: {
             paddingVertical: spacing.s,
             paddingHorizontal: spacing.m,
-            backgroundColor: DAILY_LIMIT - POSTED_COUNT === 0 ? palette.error : palette.olive + '50'
+            backgroundColor: DAILY_LIMIT - POSTED_COUNT === 0 ? palette.error + '80' : palette.olive + '80'
         },
         label: {
-            color: palette.granite
+            textAlign: 'center',
+            color: palette.granite,
+            alignItems: 'center',
+            lineHeight: 24,
+        },
+        premium: {
+            color: palette.premium
         }
     })
+
+    const routePaywall = () => router.push('/paywall')
+
+    if(DAILY_LIMIT - POSTED_COUNT === 0) return(
+        <TouchableOpacity style={styles.wrapper} onPress={routePaywall}>
+            <Text style={styles.label}>
+                no notes left today. <Text style={styles.premium}>Get more <PremiumFeature /></Text>
+            </Text>
+        </TouchableOpacity>
+    )
 
     return(
         <View style={styles.wrapper}>

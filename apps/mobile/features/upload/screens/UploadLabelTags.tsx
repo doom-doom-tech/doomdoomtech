@@ -6,6 +6,8 @@ import UploadLabelTagSelection from "@/features/upload/components/upload-label-t
 import {spacing} from "@/theme";
 import Button from "@/common/components/buttons/Button";
 import {router} from "expo-router";
+import UploadDescription from "@/features/upload/components/UploadDescription";
+
 
 interface UploadLabelTagsProps {
 
@@ -32,6 +34,9 @@ const UploadLabelTags = ({}: UploadLabelTagsProps) => {
         <View style={styles.wrapper}>
             <Header title={"Tag a label"} />
             <View style={styles.content}>
+                <UploadDescription
+                    description={"Select label tags to send your track to label inboxes for A&R managers to review. Regular members get 1 tag per upload, premium members get 5."}
+                />
                 <UploadLabelTagFunds />
                 <UploadLabelTagSelection />
                 <Button fill={'olive'} label={"Next"} callback={handleNext}/>

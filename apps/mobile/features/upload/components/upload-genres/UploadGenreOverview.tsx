@@ -91,6 +91,7 @@ const UploadGenreOverview = ({}: UploadGenresProps) => {
         <View style={styles.wrapper}>
             <Input
                 onChangeText={setQuery}
+                wrapperStyle={{ paddingHorizontal: spacing.m }}
                 placeholder={"Search for a genre"}
             />
             <ListView />

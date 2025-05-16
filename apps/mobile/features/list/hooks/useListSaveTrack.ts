@@ -10,7 +10,7 @@ const saveTrack = async (data: TrackIDRequest) => {
 const useListSaveTrack = () => useMutation({
     mutationFn: (data: TrackIDRequest) => saveTrack(data),
     onMutate: (variables) => {
-        DeviceEventEmitter.emit(`track:save`, variables.trackID)
+        DeviceEventEmitter.emit(`list:track:save`, variables.trackID)
     },
     onSuccess: async (res, req) => {
         DeviceEventEmitter.emit(`top-picks:refetch`)

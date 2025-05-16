@@ -64,6 +64,19 @@ class ListService extends Service implements IListService {
 			},
 			where: { list: { id: list.id } },
 		})
+		
+		if(list.userID === data.authID) {
+			for(let listTrack of response) {
+				await this.db.listTrack.update({
+					where: {
+						id: listTrack.id
+					},
+					data: {
+						read: true
+					}
+				})
+			}
+		}
 
 		return _.map(response, listTrack => TrackMapper.format(listTrack.track))
 	};

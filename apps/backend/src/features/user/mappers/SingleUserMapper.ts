@@ -11,6 +11,7 @@ export class SingleUserMapper {
             uuid: true,
             email: true,
             label: true,
+            premium: true,
             credits: true,
             username: true,
             verified: true,

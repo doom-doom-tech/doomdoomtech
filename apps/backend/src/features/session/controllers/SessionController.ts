@@ -4,11 +4,13 @@ import {formatErrorResponse} from "../../../common/utils/responses";
 import {Context} from "../../../common/utils/context";
 import Controller from "../../../common/controllers/Controller";
 import {container} from "../../../common/utils/tsyringe";
+import {singleton} from "tsyringe";
 
 export interface ISessionController {
     create(req: Request, res: Response): Promise<void>
 }
 
+@singleton()
 class SessionController extends Controller implements ISessionController {
 
     public create = async (req: Request, res: Response)=>  {

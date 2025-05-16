@@ -9,12 +9,11 @@ import {v4 as uuid} from "uuid";
 import axios from "axios";
 import fs from "fs/promises";
 import {IQueue} from "../../../common/types";
-import {SimpleIDInterface} from "doomdoomtech/common/types/common"; // Node.js fs module for reading files
 
 export interface IMediaService extends IServiceInterface {
     upload(data: UploadMediaRequest): Promise<string>;
     create(data: CreateMediaRequest): Promise<MediaInterface>;
-    delete(data: SimpleIDInterface): Promise<void>;
+    delete(data: { id: number }): Promise<void>;
     save(externalURL: string, filename: string, folder: string): Promise<string>;
     uploadBuffer(buffer: Buffer, fileName: string, targetFolder: string, mimetype: string): Promise<string>
     extractTypeFromMimetype(mimetype: string): string
@@ -140,7 +139,7 @@ class MediaService extends Service implements IMediaService {
         return url
     }
 
-    public delete = async (data: SimpleIDInterface) => {
+    public delete = async (data: { id: number }) => {
         await this.db.media.deleteMany({
             where: {
                 id: data.id

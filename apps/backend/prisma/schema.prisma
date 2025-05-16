@@ -556,6 +556,8 @@ model ListTrack {
 
     position Int
 
+    read Boolean @default(false)
+
     created DateTime @default(now()) @db.Date
     updated DateTime @default(now()) @updatedAt
 

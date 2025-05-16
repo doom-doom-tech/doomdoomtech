@@ -87,6 +87,18 @@ class AlertService extends Service implements IAlertService {
 			pageSize: 10,
 		});
 
+		// Mark fetched alerts as read
+		if (response.data.length > 0) {
+			const alertIds = response.data.map(alert => alert.id);
+			await this.db.alert.updateMany({
+				where: { 
+					id: { in: alertIds },
+					targetID: data.authID 
+				},
+				data: { read: true }
+			});
+		}
+
 		const populatedAlerts = await Promise.all(
 			response.data.map(alert => this.populateEntity(AlertMapper.format(alert), data.authID))
 		)

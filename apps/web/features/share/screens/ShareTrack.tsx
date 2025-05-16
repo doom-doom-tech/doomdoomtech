@@ -13,9 +13,6 @@ const ShareTrack = () => {
     const { height } = useWindowDimensions();
     const params = useLocalSearchParams<any>();
 
-    console.log(params)
-
-    // Fallback for static export: Parse query params client-side
     const [queryParams, setQueryParams] = useState({
         id: "",
         title: "",
@@ -23,11 +20,9 @@ const ShareTrack = () => {
         image: "",
     });
 
-    // State for track data fetched from API
     const [trackData, setTrackData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
 
-    // Function to fetch track data from API
     const fetchTrackData = async (trackId: string) => {
         try {
             setLoading(true);

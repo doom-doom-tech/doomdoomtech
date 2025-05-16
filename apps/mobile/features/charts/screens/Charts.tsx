@@ -90,7 +90,7 @@ const Charts = () => {
     const opacity = useSharedValue(0)
 
     useEffect(() => {
-        setTimeout(() => setLoading(false), 3000)
+        setTimeout(() => setLoading(false), 1000)
     }, []);
 
     const animatedContentStyle = useAnimatedStyle(() => ({
@@ -115,7 +115,7 @@ const Charts = () => {
                     { loading && <Loading />}
 
                     <Animated.View style={animatedContentStyle}>
-                        <LatestVideos />
+
                         <LatestTracks />
                         <NewArtists />
                         <LatestLabels />
@@ -123,6 +123,7 @@ const Charts = () => {
                         <MostListenedTracks />
                         <MostPopularTracks />
                         <LatestNotes />
+                        <LatestVideos />
                     </Animated.View>
                 </>
 

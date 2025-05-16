@@ -27,10 +27,8 @@ const TrackTile = ({size = 150}: TrackTileProps) => {
     }, [size]);
 
     const handleLoadTrack = useCallback(async () => {
-        // First emit the queue:construct event to ensure the queue is properly constructed
         DeviceEventEmitter.emit('queue:construct', { listUUID });
 
-        // Then load and play the track
         await loadTrack(track)
 
         DeviceEventEmitter.emit('notes:mute')

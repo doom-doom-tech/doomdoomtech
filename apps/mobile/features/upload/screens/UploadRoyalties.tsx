@@ -1,4 +1,4 @@
-import {ScrollView, StyleSheet, useWindowDimensions, View} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useCallback, useMemo} from "react";
 import Header from "@/common/components/header/Header";
 import UploadRoyaltiesBlock from "@/features/upload/components/upload-royalties/UploadRoyaltiesBlock";
@@ -8,6 +8,7 @@ import Button from "@/common/components/buttons/Button";
 import {router} from "expo-router";
 import {spacing} from "@/theme";
 import UploadRoyaltiesNotice from "@/features/upload/components/upload-royalties/UploadRoyaltiesNotice";
+import UploadDescription from '../components/UploadDescription';
 
 interface UploadRoyaltiesProps {
 
@@ -47,6 +48,7 @@ const UploadRoyalties = ({}: UploadRoyaltiesProps) => {
     return(
         <View style={styles.wrapper}>
             <Header title={"Artist royalties"} />
+            <UploadDescription description={"Split royalties with collaborating artists. Ensure the total adds up to 100%."} />
             <ScrollView 
                 style={styles.scrollView}
                 contentContainerStyle={styles.container} 

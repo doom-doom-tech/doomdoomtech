@@ -1,5 +1,4 @@
 import {useMediaStoreSelectors} from "@/common/store/media";
-import Track from "@/features/track/classes/Track";
 import TrackPlayer, {Event, useProgress, useTrackPlayerEvents} from "react-native-track-player"
 import {useStreamStoreSelectors} from "@/common/store/stream";
 import {CONFIG} from "@/common/constants";
@@ -7,62 +6,66 @@ import useTrackCreateStream from "@/features/track/hooks/useTrackCreateStream";
 import useTrackPlaytimeBatch from "@/features/track/hooks/useTrackPlaytimeBatch";
 import {useQueueStoreSelectors} from "@/common/store/queue";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
-import {useCallback} from "react";
-
-type MediaAction = 'play' | 'pause' | 'replace' | 'seek'
-
-export interface MediaEventPayload {
-    action: MediaAction
-    value: number
-    track: Track
-}
-
+import {useEffect} from "react";
+import {useRatingQueueStoreSelectors} from "@/features/track/store/rating-queue";
+import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
+import useTrackLike from "@/features/track/hooks/useTrackLike";
+import {DeviceEventEmitter} from "react-native";
+import useTrackCreatePlay from "@/features/track/hooks/useTrackPlay";
+import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 
 const useMediaEvents = () => {
 
     const progress = useProgress()
 
     const currentUser = useGlobalUserContext()
+    const currentTrack = useCurrentTrack()
+
+    const { rateTrack } = useAlgoliaEvents()
 
     const createStreamMutation = useTrackCreateStream()
     const batchTrackPlaytimeMutation = useTrackPlaytimeBatch()
+
+    const eligibleForRating = useRatingQueueStoreSelectors.eligible()
 
     const setMediaState = useMediaStoreSelectors.setState();
     const setStreamState = useStreamStoreSelectors.setState();
     const setQueueState = useQueueStoreSelectors.setState();
 
     const queue = useQueueStoreSelectors.queue()
-    const removeQueueTrack = useQueueStoreSelectors.removeTrack()
-    const moveQueueTrack = useQueueStoreSelectors.moveTrack()
 
-    const currentTrack = useMediaStoreSelectors.current()
     const currentPlaytime = useStreamStoreSelectors.playtime()
     const totalPlaytime = useStreamStoreSelectors.totalPlaytime()
 
-    // Helper: Remove track from both Zustand store and TrackPlayer queue
-    const removeTrackFromQueue = useCallback(async (index: number) => {
-        if (index === -1) return;
+    const likeTrackMutation = useTrackLike()
 
-        try {
-            // Remove from TrackPlayer queue
-            await TrackPlayer.remove(index);
-            // Remove from Zustand store
-            removeQueueTrack(index);
-        } catch (error) {
-            console.error('Error removing track from queue:', error);
+    const setRatingQueueState = useRatingQueueStoreSelectors.setState()
+    const currentRatingQueue = useRatingQueueStoreSelectors.current()
+
+    const trackPlayMutation = useTrackCreatePlay()
+
+    // Handle rating when track changes
+    useEffect(() => {
+        if(currentRatingQueue) {
+            rateTrack(currentRatingQueue.id, currentRatingQueue.rating)
+
+            likeTrackMutation.mutate({
+                trackID: currentRatingQueue.id,
+                amount: currentRatingQueue.rating
+            })
+
+            DeviceEventEmitter.emit(
+                'track:rate:complete',
+                { getID: () => currentRatingQueue.id },
+                currentRatingQueue.rating
+            )
+
+            setRatingQueueState({ current: null })
         }
-    }, [removeQueueTrack]);
 
-    const moveTrackInQueue = useCallback(async (from: number, to: number) => {
-        if (to <= 0) return;
-
-        try {
-            await TrackPlayer.move(from, to);
-            moveQueueTrack(from, to);
-        } catch (error) {
-            console.error('Error removing track from queue:', error);
-        }
-    }, [])
+        // Handle play request
+        currentTrack && trackPlayMutation.mutate({ trackID: currentTrack.getID() })
+    }, [currentTrack])
 
     useTrackPlayerEvents([Event.RemoteSeek], async (event) => {
         await TrackPlayer.seekTo(event.position)
@@ -89,16 +92,11 @@ const useMediaEvents = () => {
     })
 
     useTrackPlayerEvents([Event.PlaybackQueueEnded], (event) => {
-        setMediaState({ current: null });
         setQueueState({ queue: [] });
     });
 
     useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async (event) => {
-        try {
-            (event.index !== undefined && queue.length) && setMediaState({ current: queue[event.index] });
-        } catch (error) {
-            console.error('Error handling PlaybackActiveTrackChanged:', error);
-        }
+        await TrackPlayer.play()
     });
 
     useTrackPlayerEvents([Event.PlaybackProgressUpdated], async (event) => {
@@ -111,8 +109,12 @@ const useMediaEvents = () => {
             setStreamState({ playtime: currentPlaytime + 1, totalPlaytime: totalPlaytime + 1 })
         }
 
-        // Check if 10 seconds have passed, send the batch to the server and reset
-        if(currentPlaytime >= 10) {
+        // Check if 10 seconds have passed, send the batch to the server, enable the rating and reset
+        if(currentPlaytime === 10) {
+            setRatingQueueState({
+                eligible: new Set([...eligibleForRating, currentTrack.getID()])
+            })
+
             await batchTrackPlaytimeMutation.mutateAsync({
                 trackID: currentTrack.getID(),
                 amount: 10

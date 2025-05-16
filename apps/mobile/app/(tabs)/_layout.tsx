@@ -8,7 +8,7 @@ import NewPostOverlay from "@/common/components/new-post/NewPostOverlay";
 import SocketContextProvider from "@/common/context/SocketContextProvider";
 import InviteCode from "@/features/auth/sheets/InviteCode";
 import PremiumConfirmation from "@/common/sheets/PremiumConfirmation";
-import SubscriptionPresentation from "@/features/subscription/sheets/SubscriptionPresentation";
+import TrackOptions from "@/features/track/sheets/TrackOptions";
 
 
 const TabLayout = () => {
@@ -31,8 +31,8 @@ const TabLayout = () => {
                 <ParticleAnimation />
 
                 <InviteCode />
+                <TrackOptions />
                 <PremiumConfirmation />
-                {/*<SubscriptionPresentation />*/}
             </SocketContextProvider>
         </GlobalUserContextProvider>
     )

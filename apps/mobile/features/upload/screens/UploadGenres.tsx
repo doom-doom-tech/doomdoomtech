@@ -6,6 +6,7 @@ import Button from "@/common/components/buttons/Button";
 import {useUploadStoreSelectors} from "@/features/upload/store/upload";
 import {router} from "expo-router";
 import {spacing} from "@/theme";
+import UploadDescription from "@/features/upload/components/UploadDescription";
 
 interface UploadGenresProps {
 
@@ -36,6 +37,9 @@ const UploadGenres = ({}: UploadGenresProps) => {
     return(
         <View style={styles.wrapper}>
             <Header title={"Select a genre"} />
+            <UploadDescription
+                description={"Select the genre that best represents your track."}
+            />
             <UploadGenreOverview />
             <Button disabled={!nextVisible} fill={'olive'} label={"Next"} callback={handleNext} />
         </View>

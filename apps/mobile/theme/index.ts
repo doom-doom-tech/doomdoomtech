@@ -126,6 +126,11 @@ export const styling = {
             flexDirection: 'row',
             gap: spacing.m
         },
+        l: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            gap: spacing.l
+        },
     },
     column: {
         s: {
