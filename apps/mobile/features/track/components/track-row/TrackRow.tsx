@@ -17,12 +17,12 @@ import Drag from "@/assets/icons/Drag";
 import {useQueueContext} from "@/common/components/Queueable";
 import TrackOptionsTrigger from "@/features/track/components/track-options/TrackOptionsTrigger";
 
-
 interface TrackRowProps {
     index?: number
     numbered?: boolean
     selected?: boolean
     selectable?: boolean
+    disableRouting?: boolean
     onDragEnd?: () => unknown
     onDragStart?: () => unknown
     onRemove?: (track: Track) => unknown
@@ -30,10 +30,8 @@ interface TrackRowProps {
     type: 'route' | 'drag' | 'remove' | 'no-action' | 'options'
 }
 
-const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noop, onRemove = _.noop, numbered, index, type}: TrackRowProps) => {
-
+const TrackRow = ({selected, selectable, disableRouting, onDragStart, onDragEnd, onSelect = _.noop, onRemove = _.noop, numbered, index, type}: TrackRowProps) => {
     const track = useTrackContext()
-
     const { loadTrack } = useMediaActions()
 
     const styles = useMemo(() => {
@@ -67,24 +65,21 @@ const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noo
         onRemove(track)
     }, [onRemove, track])
 
-    const RightComponent = useCallback(() => {
+    const RightComponent = () => {
         switch (type) {
             case 'route': return(
                 <Animated.View entering={FadeInDown} key={type}>
                     <ChevronRight onPress={handleRouteTrack} />
                 </Animated.View>
             )
-
             case 'remove': return(
                 <Animated.View entering={FadeInDown} key={type}>
                     <DashCircle color={palette.error} onPress={handleRemoveTrack} />
                 </Animated.View>
             )
-
             case 'no-action': return (
                 <Fragment />
             )
-
             case 'drag': return (
                 <TouchableOpacity
                     onPressIn={onDragStart}
@@ -92,19 +87,17 @@ const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noo
                     <Drag />
                 </TouchableOpacity>
             )
-
             case 'options': return (
                 <TrackOptionsTrigger />
             )
-
             default: return (
                 <Fragment />
             )
         }
-    }, [type])
+    }
 
     const handleCallback = useCallback(async () => {
-        if(selectable) return onSelect(track)
+        if (selectable) return onSelect(track)
 
         // First emit the queue:construct event to ensure the queue is properly constructed
         DeviceEventEmitter.emit('queue:construct', { listUUID });
@@ -121,15 +114,10 @@ const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noo
     const ContentWrapper = useMemo(() => {
         switch (type) {
             case "route": return TouchableOpacity
-                break;
             case "options": return TouchableOpacity
-                break;
             case "drag": return View
-                break;
             case "remove": return TouchableOpacity
-                break;
             case "no-action": return TouchableOpacity
-                break;
         }
     }, [type])
 
@@ -137,13 +125,13 @@ const TrackRow = ({selected, selectable,onDragStart, onDragEnd, onSelect = _.noo
         <View style={styles.wrapper}>
             <ContentWrapper style={styles.left} activeOpacity={0.5} onPress={handleCallback}>
                 { numbered && IndexedNumberComponent }
-                {selectable && (
+                { selectable && (
                     <Fragment>
                         {selected ? <RadioSelected color={palette.olive} /> : <Radio />}
                     </Fragment>
                 )}
                 <TrackCover size={65} />
-                <TrackInformation />
+                <TrackInformation selectable={selectable} disableRouting={disableRouting} />
             </ContentWrapper>
             <View>
                 {RightComponent()}

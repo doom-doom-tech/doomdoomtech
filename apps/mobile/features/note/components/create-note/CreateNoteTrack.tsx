@@ -34,7 +34,7 @@ const CreateNoteTrack = ({}: CreateNoteTrackProps) => {
     return(
         <View style={styles.wrapper}>
             <TrackContextProvider track={track}>
-                <TrackRow type={'remove'} onRemove={handleDeselectTrack} />
+                <TrackRow disableRouting type={'remove'} onRemove={handleDeselectTrack} />
                 {/*<CreateNoteTrackConfig />*/}
             </TrackContextProvider>
         </View>

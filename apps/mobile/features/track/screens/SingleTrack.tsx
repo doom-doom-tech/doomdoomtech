@@ -14,6 +14,7 @@ import Scroll from "@/common/components/Scroll";
 import NowPlayingMetrics from "@/features/track/components/now-playing/NowPlayingMetrics";
 import SingleTrackMoreFromArtist from "@/features/track/components/single-track/SingleTrackMoreFromArtist";
 import Queueable from "@/common/components/Queueable";
+import {convertToQueryResult} from "@/common/services/utilities";
 
 
 const SingleTrack = () => {
@@ -39,7 +40,7 @@ const SingleTrack = () => {
 
     return(
         <Screen>
-            <Queueable query={trackQuery}>
+            <Queueable query={convertToQueryResult([trackQuery.data])}>
                 <TrackContextProvider track={trackQuery.data}>
                     <SingleTrackHeader />
                     <Scroll onRefresh={trackQuery.refetch} refreshing={trackQuery.isRefetching} contentContainerStyle={styles.container}>

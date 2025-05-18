@@ -19,18 +19,9 @@ export class AuthRouter extends BaseRouter {
 	}
 
 	protected initializeRoutes(): void {
-		// Rate Limiter for Password Reset and Email Verification
-		const routerLevelRateLimiter = createDynamicRateLimiter({
-			windowMs: 15 * 60 * 1000,
-			limit: 2,
-			handler: (_req, res) => {
-				res.status(429).json(formatErrorResponse('You can only reset your password once every 15 minutes'));
-			}
-		});
-
 		const verifyEmailLimiter = createDynamicRateLimiter({
 			windowMs: 15 * 60 * 1000,
-			limit: 1,
+			limit: 4,
 			handler: (_req, res) => {
 				res.status(429).json(formatErrorResponse('You can only request a new email once every 15 minutes'));
 			}
@@ -38,7 +29,7 @@ export class AuthRouter extends BaseRouter {
 
 		const registrationLimiter = createDynamicRateLimiter({
 			windowMs: 60 * 60 * 1000,
-			limit: 4,
+			limit: 20,
 			handler: (_req: any, res: any) => {
 				res.status(429).json(formatErrorResponse('You can only register 4 accounts per hour'));
 			}

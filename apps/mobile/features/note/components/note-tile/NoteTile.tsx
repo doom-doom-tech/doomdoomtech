@@ -20,7 +20,8 @@ const NoteTile = () => {
             wrapper: {
                 gap: spacing.s,
                 paddingVertical: spacing.m,
-                width: screenWidth - 50
+                width: screenWidth - 50,
+                height: 200
             },
             background:  {
                 ...StyleSheet.absoluteFillObject,

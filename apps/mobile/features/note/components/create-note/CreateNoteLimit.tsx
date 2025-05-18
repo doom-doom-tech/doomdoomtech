@@ -33,10 +33,18 @@ const CreateNoteLimit = () => {
 
     const routePaywall = () => router.push('/paywall')
 
-    if(DAILY_LIMIT - POSTED_COUNT === 0) return(
+    if(DAILY_LIMIT - POSTED_COUNT === 0 && !premiumMember) return(
         <TouchableOpacity style={styles.wrapper} onPress={routePaywall}>
             <Text style={styles.label}>
                 no notes left today. <Text style={styles.premium}>Get more <PremiumFeature /></Text>
+            </Text>
+        </TouchableOpacity>
+    )
+
+    if(DAILY_LIMIT - POSTED_COUNT === 0) return(
+        <TouchableOpacity style={styles.wrapper}>
+            <Text style={styles.label}>
+                no notes left today.
             </Text>
         </TouchableOpacity>
     )

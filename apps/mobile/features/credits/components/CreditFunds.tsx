@@ -5,6 +5,7 @@ import Text from "@/common/components/Text";
 import millify from "millify";
 import {palette, spacing} from "@/theme";
 import {router} from "expo-router";
+import ChevronRight from '@/assets/icons/ChevronRight';
 
 interface CreditFundsProps {
     amount: number
@@ -40,6 +41,7 @@ const CreditFunds = ({amount = 0}: CreditFundsProps) => {
             <Text style={styles.label}>
                 {millify(amount, { precision: 2 })} credits
             </Text>
+            <ChevronRight />
         </TouchableOpacity>
     )
 }

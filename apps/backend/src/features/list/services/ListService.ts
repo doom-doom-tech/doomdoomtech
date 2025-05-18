@@ -12,11 +12,12 @@ import {TrackMapper} from "../../track/mappers/TrackMapper";
 import _ from "lodash";
 import {container} from "../../../common/utils/tsyringe";
 import EntityNotFoundError from "../../../common/classes/errors/EntityNotFoundError";
+import { log } from "node:console";
 
 export interface IListService extends IServiceInterface {
 	find(data: UserIDRequest): Promise<List | null>
 	create(data: CreateListRequest): Promise<void>;
-	tracks(data: FetchListTracksRequest): Promise<Array<TrackInterface>>;
+	tracks(data: FetchListTracksRequest & { query?: string }): Promise<Array<TrackInterface>>;
 }
 
 @singleton()
@@ -49,37 +50,62 @@ class ListService extends Service implements IListService {
 		});
 	};
 
-	public tracks = async (data: FetchListTracksRequest)  => {
-		const listService = container.resolve<IListService>("ListService");
-		const list = await listService.find(data)
-
-		if(!list) throw new EntityNotFoundError("List")
-
-		const response = await this.db.listTrack.findMany({
-			select: {
-				id: true,
-				track: {
-					select: TrackMapper.getSelectableFields()
-				}
-			},
-			where: { list: { id: list.id } },
-		})
-		
-		if(list.userID === data.authID) {
-			for(let listTrack of response) {
-				await this.db.listTrack.update({
-					where: {
-						id: listTrack.id
-					},
-					data: {
-						read: true
-					}
-				})
-			}
+	public tracks = async (data: FetchListTracksRequest & { query?: string, genre?: number, subgenre?: number }) => {
+		const list = await this.find(data);
+	  
+		if (!list) throw new EntityNotFoundError("List");
+	  
+		console.log(data);
+	  
+		// Build the track filter conditions
+		const trackFilters: any = {};
+	  
+		// Add genre filter if provided
+		if (data.genre) {
+		  trackFilters.genreID = data.genre;
 		}
-
-		return _.map(response, listTrack => TrackMapper.format(listTrack.track))
-	};
+	  
+		// Add subgenre filter if provided
+		if (data.subgenre) {
+		  trackFilters.subgenreID = data.subgenre;
+		}
+	  
+		// Add title search filter if query is provided
+		if (data.query) {
+		  trackFilters.title = {
+			contains: data.query,
+			mode: 'insensitive',
+		  };
+		}
+	  
+		const response = await this.db.listTrack.findMany({
+		  select: {
+			id: true,
+			track: {
+			  select: TrackMapper.getSelectableFields(),
+			},
+		  },
+		  where: {
+			list: { id: list.id },
+			track: trackFilters,
+		  },
+		});
+	  
+		if (list.userID === data.authID) {
+		  for (let listTrack of response) {
+			await this.db.listTrack.update({
+			  where: {
+				id: listTrack.id,
+			  },
+			  data: {
+				read: true,
+			  },
+			});
+		  }
+		}
+	  
+		return _.map(response, listTrack => TrackMapper.format(listTrack.track));
+	  };
 }
 
 export default ListService;

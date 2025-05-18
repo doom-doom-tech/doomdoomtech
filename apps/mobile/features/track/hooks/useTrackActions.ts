@@ -1,24 +1,24 @@
-import {useCallback, useEffect, useState} from "react";
-import {Alert, DeviceEventEmitter} from "react-native";
-import {router} from "expo-router";
-import _ from "lodash";
+import { useEffect, useState } from "react";
+import { Alert, DeviceEventEmitter } from "react-native";
+import { router } from "expo-router";
+import _, { before } from "lodash";
 import TrackPlayer from "react-native-track-player";
 import Toast from "react-native-root-toast";
-import {TOASTCONFIG} from "@/common/constants";
-import {useQueueStoreSelectors} from "@/common/store/queue";
-import {useShareStoreSelectors} from "@/features/share/store/share";
-import {useCreateNoteStoreSelectors} from "@/features/note/store/create-note";
+import { TOASTCONFIG } from "@/common/constants";
+import { useQueueStoreSelectors } from "@/common/store/queue";
+import { useShareStoreSelectors } from "@/features/share/store/share";
+import { useCreateNoteStoreSelectors } from "@/features/note/store/create-note";
 import useListSaveTrack from "@/features/list/hooks/useListSaveTrack";
 import useListRemoveTrack from "@/features/list/hooks/useListRemoveTrack";
 import useTrackDelete from "@/features/track/hooks/useTrackDelete";
-import {useAlgoliaEvents} from "@/common/hooks/useAlgoliaEvents";
+import { useAlgoliaEvents } from "@/common/hooks/useAlgoliaEvents";
 import useEventListener from "@/common/hooks/useEventListener";
-import {formatServerErrorResponse, wait} from "@/common/services/utilities";
+import { formatServerErrorResponse, wait } from "@/common/services/utilities";
 import User from "@/features/user/classes/User";
 import Track from "@/features/track/classes/Track";
+import { useRoutingStoreSelectors } from "@/common/store/routing";
 
 const useTrackActions = (track: Track | null) => {
-
     const { shareTrack, saveToTopPicks } = useAlgoliaEvents();
     const addQueueTrack = useQueueStoreSelectors.addTrack();
     const setShareState = useShareStoreSelectors.setState();
@@ -27,27 +27,32 @@ const useTrackActions = (track: Track | null) => {
     const removeTrackMutation = useListRemoveTrack();
     const deleteTrackMutation = useTrackDelete();
 
-    const [saved, setSaved] = useState<boolean>(track ? track.saved() : false);
+    const isModal = useRoutingStoreSelectors.isModal();
+    const setModalState = useRoutingStoreSelectors.setState();
+
+    const handleRouting = (path: string) => {
+        if (isModal) router.back();
+
+        setModalState({ isModal: false });
+
+        DeviceEventEmitter.emit("sheet:close", { name: "TrackOptions" });
+
+        router.push(path as any);
+    };
+
+    const [saved, setSaved] = useState<boolean>(track ? track.isAdded() : false);
 
     useEffect(() => {
-        setSaved(track ? track.saved() : false);
+        setSaved(track ? track.isAdded() : false);
     }, [track]);
 
-    const closeSheetAndWait = useCallback(async () => {
-        DeviceEventEmitter.emit("sheet:close", { name: "TrackOptions" });
-        await wait(200);
-    }, []);
-
-    const comments = useCallback(async () => {
+    const comments = async () => {
         if (!track) return;
-        await closeSheetAndWait();
-        router.canDismiss() && router.dismiss();
-        router.push(`/(sheets)/comments/Track/${track.getID()}`);
-    }, [track, closeSheetAndWait]);
+        handleRouting(`/(sheets)/comments/Track/${track.getID()}`);
+    };
 
-    const favorite = useCallback(async () => {
+    const favorite = async () => {
         if (!track) return;
-        await closeSheetAndWait();
         if (saved) {
             setSaved(false);
             removeTrackMutation.mutate({ trackID: track.getID() });
@@ -56,35 +61,27 @@ const useTrackActions = (track: Track | null) => {
             saveTrackMutation.mutate({ trackID: track.getID() });
             saveToTopPicks(track.getID());
         }
-    }, [track, saved, saveTrackMutation, removeTrackMutation, saveToTopPicks, closeSheetAndWait]);
+    };
 
-    const visitArtist = useCallback(
-        (artist: User) => async () => {
-            await closeSheetAndWait();
-            router.push(`/user/${artist.getID()}`);
-        },
-        [closeSheetAndWait]
-    );
+    const visitArtist = (artist: User) => async () => {
+        handleRouting(`/user/${artist.getID()}`);
+    };
 
-    const createNote = useCallback(async () => {
+    const createNote = async () => {
         if (!track) return;
-        await closeSheetAndWait();
         setCreateNoteState({ track });
-        router.push("/create-note");
-    }, [track, setCreateNoteState, closeSheetAndWait]);
+        handleRouting("/create-note");
+    };
 
-    const share = useCallback(async () => {
+    const share = async () => {
         if (!track) return;
-        await closeSheetAndWait();
-        router.canDismiss() && router.dismiss();
         shareTrack(track.getID());
         setShareState({ entity: track });
-        router.push("/share");
-    }, [track, shareTrack, setShareState, closeSheetAndWait]);
+        handleRouting("/share");
+    };
 
-    const queue = useCallback(async () => {
+    const queue = async () => {
         if (!track) return;
-        await closeSheetAndWait();
         try {
             await TrackPlayer.add([
                 {
@@ -101,17 +98,15 @@ const useTrackActions = (track: Track | null) => {
         } catch (error) {
             Toast.show("Failed to add to queue", TOASTCONFIG.error);
         }
-    }, [track, addQueueTrack, closeSheetAndWait]);
+    };
 
-    const note = useCallback(async () => {
+    const note = async () => {
         if (!track) return;
         setCreateNoteState({ track });
-        await closeSheetAndWait();
-        router.canDismiss() && router.dismiss();
-        router.push(`/(sheets)/create-note`);
-    }, [track, setCreateNoteState, closeSheetAndWait]);
+        handleRouting(`/(sheets)/create-note`);
+    };
 
-    const remove = useCallback(async () => {
+    const remove = async () => {
         if (!track) return;
         Alert.alert(
             "Delete track",
@@ -134,21 +129,15 @@ const useTrackActions = (track: Track | null) => {
                 },
             ]
         );
-    }, [track, deleteTrackMutation]);
+    };
 
-    const catchSaveTrackEvent = useCallback(
-        (trackID: number) => {
-            if (track && trackID === track.getID()) setSaved(true);
-        },
-        [track]
-    );
+    const catchSaveTrackEvent = (trackID: number) => {
+        if (track && trackID === track.getID()) setSaved(true);
+    };
 
-    const catchRemoveTrackEvent = useCallback(
-        (trackID: number) => {
-            if (track && trackID === track.getID()) setSaved(false);
-        },
-        [track]
-    );
+    const catchRemoveTrackEvent = (trackID: number) => {
+        if (track && trackID === track.getID()) setSaved(false);
+    };
 
     useEventListener("list:track:save", catchSaveTrackEvent);
     useEventListener("list:track:remove", catchRemoveTrackEvent);

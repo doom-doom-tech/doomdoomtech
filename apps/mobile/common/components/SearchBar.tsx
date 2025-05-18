@@ -7,7 +7,11 @@ import _ from 'lodash'
 import {palette} from "@/theme";
 import Close from "@/assets/icons/Close";
 
-const SearchBar = () => {
+interface SearchBarProps {
+    placeholder?: string
+}
+
+const SearchBar = ({placeholder}: SearchBarProps) => {
 
     const query = useSearchStoreSelectors.query()
     const setSearchState = useSearchStoreSelectors.setState()
@@ -17,7 +21,7 @@ const SearchBar = () => {
 
     const styles = useMemo(() => StyleSheet.create({
         wrapper: {
-
+            width: '100%',
         },
         clear: {
             position: 'absolute',
@@ -52,7 +56,7 @@ const SearchBar = () => {
                 value={value}
                 ref={inputReference}
                 onChangeText={handleChange}
-                placeholder="Search for new music or talents"
+                placeholder={placeholder}
             />
             { Boolean(query) && <TouchableOpacity style={styles.clear} onPress={handleClear}>
                 <Close color={palette.offwhite}/>

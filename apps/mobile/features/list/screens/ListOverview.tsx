@@ -9,6 +9,8 @@ import {useSafeAreaInsets} from "react-native-safe-area-context";
 import TopPicksTitle from "@/features/list/components/TopPicksTitle";
 import {useFocusEffect} from "expo-router";
 import {useQueryClient} from "@tanstack/react-query";
+import TopPicksSearchbar from '../components/TopPicksSearchbar';
+import { spacing } from '@/theme';
 
 interface ListOverviewProps {
 
@@ -24,7 +26,8 @@ const ListOverview = ({}: ListOverviewProps) => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-
+                flex: 1,
+                gap: spacing.m,
             },
             header: {
                 width,
@@ -48,12 +51,15 @@ const ListOverview = ({}: ListOverviewProps) => {
 
     return(
         <Screen>
-            <View style={styles.header}>
-                <ImageBackground source={TopPicksBackground} style={styles.background} />
-                <TopPicksHeader />
-                <TopPicksTitle />
+            <View style={styles.wrapper}>
+                <View style={styles.header}>
+                    <ImageBackground source={TopPicksBackground} style={styles.background} />
+                    <TopPicksHeader />
+                    <TopPicksTitle />
+                </View>
+                <TopPicksSearchbar />
+                <TopPicksTracks />
             </View>
-            <TopPicksTracks />
         </Screen>
     )
 }

@@ -8,6 +8,7 @@ import {AddListTrackRequest, BulkUpdateListTrackRequest, DeleteListTrackRequest,
 import {container} from "../../../common/utils/tsyringe";
 import {IListTrackService} from "../services/ListTrackService";
 import {UserIDRequest} from "../../user/types/requests";
+import _ from "lodash";
 
 export interface IListTrackController {
 	add(req: Request<any, any, AddListTrackRequest>, res: Response): Promise<void>
@@ -35,11 +36,14 @@ class ListTrackController extends Controller implements IListTrackController {
 		}
 	};
 
-	public tracks = async (req: Request<UserIDRequest, any, any, FetchListTracksRequest>, res: Response) => {
+	public tracks = async (req: Request<UserIDRequest, any, any, FetchListTracksRequest & { query?: string, genre?: number, subgenre?: number }>, res: Response) => {
 		try {
 			const requestObject = {
 				authID: Context.get('authID'),
 				userID: Number(req.params.userID),
+				query: req.query.query,
+				genre: _.toNumber(req.query.genre),
+				subgenre: _.toNumber(req.query.subgenre),
 				cursor: req.query.cursor
 			}
 

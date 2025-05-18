@@ -35,10 +35,11 @@ const UserLists = ({}: UserListsProps) => {
 
     return(
         <View style={styles.wrapper}>
+            <UserLatestReleases />
             <BestRatedTracks />
             <MostPopularTracks />
             <MostListenedTracks />
-            <UserLatestReleases />
+        
             {/*<UserLatestAlbums />*/}
             <UserLatestNotes />
             <UserTopPicks />

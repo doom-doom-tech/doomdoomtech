@@ -100,6 +100,14 @@ const Paywall = () => {
 
     const usps = [
         {
+            label: "",
+            user: "Use up to 5 label tags per upload and spotlight your tracks to your favorite labels."
+        },
+        {
+            label: "",
+            user: "Post up to 10 notes per day instead of 3, and share your latest updates with your fans."
+        },
+        {
             label: "Streamline submissions with a professional demo inbox, making it easy to manage and review incoming tracks from artists.",
             user: "Get professional mastering tools to enhance your tracks' dynamic range."
         },
@@ -112,16 +120,8 @@ const Paywall = () => {
             user: "See detailed insights about who visited your profile"
         },
         {
-            label: "See who’s viewing your label profile, giving you valuable insights into the artists and fans engaging with your brand.",
+            label: "See who is viewing your label profile, giving you valuable insights into the artists and fans engaging with your brand.",
             user: "Increase your music's visibility and chances of appearing in playlists and recommendations."
-        },
-        {
-            label: "",
-            user: "Use up to 5 label tags per upload and spotlight your tracks to your favorite labels."
-        },
-        {
-            label: "",
-            user: "Post up to 10 notes per day instead of 3, and share your latest updates with your fans."
         },
     ]
 

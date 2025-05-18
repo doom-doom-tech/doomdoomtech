@@ -14,11 +14,18 @@ import useListRemoveTrack from '@/features/list/hooks/useListRemoveTrack';
 import {DeviceEventEmitter, StyleSheet, useWindowDimensions, View} from 'react-native';
 import Queueable from '@/common/components/Queueable';
 import DraggableTrackRow from "@/features/track/components/track-row/DraggableTrackRow";
+import { useSearchStoreSelectors } from '@/features/search/store/search';
+import { useFilterStoreSelectors } from '@/features/filter/store/filter';
 
 const TopPicksTracks = () => {
     const state = useTopPicksStoreSelectors.state();
     const updated = useTopPicksStoreSelectors.updated();
     const setTopPicksState = useTopPicksStoreSelectors.setState();
+
+    const query = useSearchStoreSelectors.query();
+
+    const subgenre = useFilterStoreSelectors.subgenre()
+    const genre = useFilterStoreSelectors.genre()
 
     const { width, height } = useWindowDimensions();
 
@@ -28,10 +35,20 @@ const TopPicksTracks = () => {
     const removeTrackMutation = useListRemoveTrack();
 
     const user = useGlobalUserContext();
+    console.log('User ID for Top Picks:', user?.getID() ?? 0);
 
     const [tracks, setTracks] = useState<Array<Track>>([]);
 
-    const topPicksQuery = useUserTopPicks({ userID: user?.getID() ?? 0 });
+    const topPicksQuery = useUserTopPicks({ 
+        query,
+        userID: user?.getID() ?? 0,
+        genre: genre?.getID() ?? null,
+        subgenre: subgenre?.getID() ?? null
+    });
+
+    useEffect(() => {
+        topPicksQuery.refetch();
+    }, [genre, subgenre]);
 
     const styles = useMemo(() => {
         return StyleSheet.create({

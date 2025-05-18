@@ -12,6 +12,8 @@ import NowPlayingQueue from '../components/now-playing/NowPlayingQueue';
 import {useAnimatedScrollHandler, useSharedValue} from 'react-native-reanimated';
 import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
 import NowPlayingWaveform from "@/features/track/components/now-playing/NowPlayingWaveform";
+import { useEffect } from 'react';
+import { useRoutingStoreSelectors } from '@/common/store/routing';
 
 interface NowPlayingProps {}
 
@@ -33,6 +35,10 @@ const NowPlaying = ({}: NowPlayingProps) => {
             scrollOffset.value = event.contentOffset.y;
         },
     });
+
+    useEffect(() => {
+        useRoutingStoreSelectors.setState()({ isModal: true });
+    }, []);
 
     if (!current) return <View />;
 

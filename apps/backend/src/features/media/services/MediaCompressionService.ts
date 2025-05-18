@@ -1,5 +1,4 @@
 import Service from "../../../common/services/Service";
-import sharp from "sharp";
 import ffmpeg from "fluent-ffmpeg";
 import {inject, singleton} from "tsyringe";
 import {IUserService} from "../../user/services/UserService";
@@ -11,7 +10,6 @@ import {join} from 'path'
 export interface IMediaCompressionService {
     video(inputPath: string): Promise<Buffer>
     audio(inputPath: string): Promise<Buffer>
-    image(inputPath: string): Promise<Buffer>
     extract(videoURL: string): Promise<Buffer>
 }
 
@@ -74,13 +72,6 @@ export default class MediaCompressionService extends Service implements IMediaCo
         // Simply read the file and return its contents
         return await fs.readFile(inputPath);
     };
-
-    public image = async (inputPath: string): Promise<Buffer> => {
-        return await sharp(inputPath)
-            .webp({ quality: 80 })
-            .rotate()
-            .toBuffer();  // Returns Buffer instead of writing to file
-    }
 
     public extract = async (videoURL: string): Promise<Buffer> => {
         return new Promise((resolve, reject) => {

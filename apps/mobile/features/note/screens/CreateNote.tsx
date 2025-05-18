@@ -51,8 +51,11 @@ const CreateNote = () => {
 
     const handleCreateNote = useCallback(async () => {
         try {
-            if(DAILY_LIMIT - POSTED_COUNT === 0)
+            if(DAILY_LIMIT - POSTED_COUNT === 0 && !premiumMember)
                 return router.push('/paywall')
+
+            if(DAILY_LIMIT - POSTED_COUNT === 0)
+                return Toast.show('You have reached your daily limit', TOASTCONFIG.error)
 
             setLoading(true)
 

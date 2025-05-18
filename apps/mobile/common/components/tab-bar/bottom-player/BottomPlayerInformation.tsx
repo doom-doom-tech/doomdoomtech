@@ -22,7 +22,7 @@ const BottomPlayerInformation = ({}: BottomPlayerInformationProps) => {
     }, []);
 
     const artists = useMemo(() => {
-        return current ? current.getArtists().map(artist => artist.getUsername()).join(', ') : ''
+        return current ? current.getArtists().filter(artist => !artist.isLabel()).map(artist => artist.getUsername()).join(', ') : ''
     }, [current])
 
     if(!current) return <Fragment />

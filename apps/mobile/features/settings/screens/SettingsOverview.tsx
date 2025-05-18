@@ -31,7 +31,8 @@ const SettingsOverview = ({}: SettingsOverviewProps) => {
 
             },
             container: {
-                gap: spacing.l
+                gap: spacing.l,
+                paddingBottom: 200
             }
         })
     }, []);
