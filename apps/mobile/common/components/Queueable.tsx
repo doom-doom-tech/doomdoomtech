@@ -31,9 +31,9 @@ const Queueable = ({ query, children }: QueueableProps) => {
     const { fillQueue } = useMediaActions();
     const listUUIDRef = useRef(Crypto.randomUUID());
 
-    const handleFillQueue = useCallback(async (data: { listUUID: string }) => {
+    const handleFillQueue = useCallback(async (data: { listUUID: string }) => {        
         if (data.listUUID !== listUUIDRef.current) return;
-
+        
         if (assertInfiniteQuery(query)) {
             return await fillQueue(
                 extractItemsFromInfinityQuery<QueueItem>(query.data).filter(

@@ -116,6 +116,7 @@ const VideoPlayer = ({ current, onExpand, panGesture }: { current: any; onExpand
 
 // Main BottomPlayer Component
 const BottomPlayer = () => {
+
     const { width } = useWindowDimensions();
     const pathname = usePathname();
     const current = useCurrentTrack();
@@ -198,8 +199,13 @@ const BottomPlayer = () => {
         opacity: videoOpacity.value,
     }));
 
+    console.log(mediaType);
+
     return (
         <Animated.View style={[styles.container, animatedContainerStyle]}>
+
+
+
             {current && (mediaType === "audio" || videoPreviewMinimized) && (
                 <Animated.View style={[styles.audioWrapper, animatedAudioStyle]}>
                     <AudioPlayer current={current} onExpand={handleExpand} />

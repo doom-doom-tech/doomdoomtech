@@ -17,7 +17,7 @@ const UserTopPicks = ({}: UserTopPicksProps) => {
 
     const user = useSingleUserContext()
 
-    const userTopPicksQuery = useUserTopPicks({ userID: user.getID() })
+    const userTopPicksQuery = useUserTopPicks({ userID: user.getID(), query: '', genre: null, subgenre: null })
 
     const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<Track>) => (
         <TrackContextProvider track={item} key={item.getID()}>

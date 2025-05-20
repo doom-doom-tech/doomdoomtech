@@ -160,7 +160,7 @@ class MediaService extends Service implements IMediaService {
                 Key: key,
                 Body: properBuffer,
                 ContentType: mimetype,
-                ACL: 'private'
+                ACL: 'public-read'
             }
         });
 

@@ -3,6 +3,9 @@ import {Fragment, useMemo} from "react";
 import TrackRow from "@/features/track/components/track-row/TrackRow";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
 import {useNoteContext} from "@/features/note/context/NoteContextProvider";
+import Queueable from '@/common/components/Queueable';
+import { convertToQueryResult } from '@/common/services/utilities';
+import Track from '@/features/track/classes/Track';
 
 interface NoteTrackProps {
 
@@ -24,9 +27,11 @@ const NoteTrack = ({}: NoteTrackProps) => {
 
     return(
         <View style={styles.wrapper}>
-            <TrackContextProvider track={note.getTrack()!}>
-                <TrackRow type={'route'} />
-            </TrackContextProvider>
+            <Queueable query={convertToQueryResult<Track>([note.getTrack() as Track])}>
+                <TrackContextProvider track={note.getTrack()!}>
+                    <TrackRow type={'options'} disableRouting />
+                </TrackContextProvider>
+            </Queueable>
         </View>
     )
 }

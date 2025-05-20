@@ -11,8 +11,8 @@ export interface UpdateSourceRequest {
 }
 
 export interface ITrackUpdateService extends IServiceInterface {
-    updateVideoSource(data: UpdateSourceRequest): Promise<TrackInterface>;
-    updateCoverSource(data: UpdateSourceRequest): Promise<TrackInterface>;
+    updateVideoSource(data: UpdateSourceRequest): Promise<void>;
+    updateCoverSource(data: UpdateSourceRequest): Promise<void>;
 }
 
 @singleton()
@@ -22,10 +22,9 @@ class TrackUpdateService extends Service implements ITrackUpdateService {
         @inject("Database") protected db: ExtendedPrismaClient
     ) { super() }
 
-    public async updateVideoSource(data: UpdateSourceRequest): Promise<TrackInterface> {
+    public async updateVideoSource(data: UpdateSourceRequest): Promise<void> {
         // Find the track
         const track = await this.db.track.findFirst({
-            select: TrackMapper.getSelectableFields(),
             where: {
                 deleted: false,
                 uuid: data.uuid
@@ -36,7 +35,6 @@ class TrackUpdateService extends Service implements ITrackUpdateService {
 
         // Update the track with the new video URL
         const updatedTrack = await this.db.track.update({
-            select: TrackMapper.getSelectableFields(),
             where: {
                 uuid: data.uuid
             },
@@ -45,14 +43,12 @@ class TrackUpdateService extends Service implements ITrackUpdateService {
             }
         });
 
-        // Return the updated track
-        return TrackMapper.format(updatedTrack);
+        return
     }
 
-    public async updateCoverSource(data: UpdateSourceRequest): Promise<TrackInterface> {
+    public async updateCoverSource(data: UpdateSourceRequest): Promise<void> {
         // Find the track
         const track = await this.db.track.findFirst({
-            select: TrackMapper.getSelectableFields(),
             where: {
                 deleted: false,
                 uuid: data.uuid
@@ -63,7 +59,6 @@ class TrackUpdateService extends Service implements ITrackUpdateService {
 
         // Update the track with the new cover URL
         const updatedTrack = await this.db.track.update({
-            select: TrackMapper.getSelectableFields(),
             where: {
                 uuid: data.uuid
             },
@@ -71,9 +66,6 @@ class TrackUpdateService extends Service implements ITrackUpdateService {
                 cover_url: data.source
             }
         });
-
-        // Return the updated track
-        return TrackMapper.format(updatedTrack);
     }
 }
 

@@ -35,8 +35,6 @@ const UserLatestReleases = ({}: UserLatestReleasesProps) => {
         </TrackContextProvider>
     ), [])
 
-    // if(!extractItemsFromInfinityQuery(userTracksQuery.data).length) return <Fragment />
-
     return(
         <Queueable query={userTracksQuery}>
             <Block

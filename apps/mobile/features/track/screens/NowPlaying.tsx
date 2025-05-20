@@ -26,7 +26,7 @@ const NowPlaying = ({}: NowPlayingProps) => {
     const styles = StyleSheet.create({
         container: {
             gap: spacing.m,
-            paddingBottom: 200,
+            paddingBottom: 400,
         },
     });
 

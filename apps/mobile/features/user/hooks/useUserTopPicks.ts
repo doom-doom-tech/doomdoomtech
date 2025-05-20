@@ -17,8 +17,7 @@ const fetchUserTopPicks = async (data: UserIDRequest & { query?: string | null, 
 
 const useUserTopPicks = (data: UserIDRequest & { query?: string | null, genre: number | null, subgenre: number | null }) => useQuery({
     queryKey: ['users', data.userID, 'top-picks', data.query, data.genre, data.subgenre],
-    queryFn: () => fetchUserTopPicks(data),
-    enabled: Boolean(data.query)
+    queryFn: () => fetchUserTopPicks(data)
 })
 
 export default useUserTopPicks
