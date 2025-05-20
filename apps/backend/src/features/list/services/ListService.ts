@@ -10,9 +10,7 @@ import {UserIDRequest} from "../../user/types/requests";
 import {List} from "@prisma/client";
 import {TrackMapper} from "../../track/mappers/TrackMapper";
 import _ from "lodash";
-import {container} from "../../../common/utils/tsyringe";
 import EntityNotFoundError from "../../../common/classes/errors/EntityNotFoundError";
-import { log } from "node:console";
 
 export interface IListService extends IServiceInterface {
 	find(data: UserIDRequest): Promise<List | null>
@@ -54,9 +52,7 @@ class ListService extends Service implements IListService {
 		const list = await this.find(data);
 	  
 		if (!list) throw new EntityNotFoundError("List");
-	  
-		console.log(data);
-	  
+
 		// Build the track filter conditions
 		const trackFilters: any = {};
 	  

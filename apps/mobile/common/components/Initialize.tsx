@@ -110,8 +110,6 @@ const Initialize = () => {
     const validateSubscriptionState = useCallback(async () => {
         if(!await AsyncStorage.getItem(STORAGE_KEYS.AUTH)) return
 
-        console.log('validating subscription state...')
-
         await validateSubscriptionMutation.mutateAsync()
     }, [])
 

@@ -1,6 +1,12 @@
 import {Platform, StyleSheet} from 'react-native'
 import {createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useState} from "react";
-import Purchases, {CustomerInfo, LOG_LEVEL, LogInResult, PurchasesOffering, PurchasesPackage} from "react-native-purchases";
+import Purchases, {
+    CustomerInfo,
+    LOG_LEVEL,
+    LogInResult,
+    PurchasesOffering,
+    PurchasesPackage
+} from "react-native-purchases";
 import {CONFIG} from "@/common/constants";
 import {WithChildren} from "@/common/types/common";
 import _ from 'lodash';
@@ -100,7 +106,6 @@ const PaymentContextProvider = ({children}: WithChildren) => {
             if (managementURL) {
                 return managementURL;
             } else {
-                console.log("No management URL available.");
                 return null;
             }
         } catch (error) {

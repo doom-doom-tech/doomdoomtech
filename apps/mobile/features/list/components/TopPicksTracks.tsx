@@ -14,8 +14,8 @@ import useListRemoveTrack from '@/features/list/hooks/useListRemoveTrack';
 import {DeviceEventEmitter, StyleSheet, useWindowDimensions, View} from 'react-native';
 import Queueable from '@/common/components/Queueable';
 import DraggableTrackRow from "@/features/track/components/track-row/DraggableTrackRow";
-import { useSearchStoreSelectors } from '@/features/search/store/search';
-import { useFilterStoreSelectors } from '@/features/filter/store/filter';
+import {useSearchStoreSelectors} from '@/features/search/store/search';
+import {useFilterStoreSelectors} from '@/features/filter/store/filter';
 
 const TopPicksTracks = () => {
     const state = useTopPicksStoreSelectors.state();
@@ -35,7 +35,6 @@ const TopPicksTracks = () => {
     const removeTrackMutation = useListRemoveTrack();
 
     const user = useGlobalUserContext();
-    console.log('User ID for Top Picks:', user?.getID() ?? 0);
 
     const [tracks, setTracks] = useState<Array<Track>>([]);
 

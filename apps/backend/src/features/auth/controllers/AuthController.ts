@@ -48,8 +48,6 @@ class AuthController extends Controller implements IAuthController {
 		try {
 			const authService = container.resolve<IAuthService>("AuthService");
 
-			console.log(req.body)
-
 			const { email, username, newsletter, label, code } = req.body;
 
 			if (!email) throw new ValidationError("Email is required");

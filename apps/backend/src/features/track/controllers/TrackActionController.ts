@@ -41,7 +41,6 @@ class TrackActionController extends Controller implements ITrackActionController
             const trackActionService = container.resolve<ITrackActionService>("TrackActionService")
             await trackActionService.processStreamRequest({ trackID: Number(req.params.trackID) })
 
-            console.log('stream added')
             res.status(200).json(formatMutationResponse('Stream added'))
         } catch (error: any) {
             console.log(error)

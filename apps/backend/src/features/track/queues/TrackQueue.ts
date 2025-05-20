@@ -30,12 +30,10 @@ export class TrackQueue extends Singleton implements IQueue {
                 jobId: "compute-score-batch",
             }
         );
-        console.log("TrackQueue initialized and scheduled.");
     }
 
     public async close(): Promise<void> {
         await this.queue.close();
-        console.log("TrackQueue closed.");
     }
 
     public async addJob<T>(name: string, data: T, options?: BaseJobOptions): Promise<Job<T>> {

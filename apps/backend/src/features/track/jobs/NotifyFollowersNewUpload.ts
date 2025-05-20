@@ -35,8 +35,6 @@ class NotifyFollowersNewUpload extends Singleton implements IJob<NotifyFollowers
         const queue = container
             .resolve<IQueue>("NotificationQueue");
 
-        console.log(followers)
-
         await queue.addJob("SendNotificationBatch", {
             notifications: _.map(followers, follower => ({
                 body: artist.username + ' ' + createNotificationText('Upload'),

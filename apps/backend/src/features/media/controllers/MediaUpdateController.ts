@@ -19,8 +19,6 @@ export class MediaUpdateController extends Controller implements IMediaUpdateCon
         try {
             const { uuid, source, filename } = req.body;
 
-            console.log('updating media source', { uuid, source, filename })
-
             if (!uuid || !source) {
                 res.status(400).json(formatErrorResponse("UUID and source are required."));
                 return;

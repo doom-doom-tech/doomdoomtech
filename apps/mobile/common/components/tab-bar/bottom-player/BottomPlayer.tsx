@@ -1,17 +1,17 @@
-import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { useCallback, useEffect, useMemo } from "react";
-import { constants, palette, spacing } from "@/theme";
+import {StyleSheet, TouchableOpacity, useWindowDimensions, View} from "react-native";
+import {useCallback, useEffect, useMemo} from "react";
+import {constants, palette, spacing} from "@/theme";
 import BottomPlayerInformation from "@/common/components/tab-bar/bottom-player/BottomPlayerInformation";
 import BottomPlayerAction from "@/common/components/tab-bar/bottom-player/BottomPlayerAction";
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { useMediaStoreSelectors } from "@/common/store/media";
+import Animated, {runOnJS, useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
+import {useMediaStoreSelectors} from "@/common/store/media";
 import BottomPlayerProgress from "@/common/components/tab-bar/bottom-player/BottomPlayerProgress";
 import TrackCover from "@/features/track/components/TrackCover";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
-import { router, usePathname } from "expo-router";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import {router, usePathname} from "expo-router";
+import {Gesture, GestureDetector} from "react-native-gesture-handler";
 import useCurrentTrack from "@/features/track/hooks/useCurrentTrack";
-import { Image } from "expo-image";
+import {Image} from "expo-image";
 
 const usePlayerAnimation = (mediaType: string | null, videoPreviewMinimized: boolean) => {
     const audioTranslation = useSharedValue(mediaType === "audio" ? 0 : 100);
@@ -198,8 +198,6 @@ const BottomPlayer = () => {
         transform: [{ translateY: videoTranslation.value + panY.value }],
         opacity: videoOpacity.value,
     }));
-
-    console.log(mediaType);
 
     return (
         <Animated.View style={[styles.container, animatedContainerStyle]}>

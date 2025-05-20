@@ -55,7 +55,6 @@ class AlgoliaService extends Cachable implements IAlgoliaService {
 
         // Handle case where no tracks are found across all given genres
         if (allTracks.length === 0) {
-            console.log('No tracks found in the specified genres');
             return;
         }
 

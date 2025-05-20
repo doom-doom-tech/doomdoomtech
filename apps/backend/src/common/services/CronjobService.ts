@@ -12,9 +12,6 @@ export class CronJobService {
      * Call this once during the bootstrap process.
      */
     public scheduleJobs() {
-
-        console.log('scheduling cron jobs')
-
         const dailyJob = cron.schedule("0 0 * * *", async () => {
             try {
                 const feedService = container.resolve<IFeedService>("FeedService");

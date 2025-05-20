@@ -12,7 +12,6 @@ import Cachable from "./common/classes/cache/Cachable";
 import {RefreshSession} from "./features/session/middleware/RefreshSession";
 import QueueWorkerManager from "./common/queues/QueueWorkerManager";
 import {CronJobService} from "./common/services/CronjobService";
-import {ITrackBoostService} from "./features/track/services/TrackBoostService";
 
 require('dotenv').config()
 
@@ -125,19 +124,6 @@ async function bootstrap() {
             apiKey: "f1cb2c553f196d0caec92ac9b081f2f4-us12",
             server: "us12",
         });
-
-        const t = async () => {
-
-            const trackBoostService = container.resolve<ITrackBoostService>("TrackBoostService")
-
-            await trackBoostService.metadata(
-                '6b1ef7ef-cf07-40bf-84da-2bbc0d9b0072',
-                'https://ddt.ams3.digitaloceanspaces.com/6b1ef7ef-cf07-40bf-84da-2bbc0d9b0072/audio.mp3'
-            )
-        }
-
-        t()
-        
     } catch (error) {
         console.error("Failed to start the server:", error);
         process.exit(1);

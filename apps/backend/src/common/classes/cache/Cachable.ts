@@ -11,7 +11,6 @@ class Cachable {
                 const keys = await redis.keys(`${prefix}*`);
                 if (keys.length > 0) {
                     await redis.del(keys);
-                    console.log(`Deleted keys with prefix "${prefix}"`);
                 }
             }
         } catch (error) {

@@ -128,8 +128,6 @@ class FeedService extends Singleton implements IFeedService {
                 };
             } else {
                 // Handle the SearchForFacetValues.Response case (unlikely in your scenario)
-                console.log('Unexpected facet search result:', result);
-
                 return {
                     data: [],
                     prev_page: null,

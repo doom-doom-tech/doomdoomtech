@@ -49,8 +49,6 @@ export default class PrepareNotifyFollowersNewUpload extends Singleton implement
     private async getFollowersBatch(artist: SingleUserInterface, offset: number, limit: number) {
         const db = container.resolve<ExtendedPrismaClient>("Database");
 
-        console.log(Number(artist.id))
-
         const followers =  await db.follow.findMany({
             where: {
                 followsID: Number(artist.id)

@@ -56,24 +56,17 @@ async function getAllNotes() {
 // Fetch and index objects in Algolia
 const processRecords = async () => {
     try {
-        console.log('Starting...');
-
         // Fetch and transform tracks
         const trackItems = await getAllTracks();
-        console.log(`Transformed ${trackItems.length} tracks.`);
 
         // Fetch and transform notes
         const noteItems = await getAllNotes();
-        console.log(`Transformed ${noteItems.length} notes.`);
 
         // Combine track and note items
         const allItems = [...trackItems, ...noteItems];
-        console.log(`Total items to index: ${allItems.length}`);
 
         // Save to Algolia
         return await client.saveObjects({ indexName: 'feed-items', objects: allItems as any });
-
-        console.log('Indexing completed successfully.');
     } catch (error: any) {
         console.log('Error during processing:', error);
     }

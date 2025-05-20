@@ -1,11 +1,11 @@
 import {StyleSheet, View} from 'react-native'
-import {Fragment, useCallback, useEffect, useMemo} from "react";
+import {Fragment, useCallback, useMemo} from "react";
 import NewPostOverlayItem from "@/common/components/new-post/NewPostOverlayItem";
 import _ from "lodash";
 import Waveform from "@/assets/icons/Waveform";
 import {spacing} from "@/theme";
 import {router} from "expo-router";
-import {extractItemsFromInfinityQuery, wait} from "@/common/services/utilities";
+import {wait} from "@/common/services/utilities";
 import Note from "@/assets/icons/Note";
 import Animated, {FadeInDown} from "react-native-reanimated";
 import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
@@ -13,7 +13,6 @@ import {initialUploadStore, useUploadStoreSelectors} from "@/features/upload/sto
 import {initialCreateNoteStore, useCreateNoteStoreSelectors} from "@/features/note/store/create-note";
 import {initialUploadSettingsStore, useUploadSettingsStoreSelectors} from "@/features/upload/store/upload-settings";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
-import Album from "@/assets/icons/Album";
 import useLatestTracks from "@/features/track/hooks/useLatestTracks";
 import Toast from "react-native-root-toast";
 import {TOASTCONFIG} from "@/common/constants";
@@ -54,8 +53,6 @@ const NewPostOverlayItems = ({onCancel}: NewPostOverlayItemsProps) => {
         onCancel()
 
         await wait(300)
-
-        console.log(currentUser!.getID())
 
         if(!currentUser)
             return router.push('/auth')

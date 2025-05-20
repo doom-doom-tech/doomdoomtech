@@ -219,8 +219,6 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
     const inputKey = `${uuid}/${filename}`;
     const outputKey = `${uuid}/${name}-compressed.${extension}`;
 
-    console.log(`Input key: ${inputKey}, Output key: ${outputKey}`);
-
     let tempInputFile: string | undefined = undefined;
     let tempOutputFile: string | undefined = undefined;
 
@@ -230,7 +228,6 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
             Key: inputKey
         });
 
-        console.log('Sending S3 GetObjectCommand for image');
         const { Body } = await s3Client.send(getCommand);
 
         if (!Body || !(Body instanceof Readable)) {
@@ -238,7 +235,6 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
         }
 
         tempInputFile = path.join(os.tmpdir(), `input-${filename}`);
-        console.log(`Temporary input file path: ${tempInputFile}`);
 
         await streamToFile(Body, tempInputFile);
 
@@ -251,13 +247,11 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
         }, PROCESS_TIMEOUT_MS);
 
         tempOutputFile = path.join(os.tmpdir(), `output-${filename}`);
-        console.log(`Temporary output file path: ${tempOutputFile}`);
 
         await sharp(tempInputFile)
             .webp({ quality: 80 })
             .rotate()
             .on('end', () => {
-                console.log('Sharp processing completed');
                 clearTimeout(timeout);
             })
             .toFile(tempOutputFile)
@@ -267,7 +261,6 @@ async function compressImage({ uuid, purpose, filename }: CompressMediaRequest) 
         console.log(`Input image size: ${inputFileSize} bytes, Output image size: ${outputFileSize} bytes`);
 
         if (outputFileSize < inputFileSize) {
-            console.log('Output image is smaller, proceeding with upload');
             try {
                 const buffer = fs.readFileSync(tempOutputFile);
 

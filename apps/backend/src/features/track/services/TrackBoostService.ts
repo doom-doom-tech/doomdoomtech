@@ -59,7 +59,6 @@ class TrackBoostService extends Service implements ITrackBoostService {
                 }
             );
 
-            console.log(`Started polling for Moises job ${moisesJobId}`);
         } catch (error) {
             console.error('Error in metadata processing:', error);
             // Optionally, rethrow the error or handle it based on your application's needs
@@ -94,7 +93,6 @@ class TrackBoostService extends Service implements ITrackBoostService {
             }
         );
 
-        console.log('mastering job added');
     };
 
     /** Gets the duration of an audio file using ffprobe */

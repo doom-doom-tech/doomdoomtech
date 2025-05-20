@@ -17,7 +17,6 @@ export class MediaCompressionQueue extends Singleton implements IQueue {
 
     public async close(): Promise<void> {
         await this.queue.close();
-        console.log("MediaCompressionQueue closed.");
     }
 
     public async addJob<T>(name: string, data: T, options?: BaseJobOptions): Promise<Job<T>> {
