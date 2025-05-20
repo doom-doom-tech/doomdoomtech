@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native'
+import {DeviceEventEmitter, StyleSheet} from 'react-native'
 import {useCallback, useEffect, useMemo} from "react";
 import Screen from "@/common/components/Screen";
 import Header from "@/common/components/header/Header";
@@ -19,7 +19,8 @@ const AlertsOverview = ({}: AlertsOverviewProps) => {
     const queryClient = useQueryClient()
 
     useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: ['alerts', 'count'] })
+        DeviceEventEmitter.emit('alerts:count:reset')
+        // queryClient.invalidateQueries({ queryKey: ['alerts', 'count'] })
     }, [queryClient])
 
     const styles = useMemo(() => {

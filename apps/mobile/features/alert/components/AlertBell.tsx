@@ -1,68 +1,74 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
-import {useCallback, useMemo} from "react";
-import {palette} from "@/theme";
-import Bell from "@/assets/icons/Bell";
-import {router} from "expo-router";
-import useAlertCount from "@/features/alert/hooks/useAlertCount";
-import useGlobalUserContext from "@/features/user/hooks/useGlobalUserContext";
-import Text from "@/common/components/Text";
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { palette } from '@/theme';
+import Bell from '@/assets/icons/Bell';
+import { router } from 'expo-router';
+import useAlertCount from '@/features/alert/hooks/useAlertCount';
+import useGlobalUserContext from '@/features/user/hooks/useGlobalUserContext';
+import Text from '@/common/components/Text';
 import millify from 'millify';
+import useEventListener from '@/common/hooks/useEventListener';
 
-interface AlertBellProps {
+const AlertBell = () => {
+    const { data: alertCount } = useAlertCount();
+    const user = useGlobalUserContext();
+    const [count, setCount] = useState<number | undefined>(alertCount);
 
-}
+    // Sync count with alertCount when it changes
+    useEffect(() => {
+        setCount(alertCount);
+    }, [alertCount]);
 
-const AlertBell = ({}: AlertBellProps) => {
-
-    const alertsCountQuery = useAlertCount()
-    const user = useGlobalUserContext()
-
-    const styles = useMemo(() => {
-        return StyleSheet.create({
-            wrapper: {
-                position: 'relative',
-            },
-            notify: {
-                position: 'absolute',
-                bottom: -4,
-                alignSelf: 'center',
-                paddingHorizontal: 2,
-                backgroundColor: palette.error,
-                borderRadius: 2,
-                justifyContent: 'center',
-                alignItems: 'center'
-            },
-            count: {
-                fontSize: 8,
-                color: palette.offwhite
-            }
-        })
-    }, []);
-
+    // Handle navigation to alerts or auth
     const routeAlerts = useCallback(() => {
-        if(!user) return router.push('/auth')
+        if (!user) {
+            router.push('/auth');
+            return;
+        }
+        router.push('/alerts');
+    }, [user]);
 
-        router.push(`/alerts`)
-    }, [user])
+    // Event listener for resetting count
+    useEventListener('alerts:count:reset', () => setCount(0));
 
-    const shouldNotify = useMemo(() => {
-        if(alertsCountQuery.isError || alertsCountQuery.isLoading || alertsCountQuery.data === undefined) return false
-        return alertsCountQuery.data > 0
-    }, [alertsCountQuery])
+    // Ensure millify output is a string to avoid rendering issues
+    const formattedCount = typeof count === 'number' && count > 0 ? millify(count) : null;
 
-    return(
-        <TouchableOpacity onPress={routeAlerts} style={styles.wrapper}>
+    return (
+        <TouchableOpacity
+            onPress={routeAlerts}
+            style={styles.wrapper}
+            accessibilityLabel={`Alerts, ${count || 0} unread`}
+            accessibilityRole="button"
+        >
             <Bell color={palette.offwhite} />
-
-            { shouldNotify && (
+            {formattedCount && (
                 <View style={styles.notify}>
-                    <Text style={styles.count}>
-                        {millify(alertsCountQuery.data)}
-                    </Text>
+                    <Text style={styles.count}>{formattedCount}</Text>
                 </View>
             )}
         </TouchableOpacity>
-    )
-}
+    );
+};
 
-export default AlertBell
+const styles = StyleSheet.create({
+    wrapper: {
+        position: 'relative',
+    },
+    notify: {
+        position: 'absolute',
+        bottom: -4,
+        alignSelf: 'center',
+        paddingHorizontal: 2,
+        backgroundColor: palette.error,
+        borderRadius: 2,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    count: {
+        fontSize: 8,
+        color: palette.offwhite,
+    },
+});
+
+export default AlertBell;

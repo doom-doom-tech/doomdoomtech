@@ -385,10 +385,6 @@ class TrackService extends Service implements ITrackService {
 
         const formattedTrack = TrackMapper.format(track);
 
-        // // Emit socket event for track creation
-        const socketManager = container.resolve<SocketManager>("SocketManager");
-        socketManager && await socketManager.emitToRoom(`user_${data.authID}`, 'track:upload:complete', {})
-
         return formattedTrack
     }
 
