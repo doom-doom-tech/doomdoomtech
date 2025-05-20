@@ -62,9 +62,6 @@ const SettingsOverview = ({}: SettingsOverviewProps) => {
     }, [])
 
     const handleLogout = useCallback(async () => {
-
-        console.log('???')
-
         Alert.alert("Logout", "Are you sure you want to log out?", [
             {
                 text: 'Cancel',

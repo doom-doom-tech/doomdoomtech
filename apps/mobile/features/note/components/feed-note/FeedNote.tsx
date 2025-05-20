@@ -31,7 +31,7 @@ const FeedNote = () => {
     const { viewItem } = useAlgoliaEvents()
 
     const handleRouteNote  = useCallback(() => {
-        viewItem(note.getID(), 'note')
+        viewItem(note.getID(), 'Note')
         router.push(`/note/${note.getID()}`)
     }, [note])
 

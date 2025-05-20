@@ -22,7 +22,7 @@ const CommentRowLikes = () => {
 
     const handleLike = useCallback(() => {
 
-        likeComment(comment.getEntityID())
+        likeComment(comment.getEntityID(), comment.getEntity())
 
         setLiked((prevLiked) => {
             const newLiked = !prevLiked;
