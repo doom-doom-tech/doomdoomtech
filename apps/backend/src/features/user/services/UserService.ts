@@ -55,8 +55,6 @@ class UserService extends Service implements IUserService {
     public find = async (data: FindUserRequest) => {
         const userBlockService = container.resolve<IUserBlockService>("UserBlockService");
 
-        console.log('??? :', data);
-
         const cacheKey = `users:${data.userID}`;
 
         return await this.withCache(

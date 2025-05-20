@@ -41,7 +41,9 @@ export class TrackPollingWorker extends Singleton implements IWorker {
         container.register("TrackPollingWorker", { useClass: TrackPollingWorker });
     }
 
-    public async initialize(): Promise<void> {}
+    public async initialize(): Promise<void> {
+        console.log('Polling queue running')
+    }
 
     public async close(): Promise<void> {
         await this.worker.close();
