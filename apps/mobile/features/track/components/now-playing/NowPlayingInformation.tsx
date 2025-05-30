@@ -20,7 +20,7 @@ const NowPlayingInformation = ({}: NowPlayingInformationProps) => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginTop: -200,
+                marginTop: -100,
                 marginBottom: spacing.m,
             },
             left: {

@@ -38,7 +38,7 @@ const WaveformRenderer = ({
 	const scalingFactor = maxTransformedAmp > 0 ? height / maxTransformedAmp : 0;
 
 	return (
-		<View>
+		<View style={{ opacity: 1 }}>
 			<Svg width={width} height={height}>
 				{waveformData.map(({ min, max }, index) => {
 					const x = index * barWidth;

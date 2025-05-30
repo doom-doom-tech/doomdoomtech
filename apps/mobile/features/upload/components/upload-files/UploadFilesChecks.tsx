@@ -33,7 +33,13 @@ const UploadFilesChecks = ({}: UploadFilesChecksProps) => {
         })
     }, []);
 
+    console.log(files);
+    
+
     const FileSizeExceededIcon = useCallback(() => {
+
+        if(_.isEmpty(files)) return <DashCircle />
+
         return _.some(files, (file: DocumentPickerAsset) => file.size! > 200000000)
             ? <ErrorCircle />
             : <CheckCircle color={palette.olive} />
@@ -54,7 +60,7 @@ const UploadFilesChecks = ({}: UploadFilesChecksProps) => {
                 ? <CheckCircle color={palette.olive} />
                 : <ErrorCircle color={palette.error} />
         }
-        return <DashCircle />;
+        return <DashCircle />
     }, [files])
 
     return(
@@ -65,18 +71,25 @@ const UploadFilesChecks = ({}: UploadFilesChecksProps) => {
                     Files should be less than 200Mb in size each
                 </Text>
             </View>
-            <View style={styles.item}>
-                <CoverRequiredIcon />
-                <Text style={styles.label}>
-                    Audio files require a cover image
-                </Text>
-            </View>
-            <View style={styles.item}>
-                <AudioRequiredIcon />
-                <Text style={styles.label}>
-                    Cover images require an audio file
-                </Text>
-            </View>
+
+            { _.some(files, (file: DocumentPickerAsset) => file.mimeType?.startsWith('audio')) && (
+                <View style={styles.item}>
+                    <CoverRequiredIcon />
+                    <Text style={styles.label}>
+                        Audio files require a cover image
+                    </Text>
+                </View>
+            ) }
+            
+            { _.some(files, (file: DocumentPickerAsset) => file.mimeType?.startsWith('image')) && (
+                <View style={styles.item}>
+                    <AudioRequiredIcon />
+                    <Text style={styles.label}>
+                        Cover images require an audio file
+                    </Text>
+                </View>
+            ) }
+
         </View>
     )
 }

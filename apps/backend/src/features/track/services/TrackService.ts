@@ -8,7 +8,14 @@ import EntityNotFoundError from "../../../common/classes/errors/EntityNotFoundEr
 import {IUserBlockService} from "../../user/services/UserBlockService";
 import {ICollabRequestService} from "../../collab/services/CollabRequestService";
 import {IUserService} from "../../user/services/UserService";
-import {CreateTrackRequest, FetchTracksRequest, FetchUserTracksRequest, FindTrackRequest, SearchTrackRequest, TrackIDRequest} from "../types/requests";
+import {
+    CreateTrackRequest,
+    FetchTracksRequest,
+    FetchUserTracksRequest,
+    FindTrackRequest,
+    SearchTrackRequest,
+    TrackIDRequest
+} from "../types/requests";
 import {TrackInterface} from "../types";
 import {INotificationService} from "../../notification/services/NotificationService";
 import {FetchRankedListRequest} from "../../../common/services/RankedListService";
@@ -24,18 +31,19 @@ import {ITrackScoringService} from "./TrackScoringService";
 import {Context} from "../../../common/utils/context";
 import {CREDIT_VALUES} from "../../../common/constants/credits";
 import {ICreditsService} from "../../credits/services/CreditsService";
-import {IMediaCompressionService} from "../../media/services/MediaCompressionService";
-import {IMediaService} from "../../media/services/MediaService";
 import {ITrackBoostService} from "./TrackBoostService";
 import {ITrackWaveformService} from "./TrackWaveformService";
 import {IAlgoliaService} from "../../../common/services/AlgoliaService";
 import {SingleUserInterface} from "../../user/types";
 import {IQueue} from "../../../common/types";
 import {PrepareNotifyFollowersNewUploadPayload} from "../jobs/PrepareNotifyFollowersNewUpload";
-import SocketManager from "../../../common/services/SocketManager";
 import {v4} from "uuid";
 import {IAlertService} from "../../alert/services/AlertService";
 import Cachable from "../../../common/classes/cache/Cachable";
+import {DetermineTrackMetadataPayload} from "../jobs/DetermineTrackMetadata";
+import axios, {AxiosResponse} from "axios";
+import SocketManager from "../../../common/services/SocketManager";
+import { IUploadService } from "../../upload/services/UploadService";
 
 export interface ITrackService extends IServiceInterface {
     all(data: FetchTracksRequest): Promise<PaginationResult<TrackInterface>>
@@ -197,9 +205,10 @@ class TrackService extends Service implements ITrackService {
     }
 
     public async create(data: CreateTrackRequest) {
+        const uploadService = container.resolve<IUploadService>("UploadService")
         const genreService = container.resolve<IGenreService>('GenreService')
         const parentGenre = await genreService.findParent(data.subgenreID)
-
+        
         let audioURL = data.audio_url || ''
 
         const mainArtist: SingleUserInterface = await this.userService.find({
@@ -225,23 +234,19 @@ class TrackService extends Service implements ITrackService {
 
         // If the track has a video url, extract the audio and update the track
         if(data.video_url && !data.audio_url) {
-            const mediaService = container
-                .resolve<IMediaService>('MediaService')
+            const extractAudioResponse: AxiosResponse = await axios.post('https://extractaudiofromvideo-fuovwifv7a-uc.a.run.app', {
+                videoURL: data.video_url,
+                trackUUID: track.uuid,
+            });
 
-            const mediaCompressionService = container
-                .resolve<IMediaCompressionService>('MediaCompressionService')
-
-            const signedURL = await mediaService
-                .uploadBuffer(await mediaCompressionService.extract(data.video_url), 'audio.mp3', track.uuid, 'audio/mpeg')
-
-            audioURL = signedURL
+            audioURL = extractAudioResponse.data.url
 
             await this.db.track.update({
                 where: {
                     uuid: track.uuid
                 },
                 data: {
-                    audio_url: signedURL
+                    audio_url: extractAudioResponse.data.url
                 }
             })
         }
@@ -252,12 +257,18 @@ class TrackService extends Service implements ITrackService {
             const trackQueue = container.resolve<IQueue>("TrackQueue")
             const algoliaService = container.resolve<IAlgoliaService>("AlgoliaService")
 
+            
             const creditsService = container.resolve<ICreditsService>("CreditsService").bindTransactionClient(db);
             const trackTagService = container.resolve<ITrackTagService>("TrackTagService").bindTransactionClient(db)
             const trackBoostService = container.resolve<ITrackBoostService>("TrackBoostService").bindTransactionClient(db)
             const trackScoreService = container.resolve<ITrackScoringService>("TrackScoringService").bindTransactionClient(db)
             const trackPopularityService = container.resolve<ITrackPopularityService>("TrackPopularityService").bindTransactionClient(db)
             const trackWaveformService = container.resolve<ITrackWaveformService>('TrackWaveformService').bindTransactionClient(db)
+
+            await uploadService.create({
+                ...data,
+                trackID: track.id
+            })
 
             for(let tag of data.tags) {
                 await trackTagService.create({
@@ -275,11 +286,6 @@ class TrackService extends Service implements ITrackService {
             await trackWaveformService.createWaveform({
                 uuid: track.uuid, source: audioURL
             })
-
-            audioURL && await trackBoostService.metadata(
-                track.uuid,
-                audioURL
-            )
 
             if(_.some(data.services, service => service === 'mastering') && audioURL) {
                 await trackBoostService.mastering(
@@ -313,6 +319,11 @@ class TrackService extends Service implements ITrackService {
                     }
                 }
             })
+
+            await trackQueue.addJob<DetermineTrackMetadataPayload>("DetermineTrackMetadata", {
+                trackUUID: track.uuid,
+                audioURL: audioURL,
+            });
 
             // Alert all followers of the artist about the new upload
             await trackQueue.addJob<PrepareNotifyFollowersNewUploadPayload>('PrepareNotifyFollowersNewUpload', {
@@ -365,6 +376,7 @@ class TrackService extends Service implements ITrackService {
                     userID: data.authID,
                     targetID: artist.userID
                 })
+
             }
         }, {
             maxWait: 60000,
@@ -383,11 +395,15 @@ class TrackService extends Service implements ITrackService {
             })
         }
 
+
+        await uploadService.complete({
+            trackID: track.id
+        })
+
         const formattedTrack = TrackMapper.format(track);
 
         return formattedTrack
     }
-
     public async latest (data: FetchRankedListRequest) {
         let response = await PaginationHandler.paginate({
             fetchFunction: async (params) => await this.db.track.paginate({
@@ -418,6 +434,7 @@ class TrackService extends Service implements ITrackService {
                         id: 'desc'
                     }
                 ],
+                ...(data.distinct ? { distinct: [data.distinct as any] } : {})
             }).withCursor(params),
             data: {cursor: data.cursor},
             pageSize: 10

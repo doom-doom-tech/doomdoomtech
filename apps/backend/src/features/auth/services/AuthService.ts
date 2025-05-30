@@ -5,7 +5,14 @@ import prisma, {ExtendedPrismaClient} from "../../../common/utils/prisma";
 import {randomBytes} from 'crypto';
 import {WELCOMEMESSAGE} from "../../../common/constants/DMS";
 import {container, inject, injectable} from "tsyringe";
-import {AuthorizeRequest, DeleteAuthorizationCodeRequest, DeletePasswordResetTokenRequest, LoginRequest, RegistrationRequestInterface, VerifyAuthorizationCodeRequest} from "../types/requests";
+import {
+	AuthorizeRequest,
+	DeleteAuthorizationCodeRequest,
+	DeletePasswordResetTokenRequest,
+	LoginRequest,
+	RegistrationRequestInterface,
+	VerifyAuthorizationCodeRequest
+} from "../types/requests";
 import {EmailConfig, IEmailService} from "../../email/services/EmailService";
 import {DDT_ACCOUNT_ID} from "../../../common/constants";
 import Service from "../../../common/services/Service";
@@ -21,8 +28,10 @@ import {SingleUserMapper} from "../../user/mappers/SingleUserMapper";
 import {ICreditsService} from "../../credits/services/CreditsService";
 import {CREDIT_VALUES} from "../../../common/constants/credits";
 import _ from "lodash";
+import {Context} from "../../../common/utils/context";
 
 export interface IAuthService {
+	signOut(deviceToken: string): Promise<void>
 	request(data: LoginRequest): Promise<void>
 	authorize(data: AuthorizeRequest): Promise<{ user: SingleUserInterface, token: string }>
 	signup(data: RegistrationRequestInterface): Promise<{ user: SingleUserInterface, token: string }>
@@ -38,6 +47,18 @@ class AuthService extends Service implements IAuthService {
 	constructor(
 		@inject("Database") protected db: ExtendedPrismaClient
 	) { super() }
+
+	public signOut = async (expoDeviceID: string): Promise<void> => {
+		await this.db.device.updateMany({
+			where: {
+				userID: Context.get('authID'),
+				expo_device_id: expoDeviceID
+			},
+			data: {
+				userID: null
+			}
+		});
+	};
 
 	public request = async (data: LoginRequest): Promise<void> => {
 		const {email} = data;

@@ -39,6 +39,7 @@ export class AuthRouter extends BaseRouter {
 		const authController = container.resolve<IAuthController>("AuthController");
 
 		this.router.post('/request', authController.request);
+		this.router.post('/sign-out', authController.signOut);
 		this.router.post('/authorize', authController.authorize);
 		this.router.post('/signup', registrationLimiter, authController.signup);
 		this.router.post('/verify-email', authController.verifyEmail);

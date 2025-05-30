@@ -5,6 +5,7 @@ import {IJob, IWorker} from "../../../common/types";
 import {container} from "../../../common/utils/tsyringe";
 import {PrepareNotifyFollowersNewUploadPayload} from "../jobs/PrepareNotifyFollowersNewUpload";
 import {ComputeTrackScoresJob} from "../jobs/ComputeTrackScores";
+import {DetermineTrackMetadata} from "../jobs/DetermineTrackMetadata";
 
 @singleton()
 export class TrackWorker extends Singleton implements IWorker {
@@ -31,6 +32,11 @@ export class TrackWorker extends Singleton implements IWorker {
                 if(job.name === "NotifyFollowersNewUpload") {
                     const computeJob = container.resolve<IJob<PrepareNotifyFollowersNewUploadPayload>>("NotifyFollowersNewUpload");
                     await computeJob.process(job);
+                }
+
+                if (job.name === "DetermineTrackMetadata") {
+                    const jobHandler = container.resolve<DetermineTrackMetadata>("DetermineTrackMetadata");
+                    await jobHandler.process(job);
                 }
             },
             { connection: this.redis, concurrency: 2 }

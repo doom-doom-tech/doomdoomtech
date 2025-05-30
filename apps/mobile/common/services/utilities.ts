@@ -134,11 +134,9 @@ export const extractTypeFromMimetype = (mimetype: string): "File" | "Video" | "I
         default: return 'Image';
     }
 }
-
 export const uploadFile = async (file: DocumentPickerAsset | ImagePickerAsset, uuid: string, purpose: string) => {
     try {
         const bearer = await AsyncStorage.getItem(STORAGE_KEYS.AUTH)
-
         const endpoint = `/media/upload?uuid=${uuid}&purpose=${purpose}`
 
         const response = await FileSystem.uploadAsync(API_BASE_URL + endpoint, file.uri, {
@@ -151,9 +149,12 @@ export const uploadFile = async (file: DocumentPickerAsset | ImagePickerAsset, u
             },
         });
 
-        return _.get(JSON.parse(response.body), 'data.upload.url', '')
-    } catch (error) {
+        const url = _.get(JSON.parse(response.body), 'data.upload.url', '')
 
+        return url
+    } catch (error) {
+        console.error("Upload failed:", error)
+        throw error
     }
 }
 
@@ -201,6 +202,11 @@ export const formatReadableDate = (date: Date) => {
 
     return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
+
+export const formatNormalizedDate = (date: Date) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`;
+  }
 
 export const secondsToTimeFormat = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);

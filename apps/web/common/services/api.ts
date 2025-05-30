@@ -1,6 +1,7 @@
 import axios, {AxiosError, InternalAxiosRequestConfig} from "axios";
 
-export const API_BASE_URL = 'https://api.doomdoom.tech'
+export const API_BASE_URL = process.env.API_BASE_URL
+// export const API_BASE_URL = 'https://api.doomdoom.tech'
 
 export const STORAGE_KEYS = {
     SESSION: 'Session.ID',

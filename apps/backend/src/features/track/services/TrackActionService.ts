@@ -58,7 +58,11 @@ class TrackActionService extends Singleton implements ITrackActionService {
                     total_streams:  _.get(currentMetrics, 'total_streams', 0) + 1
                 })
 
-            await this.assignCreditsForStreamCounts(_.get(currentMetrics, 'total_streams', 0), db)
+            await this.assignCreditsForStreamCounts(
+                _.get(currentMetrics, 'total_streams', 0),
+                db,
+                data.trackID
+            )
 
             await this.redis.sadd(`${sessionID}:streams`, data.trackID)
         })
@@ -170,7 +174,7 @@ class TrackActionService extends Singleton implements ITrackActionService {
         })
     }
 
-    private async assignCreditsForStreamCounts(totalStreams: number, db: ExtendedPrismaClient) {
+    private async assignCreditsForStreamCounts(totalStreams: number, db: ExtendedPrismaClient, trackID: number) {
         const creditsService = container
             .resolve<ICreditsService>("CreditsService")
             .bindTransactionClient(db)
@@ -186,10 +190,23 @@ class TrackActionService extends Singleton implements ITrackActionService {
             case totalStreams === 99999: amount = 1000; break;
         }
 
-        await creditsService.add({
-            userID: Context.get('authID'),
-            amount
+        // Share with royalty split
+        const artists = await this.db.trackArtist.findMany({
+            select: {
+                userID: true,
+                royalties: true
+            },
+            where: {
+                trackID
+            }
         })
+
+        for(let artist of artists) {
+            await creditsService.add({
+                userID: artist.userID,
+                amount: amount * artist.royalties / 100,
+            })
+        }
     }
 }
 

@@ -19,6 +19,7 @@ import Track from "@/features/track/classes/Track";
 import { useRoutingStoreSelectors } from "@/common/store/routing";
 
 const useTrackActions = (track: Track | null) => {
+
     const { shareTrack, saveToTopPicks } = useAlgoliaEvents();
     const addQueueTrack = useQueueStoreSelectors.addTrack();
     const setShareState = useShareStoreSelectors.setState();
@@ -36,6 +37,7 @@ const useTrackActions = (track: Track | null) => {
         setModalState({ isModal: false });
 
         DeviceEventEmitter.emit("sheet:close", { name: "TrackOptions" });
+        DeviceEventEmitter.emit("sheet:close", { name: "NowPlaying" });
 
         router.push(path as any);
     };

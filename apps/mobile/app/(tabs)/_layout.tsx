@@ -9,7 +9,7 @@ import SocketContextProvider from "@/common/context/SocketContextProvider";
 import InviteCode from "@/features/auth/sheets/InviteCode";
 import PremiumConfirmation from "@/common/sheets/PremiumConfirmation";
 import TrackOptions from "@/features/track/sheets/TrackOptions";
-
+import NowPlayingSheet from "@/features/track/sheets/NowPlaying";
 
 const TabLayout = () => {
     return (
@@ -30,6 +30,7 @@ const TabLayout = () => {
                 <NewPostOverlay />
                 <ParticleAnimation />
 
+                <NowPlayingSheet />
                 <InviteCode />
                 <TrackOptions />
                 <PremiumConfirmation />

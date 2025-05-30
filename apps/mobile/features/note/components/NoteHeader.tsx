@@ -4,7 +4,6 @@ import {useNoteContext} from "@/features/note/context/NoteContextProvider";
 import User from "@/features/user/classes/User";
 import {StyleSheet, View} from "react-native";
 import {useMemo} from "react";
-import {spacing} from "@/theme";
 
 interface NoteHeaderProps extends UserRowProps {
     user: User
@@ -17,7 +16,7 @@ const NoteHeader = ({user, ...rest}: NoteHeaderProps) => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                paddingHorizontal: spacing.m,
+
             },
         })
     }, []);

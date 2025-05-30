@@ -8,11 +8,13 @@ import Agenda from "@/assets/icons/Agenda";
 import {useTrackContext} from "@/features/track/context/TrackContextProvider";
 import {useProgress} from "react-native-track-player";
 import {secondsToTimeFormat} from "@/common/services/utilities";
+import Play from "@/assets/icons/Play";
+import Heart from "@/assets/icons/Heart";
+import Flame from "@/assets/icons/Flame";
 
 const NowPlayingMetrics = () => {
 
     const track = useTrackContext()
-    const progress = useProgress()
 
     const styles = StyleSheet.create({
         wrapper: {
@@ -46,6 +48,21 @@ const NowPlayingMetrics = () => {
 
     const items = [
         {
+            icon: <Play />,
+            title: 'Plays',
+            content: track.getMetrics()?.total_plays ?? '0'
+        },
+        {
+            icon: <Heart />,
+            title: 'Favorites',
+            content: track.getMetrics()?.total_lists ?? '0'
+        },
+        {
+            icon: <Flame />,
+            title: 'Likes',
+            content: track.getMetrics()?.total_likes ?? '0'
+        },
+        {
             icon: <Key />,
             title: 'Key',
             content: track.getMetadata()?.key ?? '-'
@@ -54,11 +71,6 @@ const NowPlayingMetrics = () => {
             icon: <Drums />,
             title: 'BPM',
             content: track.getMetadata()?.bpm ?? '-'
-        },
-        {
-            icon: <Clock />,
-            title: 'Playtime',
-            content: secondsToTimeFormat(Math.floor(progress.duration))
         },
         {
             icon: <Agenda />,

@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
+import {StyleSheet, TouchableOpacity, View, Text, DeviceEventEmitter} from 'react-native';
 import {useCallback, useMemo} from 'react';
 import {useTrackContext} from '@/features/track/context/TrackContextProvider';
 import {palette, spacing} from '@/theme';
@@ -53,6 +53,11 @@ const TrackInformation = ({ center, truncate = false, disableRouting = false, se
 
     const handleRouteTrack = useCallback(async () => {
         if (disableRouting || selectable) return;
+
+        DeviceEventEmitter.emit('sheet:close', {
+            name: 'NowPlaying'
+        })
+
         router.canDismiss() && router.dismiss();
         await wait(200);
         router.push(`/track/${track.getID()}`);
@@ -60,6 +65,11 @@ const TrackInformation = ({ center, truncate = false, disableRouting = false, se
 
     const handleRouteArtist = useCallback((artist: User) => async () => {
         if (disableRouting || selectable) return;
+
+        DeviceEventEmitter.emit('sheet:close', {
+            name: 'NowPlaying'
+        })
+
         router.canDismiss() && router.dismiss();
         await wait(200);
         router.push(`/user/${artist.getID()}`);
@@ -96,6 +106,7 @@ const TrackInformation = ({ center, truncate = false, disableRouting = false, se
                 <View>
                     {labelArtists.map((artist, index) => (
                         <Subtitle
+                            key={index}
                             onPress={selectable ? undefined : handleRouteArtist(artist)}
                             content={artist.getUsername()}
                             center={center}

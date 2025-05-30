@@ -2,6 +2,7 @@ import {singleton} from "tsyringe";
 import cron from "node-cron";
 import {container} from "../utils/tsyringe";
 import {IFeedService} from "../../features/feed/services/FeedService";
+import { INoteService } from "../../features/note/services/NoteService";
 
 @singleton()
 export class CronJobService {
@@ -16,6 +17,9 @@ export class CronJobService {
             try {
                 const feedService = container.resolve<IFeedService>("FeedService");
                 await feedService.removeViewedHistory()
+
+                const noteService = container.resolve<INoteService>("NoteService");
+                await noteService.resetDailyNotes();
             } catch (err) {
                 console.error("Error running daily cleanup job:", err);
             }

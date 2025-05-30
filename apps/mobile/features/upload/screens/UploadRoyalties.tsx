@@ -48,7 +48,7 @@ const UploadRoyalties = ({}: UploadRoyaltiesProps) => {
     return(
         <View style={styles.wrapper}>
             <Header title={"Artist royalties"} />
-            <UploadDescription description={"Split royalties with collaborating artists. Ensure the total adds up to 100%."} />
+            <UploadDescription description={"Divide royalties among collaborating artists to allocate streaming credits evenly, ensuring the total equals 100%."} />
             <ScrollView 
                 style={styles.scrollView}
                 contentContainerStyle={styles.container} 

@@ -11,7 +11,7 @@ import Bell from "@/assets/icons/Bell";
 import {router} from "expo-router";
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
 import Eye from "@/assets/icons/Eye";
-import Button from '@/common/components/buttons/Button';
+import PremiumFeature from "@/assets/icons/PremiumFeature";
 
 interface UserActionsProps {
 
@@ -50,7 +50,6 @@ const UserActions = ({}: UserActionsProps) => {
         if(isCurrentUser) return(
             <View style={styling.row.m}>
                 <CreditFunds amount={currentUser?.getCreditValue() ?? 0} />
-                { !premiumMember && isCurrentUser && <Button fill={'premium'} label={"Upgrade"} callback={routePaywall} /> }
             </View>
         )
         return <FollowButton user={user} />
@@ -75,12 +74,21 @@ const UserActions = ({}: UserActionsProps) => {
             <View style={styles.right}>
                 { isCurrentUser && (
                     <IconButton
+                        icon={<PremiumFeature color={palette.offwhite} />}
+                        fill={'darkgrey'}
+                        callback={routePaywall}
+                    />
+                )}
+
+                { isCurrentUser && (
+                    <IconButton
                         premium
                         icon={<Eye color={palette.offwhite} />}
                         fill={'darkgrey'}
                         callback={handleRouteProfileVisits}
                     />
                 )}
+
 
                 { user.isLabel() && isCurrentUser && (
                     <IconButton

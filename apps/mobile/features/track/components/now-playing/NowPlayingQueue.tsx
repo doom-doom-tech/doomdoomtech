@@ -50,7 +50,7 @@ const NowPlayingQueue = ({}: NowPlayingQueueProps) => {
                 horizontal
                 subtitle={""}
                 callback={_.noop}
-                title={"Now playing"}
+                title={"Next up"}
                 data={upcomingTracks}
                 renderItem={renderItem}
                 keyExtractor={KeyExtractor}

@@ -16,9 +16,9 @@ const CreditFunds = ({amount = 0}: CreditFundsProps) => {
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                height: 56,
+                height: 50,
                 gap: spacing.s,
-                paddingHorizontal: spacing.m,
+                paddingHorizontal: 8,
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: palette.darkgrey,
@@ -26,7 +26,9 @@ const CreditFunds = ({amount = 0}: CreditFundsProps) => {
             },
             label: {
                 color: palette.offwhite,
-                fontSize: 18
+                fontSize: 18,
+                lineHeight: 24,
+                transform: [{ translateY: -2 }]
             }
         })
     }, []);
@@ -39,7 +41,7 @@ const CreditFunds = ({amount = 0}: CreditFundsProps) => {
         <TouchableOpacity style={styles.wrapper} onPress={handleRouteCredits}>
             <Coins />
             <Text style={styles.label}>
-                {millify(amount, { precision: 2 })} credits
+                {millify(amount, { precision: 2 })}
             </Text>
             <ChevronRight />
         </TouchableOpacity>

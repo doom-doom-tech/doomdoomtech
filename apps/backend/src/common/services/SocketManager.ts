@@ -1,5 +1,5 @@
 import {Server, Socket} from "socket.io";
-import {inject, injectable, singleton} from "tsyringe";
+import {inject, injectable, Lifecycle, singleton} from "tsyringe";
 import {container} from "../utils/tsyringe";
 
 export let socketInstance: SocketManager | null = null;
@@ -15,6 +15,16 @@ class SocketManager {
 	) {
 		this.setupConnectionHandler();
 		socketInstance = this;
+	}
+
+	// Register service with tsyringe DI container
+	static register<T extends new (...args: any[]) => any>(
+		this: T,
+		identifier?: string
+	): void {
+		container.register(identifier || this.name, {
+			useClass: this as unknown as new (...args: any[]) => T
+		}, { lifecycle: Lifecycle.ResolutionScoped });
 	}
 
 	public async emitToRoom(room: string, event: string, data: any) {
@@ -67,17 +77,16 @@ class SocketManager {
 	private async handleNewConnection(socket: Socket) {
 		try {
 			const userID = socket.handshake.headers.user as string;
+			console.log(`New connection: socket=${socket.id}, userID=${userID}`);
 			if (!userID) {
 				throw new Error("User ID missing from handshake headers.");
 			}
-
 			const userRoom = `user_${userID}`;
 			await this.addConnection(socket, userRoom);
-
+			console.log(`Socket ${socket.id} joined room ${userRoom}`);
 			socket.on("disconnecting", async () => {
 				await this.handleDisconnection(socket, userRoom);
 			});
-
 		} catch (error) {
 			console.error("Error during socket connection:", error);
 			socket.disconnect(true);
@@ -99,3 +108,5 @@ class SocketManager {
 }
 
 export default SocketManager;
+
+SocketManager.register()

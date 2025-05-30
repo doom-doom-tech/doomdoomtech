@@ -10,6 +10,7 @@ import UserBlockRouter from "./UserBlockRouter";
 import Authorized from "../../auth/middleware/Authorized";
 import authorized from "../../auth/middleware/Authorized";
 import Subscribed from "../../auth/middleware/Subscribed";
+import { IUploadController } from "../../upload/controllers/UploadController";
 
 @injectable()
 export class UserRouter extends BaseRouter {

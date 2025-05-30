@@ -29,20 +29,23 @@ const UploadInformationForm = ({}: UploadInformationFormProps) => {
     }, [])
 
     return(
-        <View style={styles.wrapper}>
+        <View>
             <UploadDescription
-                description={"Enter your track's title and indicate if it contains explicit content."}
+                description={"Enter your track's title and indicate if it contains explicit content. \n\nNote: Make sure not to include artist names in the title. \n"}
             />
 
-            <Input
-                placeholder={"Track title"}
-                onChangeText={handleChange('title')} />
+            <View style={styles.wrapper}>
+                <Input
+                    placeholder={"Track title"}
+                    onChangeText={handleChange('title')} />
 
-            <SwitchConsent
-                label={"Explicit content"}
-                value={explicit}
-                callback={handleChange('explicit')}
-            />
+                <SwitchConsent
+                    label={"Explicit content"}
+                    value={explicit}
+                    callback={handleChange('explicit')}
+                />                
+            </View>
+
         </View>
     )
 }

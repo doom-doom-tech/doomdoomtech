@@ -5,7 +5,6 @@ import {inject, singleton} from "tsyringe";
 import DeviceMapper from "../mappers/DeviceMapper";
 import {DeviceInterface} from "../types";
 import {UserIDRequest} from "../../user/types/requests";
-import _ from "lodash";
 
 export interface IDeviceService {
     connect(data: Partial<Prisma.DeviceCreateInput> & { userID: number }): Promise<void>
@@ -33,29 +32,37 @@ class DeviceService extends Service implements IDeviceService {
             )
         )
     }
+
     public connect = async (data: Partial<Prisma.DeviceCreateInput> & { userID: number }) => {
-
-        const device = await this.db.device.findFirst({
+        const existingDevice = await this.db.device.findFirst({
             where: {
-                device_token: data.device_token,
+                OR: [
+                    { expo_device_id: data.expo_device_id ?? undefined },
+                    { device_token: data.device_token ?? undefined }
+                ]
             }
-        })
+        });
 
-        if (device) {
-            // Update existing device
-            await this.db.device.update({
-                where: {
-                    id: device.id
-                },
-                data: {
-                    expo_device_id: data.expo_device_id ?? '',
-                    push_token: data.push_token,
-                    platform: data.platform,
-                    userID: data.userID
-                }
-            })
+        if (existingDevice) {
+            const shouldUpdate =
+                existingDevice.userID !== data.userID ||
+                existingDevice.push_token !== data.push_token ||
+                existingDevice.platform !== data.platform;
+
+            if (shouldUpdate) {
+                await this.db.device.update({
+                    where: {
+                        id: existingDevice.id
+                    },
+                    data: {
+                        expo_device_id: data.expo_device_id ?? existingDevice.expo_device_id,
+                        push_token: data.push_token ?? existingDevice.push_token,
+                        platform: data.platform ?? existingDevice.platform,
+                        userID: data.userID
+                    }
+                });
+            }
         } else {
-            // Create new device only if it doesn't exist
             await this.db.device.create({
                 data: {
                     expo_device_id: data.expo_device_id ?? '',
@@ -64,9 +71,9 @@ class DeviceService extends Service implements IDeviceService {
                     platform: data.platform,
                     userID: data.userID
                 }
-            })
+            });
         }
-    }
+    };
 }
 
 DeviceService.register()

@@ -72,7 +72,7 @@ const FeedTrackMedia = () => {
         <View style={styles.wrapper}>
             <GestureDetector gesture={combinedGestures}>
                 <View>
-                    <TrackCover size={width} />
+                    {/* <TrackCover size={width} /> */}
                     <FeedTrackShadow />
                 </View>
             </GestureDetector>

@@ -3,6 +3,7 @@ import {TrackActivityInterface, TrackInterface} from "@/features/track/types";
 import User from "@/features/user/classes/User";
 import {UserInterface} from "@/features/user/types";
 import Comment from "@/features/comment/classes/Comment"
+import { formatNormalizedDate, formatReadableDate } from "@/common/services/utilities";
 
 class Track {
 
@@ -122,7 +123,7 @@ class Track {
     }
 
     public getReleaseDate() {
-        return '-'
+        return formatNormalizedDate(new Date(this.data.created))
     }
 
     private getRemainingActivityCount(activity: TrackActivityInterface) {

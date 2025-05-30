@@ -46,6 +46,7 @@ const CreateNoteInput = ({}: CreateNoteInputProps) => {
                 numberOfLines={0}
                 inputStyle={styles.input}
                 onChangeText={handleChange}
+                placeholder={"Shout-outs, collabs, promos or just vibes—drop it in a note."}
             />
         </View>
     )

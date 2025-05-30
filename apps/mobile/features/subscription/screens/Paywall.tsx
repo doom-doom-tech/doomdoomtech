@@ -100,29 +100,30 @@ const Paywall = () => {
 
     const usps = [
         {
+            label: "Enable a label tag for artists, allowing them to send tracks directly to your label during their upload process—no more missed demos.",
+            user: "Earn double credits for all your platform engagement"
+        },
+        {
             label: "",
             user: "Use up to 5 label tags per upload and spotlight your tracks to your favorite labels."
         },
         {
-            label: "",
+            label: "Post up to 10 notes per day instead of 3, and share your latest updates with your fans.",
             user: "Post up to 10 notes per day instead of 3, and share your latest updates with your fans."
+        },
+        {
+            label: "See who is viewing your label profile, giving you valuable insights into the artists and fans engaging with your brand.",
+            user: "See detailed insights about who visited your profile"
         },
         {
             label: "Streamline submissions with a professional demo inbox, making it easy to manage and review incoming tracks from artists.",
             user: "Get professional mastering tools to enhance your tracks' dynamic range."
         },
         {
-            label: "Enable a label tag for artists, allowing them to send tracks directly to your label during their upload process—no more missed demos.",
-            user: "Earn double credits for all your platform engagement"
-        },
-        {
             label: "Track demo performance at a glance, so you can focus only on the most promising, high-performing submissions.",
-            user: "See detailed insights about who visited your profile"
+            user: ""
         },
-        {
-            label: "See who is viewing your label profile, giving you valuable insights into the artists and fans engaging with your brand.",
-            user: "Increase your music's visibility and chances of appearing in playlists and recommendations."
-        },
+
     ]
 
     const triggerPayment = async () => {

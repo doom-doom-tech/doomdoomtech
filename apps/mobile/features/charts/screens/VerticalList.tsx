@@ -1,14 +1,14 @@
-import {StyleSheet, View} from 'react-native'
-import {Fragment, useCallback, useMemo} from "react";
+import { StyleSheet, View } from 'react-native'
+import { Fragment, useCallback, useMemo } from "react";
 import useMostPopularTracks from "@/features/track/hooks/useMostPopularTracks";
 import useBestRatedTracks from "@/features/track/hooks/useBestRatedTracks";
 import useMostListenedTracks from "@/features/track/hooks/useMostListenedTracks";
-import {useLocalSearchParams} from "expo-router";
-import {useFilterStoreSelectors} from "@/features/filter/store/filter";
+import { useLocalSearchParams } from "expo-router";
+import { useFilterStoreSelectors } from "@/features/filter/store/filter";
 import useUserLatest from "@/features/user/hooks/useUserLatest";
 import UserContextProvider from "@/features/user/context/UserContextProvider";
 import UserRow from "@/features/user/components/user-row/UserRow";
-import List, {ListRenderItemPropsInterface} from "@/common/components/List";
+import List, { ListRenderItemPropsInterface } from "@/common/components/List";
 import User from "@/features/user/classes/User";
 import Track from "@/features/track/classes/Track";
 import TrackContextProvider from "@/features/track/context/TrackContextProvider";
@@ -22,13 +22,14 @@ import FeedNote from "@/features/note/components/feed-note/FeedNote";
 import NoteContextProvider from "@/features/note/context/NoteContextProvider";
 import useUserTopPicks from "@/features/user/hooks/useUserTopPicks";
 import useUserNotes from "@/features/user/hooks/useUserNotes";
-import {spacing} from "@/theme";
+import { spacing } from "@/theme";
 import useLatestTracks from "@/features/track/hooks/useLatestTracks";
 import useLabelsLatest from "@/features/label/hooks/useLabelsLatest";
 import LabelContextProvider from "@/features/label/context/LabelContextProvider";
 import Label from "@/features/label/classes/Label";
 import LabelRow from "@/features/user/components/label-row/LabelRow";
 import useLatestVideos from "@/features/track/hooks/useLatestVideos";
+import Queueable from '@/common/components/Queueable';
 
 const QUERY_MAP = {
     userNotes: useUserNotes,
@@ -60,7 +61,7 @@ interface VerticalListProps {
 
 }
 
-const VerticalList = ({}: VerticalListProps) => {
+const VerticalList = ({ }: VerticalListProps) => {
 
     const user = useFilterStoreSelectors.user()
     const tag = useFilterStoreSelectors.label()
@@ -71,10 +72,14 @@ const VerticalList = ({}: VerticalListProps) => {
     const { type } = useLocalSearchParams<{ type: keyof typeof QUERY_MAP }>()
 
     const query = QUERY_MAP[type]({
-        period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag, userID: user?.getID() as any
+        period: period.value,
+        genre: genre?.getID() ?? null,
+        subgenre: subgenre?.getID() ?? null,
+        query: null,
+        userID: user?.getID() as any
     });
 
-    const renderItem = useCallback(({item, index}: ListRenderItemPropsInterface<User | Track | Note | Label>) => {
+    const renderItem = useCallback(({ item, index }: ListRenderItemPropsInterface<User | Track | Note | Label>) => {
         switch (item.getType()) {
             case "User": return (
                 <UserContextProvider user={item as User} key={item.getID()}>
@@ -84,7 +89,7 @@ const VerticalList = ({}: VerticalListProps) => {
 
             case "Label": return (
                 <LabelContextProvider label={item as Label} key={item.getID()}>
-                    <LabelRow type={'follow'}/>
+                    <LabelRow type={'follow'} />
                 </LabelContextProvider>
             )
 
@@ -119,21 +124,23 @@ const VerticalList = ({}: VerticalListProps) => {
         <FilterIcon available={['genre', 'label', 'period', 'subgenre']} />
     ), [])
 
-    return(
+    return (
         <Screen>
             <View style={styles.wrapper}>
                 <Header
                     title={TITLES[type]}
                     RightComponent={RightComponent}
                 />
+                <Queueable query={query as any}>
+                    <List
+                        <User | Track | Note>
+                        infinite
+                        renderItem={renderItem}
+                        query={query as any}
+                        contentContainerStyle={styles.container}
+                    />
+                </Queueable>
 
-                <List
-                    <User | Track | Note>
-                    infinite
-                    renderItem={renderItem}
-                    query={query as any}
-                    contentContainerStyle={styles.container}
-                />
             </View>
         </Screen>
     )

@@ -77,6 +77,10 @@ class SingleUser{
 	public getSettings() {
 		return this.data.settings
 	}
+
+	public serialize() {
+		return this.data
+	}
 }
 
 export default SingleUser

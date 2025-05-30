@@ -1,5 +1,5 @@
 import {Keyboard, StyleSheet, Text, useWindowDimensions, View} from 'react-native'
-import {Fragment, useCallback, useMemo, useState} from "react";
+import {Fragment, useCallback, useEffect, useMemo, useState} from "react";
 import Form, {FormChangeHandler} from "@/common/components/form/Form";
 import Input from "@/common/components/inputs/Input";
 import {LoginRequest} from "@/features/auth/types/auth";
@@ -14,10 +14,11 @@ import {router} from "expo-router";
 import useRequestVerificationEmail from "@/features/auth/hooks/useRequestVerificationEmail";
 import {palette, spacing} from "@/theme";
 import SocialLogins from "@/features/auth/components/socials/SocialLogins";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginForm = () => {
 
-    const { width } = useWindowDimensions()
+    const {width} = useWindowDimensions()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -44,9 +45,26 @@ const LoginForm = () => {
         errors.length && Toast.show(_.get(_.first(errors), 'error', ''), TOASTCONFIG.error)
     }, [])
 
-    const [initialValues] = useState({
+    const [initialValues, setInitialValues] = useState({
         email: '',
     })
+
+    useEffect(() => {
+        const loadSavedEmail = async () => {
+
+            console.log(await AsyncStorage.getItem('savedEmail'))
+
+            const savedEmail = await AsyncStorage.getItem('savedEmail')
+            if (savedEmail) {
+                setInitialValues({email: savedEmail})
+            }
+        }
+
+        console.log('loading saved email')
+
+
+        loadSavedEmail()
+    }, [])
 
     const validationSchema = Yup.object<LoginRequest>({
         email: Yup.string()
@@ -65,7 +83,7 @@ const LoginForm = () => {
                 autoCapitalize="none"
             />
         </Fragment>
-    ), []);
+    ), [initialValues]);
 
     const FooterComponent = useCallback((formData: LoginRequest) => (
         <Fragment>
@@ -81,7 +99,8 @@ const LoginForm = () => {
 
             await requestAuthCodeMutation.mutateAsync(values)
 
-            setAuthState({ email: values.email })
+            setAuthState({email: values.email})
+            await AsyncStorage.setItem('savedEmail', values.email)
 
             router.back()
             await wait(200)
@@ -95,22 +114,25 @@ const LoginForm = () => {
         try {
             Keyboard.dismiss()
 
-            if(!values.email) return Toast.show("Enter your email", TOASTCONFIG.error)
+            if (!values.email) return Toast.show("Enter your email", TOASTCONFIG.error)
 
             await requestVerifyEmailMutation.mutateAsync({
                 email: values.email
             })
 
-           Toast.show('Email sent. Check your inbox', TOASTCONFIG.success)
+            Toast.show('Email sent. Check your inbox', TOASTCONFIG.success)
         } catch (error: any) {
             Toast.show(formatServerErrorResponse(error.message), TOASTCONFIG.error)
         }
     }, [])
 
-    return(
+    console.log(initialValues)
+
+    return (
         <View style={styles.wrapper}>
             <Form
                 <LoginRequest>
+                key={initialValues.email}
                 content={Content}
                 label={'Request code'}
                 onError={handleErrors}
@@ -119,7 +141,7 @@ const LoginForm = () => {
                 FooterComponent={FooterComponent}
                 validationSchema={validationSchema}
             />
-            <SocialLogins />
+            <SocialLogins/>
         </View>
     )
 }

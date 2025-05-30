@@ -8,6 +8,7 @@ import ValidationError from "../../../common/classes/errors/ValidationError";
 
 export interface IAuthController {
 	request(req: Request, res: Response, next: NextFunction): Promise<void>;
+	signOut(req: Request, res: Response, next: NextFunction): Promise<void>;
 	authorize(req: Request, res: Response, next: NextFunction): Promise<void>;
 	signup(req: Request<any, any, RegistrationRequestInterface>, res: Response, next: NextFunction): Promise<void>;
 	sendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -17,6 +18,20 @@ export interface IAuthController {
 
 @injectable()
 class AuthController extends Controller implements IAuthController {
+
+	public signOut = async (
+		req: Request<any, any, { expo_device_id: string }>,
+		res: Response
+	): Promise<void> => {
+		try {
+			const authService = container.resolve<IAuthService>("AuthService");
+			await authService.signOut(req.body.expo_device_id);
+
+			res.status(200).json(formatMutationResponse('Sign out successful'));
+		} catch (error: any) {
+			this.handleError(error, req, res);
+		}
+	};
 
 	public request = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		try {

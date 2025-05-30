@@ -46,6 +46,7 @@ export interface INoteService extends IServiceInterface {
     user(data: FindUserNotesRequest): Promise<PaginationResult<NoteInterface>>
     update(data: Prisma.NoteUpdateArgs): Promise<void>
     delete(data: NoteIDRequest): Promise<void>
+    resetDailyNotes(): Promise<void>
 }
 
 @singleton()
@@ -322,6 +323,14 @@ class NoteService extends Service implements INoteService {
             data: formattedNotes
         };
     };
+
+    public async resetDailyNotes(): Promise<void> {
+        await this.db.userSettings.updateMany({
+            data: {
+                daily_notes: 0
+            }
+        })
+    }
 
     public async delete(data: NoteIDRequest): Promise<void> {
         const note = await this.db.note.findFirst({

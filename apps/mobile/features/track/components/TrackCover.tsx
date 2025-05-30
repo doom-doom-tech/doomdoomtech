@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useTrackContext} from '@/features/track/context/TrackContextProvider';
 import {useMediaStoreSelectors} from '@/common/store/media';
@@ -84,7 +84,23 @@ const TrackCover = ({ size = 100 }: TrackCoverProps) => {
     /**
      * If this is audio, render the cover image
      */
-    if (!track.getVideoSource()) {
+    if (track.getVideoSource()) {
+        return (
+            <View style={styles.wrapper}>
+                <Video
+                    ref={videoRef}
+                    source={{ uri: track.getVideoSource() as string }}
+                    style={styles.media}
+                    resizeMode={ResizeMode.COVER}
+                    isMuted={true}
+                    isLooping={true}
+                    shouldPlay={Platform.OS === 'ios' ? visible : false}
+                />
+            </View>
+        );
+    }
+
+    if(track.getAudioSource()) {
         return (
             <CachedImage
                 width={size}
@@ -99,19 +115,7 @@ const TrackCover = ({ size = 100 }: TrackCoverProps) => {
     /**
      * Render the video using expo-av
      */
-    return (
-        <View style={styles.wrapper}>
-            <Video
-                ref={videoRef}
-                source={{ uri: track.getVideoSource() as string }}
-                style={styles.media}
-                resizeMode={ResizeMode.COVER}
-                isMuted={true}
-                isLooping={true}
-                shouldPlay={visible}
-            />
-        </View>
-    );
+    return null
 };
 
 export default TrackCover;

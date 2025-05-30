@@ -1,15 +1,18 @@
 import {StyleSheet, useWindowDimensions} from 'react-native'
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import RandomFeed from "@/features/feed/screens/RandomFeed";
 import {palette} from "@/theme";
 import {SceneMap, TabBar, TabView} from "react-native-tab-view";
 import Screen from "@/common/components/Screen";
 import FollowingFeed from "@/features/feed/screens/FollowingFeed";
 import FeedHeader from "@/features/feed/components/FeedHeader";
+import useGlobalUserContext from '@/features/user/hooks/useGlobalUserContext';
+import { useSocketContext } from '@/common/context/SocketContextProvider';
+import UploadProgressIndicator from '../components/progress-indicator/UploadProgressIndicator';
 
 const Feed = () => {
 
-    // return <Fragment />
+    const user = useGlobalUserContext()
 
     const { width } = useWindowDimensions()
 
@@ -24,19 +27,36 @@ const Feed = () => {
 
     const [index, setIndex] = useState(0)
 
-    const [routes] = useState([
+    const [routes] = useState(user ? [
+        { key: 'following', title: 'Following' },
+        { key: 'all', title: 'All' },
+    ] : [
         { key: 'all', title: 'All' },
         { key: 'following', title: 'Following' },
     ])
 
     const renderScene = SceneMap({
-        all: RandomFeed,
         following: FollowingFeed,
+        all: RandomFeed,
     })
+
+    const socket = useSocketContext()
+
+    useEffect(() => {
+        if (socket) {
+            
+            socket && socket.on("test", (data) => {
+                console.log("test", data)
+            })
+        }
+    }, [socket])
 
     return(
         <Screen>
             <FeedHeader />
+
+            <UploadProgressIndicator />
+
             <TabView
                 onIndexChange={setIndex}
                 navigationState={{ index, routes }}

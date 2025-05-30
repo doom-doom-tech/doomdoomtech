@@ -8,6 +8,7 @@ export interface FetchRankedListRequest extends AuthenticatedRequest, EncodedCur
     labelTag?: string
     subgenreID?: number
     period: 7 | 24 | 30 | 'infinite'
+    distinct?: string
 }
 
 class RankedListService {

@@ -38,7 +38,7 @@ const NowPlayingHeader = ({}: NowPlayingHeaderProps) => {
 
     return(
         <View style={styles.wrapper}>
-            <Header title={'Now Playing'} RightComponent={RightComponent} />
+            <Header hideBackButton title={'Now Playing'} RightComponent={RightComponent} />
         </View>
     )
 }

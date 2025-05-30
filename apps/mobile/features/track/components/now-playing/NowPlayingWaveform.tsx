@@ -138,7 +138,7 @@ const NowPlayingWaveform = () => {
                 setProgress(position);
             }
         };
-        updateProgress(); // Call it immediately
+        updateProgress();
     }, [position, size]);
 
     if (waveformQuery.isLoading || waveformQuery.isError) return null;
@@ -151,7 +151,7 @@ const NowPlayingWaveform = () => {
                         waveformData={waveformQuery.data}
                         width={size}
                         height={100}
-                        color={palette.lightgrey}
+                        color={palette.darkgrey}
                         playedColor={palette.olive}
                         progress={progress / duration}
                     />

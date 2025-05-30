@@ -2,13 +2,13 @@ import {create} from "zustand";
 import {TrackInterface} from "@/features/track/types";
 
 const initialUploadProgressStore = <InitialUploadProgressStore>{
-    track: null,
-    active: true,
+    active: false,
+	track: null
 }
 
 interface InitialUploadProgressStore {
     active: boolean
-    track: TrackInterface | null
+	track: TrackInterface | null
 }
 
 interface UploadProgressStore extends InitialUploadProgressStore {
@@ -25,7 +25,7 @@ const UploadProgressStore = create<UploadProgressStore>((set, get) => ({
 }))
 
 export const useUploadProgressStoreSelectors = {
-    track: () => UploadProgressStore(state => state.track),
     active: () => UploadProgressStore(state => state.active),
+	track: () => UploadProgressStore(state => state.track),
     setState: () => UploadProgressStore(state => state.actions.setState)
 }

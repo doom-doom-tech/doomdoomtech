@@ -1,11 +1,9 @@
-import {Button, StyleSheet, useWindowDimensions, View} from 'react-native'
-import {useCallback, useMemo} from "react";
-import ImageBanner from "@/common/components/ImageBanner";
-import Background from "@/assets/mockups/hiphop.png"
+import {StyleSheet, useWindowDimensions, View} from 'react-native'
+import {useMemo} from "react";
 import Text from '@/common/components/Text';
-import { palette, spacing } from '@/theme';
+import {palette, spacing} from '@/theme';
 import HeartFilled from '@/assets/icons/HeartFilled';
-import { useSearchStoreSelectors } from '@/features/search/store/search';
+import {useSearchStoreSelectors} from '@/features/search/store/search';
 
 
 const TopPicksEmpty = () => {
@@ -47,9 +45,9 @@ const TopPicksEmpty = () => {
 
     return(
         <View style={styles.wrapper}>
-            <Text style={styles.title}>Build Your Favorites List</Text>
+            <Text style={styles.title}>Your favorites live here.</Text>
             <HeartFilled color={palette.olive} />
-            <Text style={styles.subtitle}>Add tracks to this list and re-order them to create your top picks</Text>
+            <Text style={styles.subtitle}>Hit the heart on tracks you like. You can reorder them to build your personal Top Picks.</Text>
         </View>
     )
 }

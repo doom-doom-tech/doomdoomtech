@@ -54,6 +54,7 @@ model User {
     pending_jobs  PendingJob[]
     devices       Device[]
     media         Media[]
+    uploads       Upload[]
 
     notes Note[] @relation(name: "CreatedNotes")
     loops Note[] @relation(name: "LoopedNotes")
@@ -84,6 +85,7 @@ model User {
     @@index([uuid])
     @@index([username])
     @@map(name: "users")
+    
 }
 
 model UserSettings {
@@ -185,6 +187,8 @@ model Track {
     active   Boolean @default(true)
 
     main_artist Int
+
+    upload     Upload?
 
     notes      Note[]
     likes      Like[]
@@ -1076,4 +1080,31 @@ model Report {
     updated DateTime @default(now()) @updatedAt
 
     @@map(name: "reports")
+}
+
+enum UploadStatus {
+    Pending
+    Processing
+    Completed
+}
+
+model Upload {
+    id Int @id @default(autoincrement())
+
+    user   User @relation(fields: [userID], references: [id], onDelete: Cascade)
+    userID Int
+
+    track   Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+    trackID Int   @unique
+
+    payload Json
+
+    status UploadStatus @default(Pending)
+
+    created DateTime @default(now()) @db.Date
+    updated DateTime @default(now()) @updatedAt
+
+    @@index([userID])
+    @@index([trackID])
+    @@map(name: "uploads")
 }

@@ -1,7 +1,5 @@
 import {ScrollView, StyleSheet} from 'react-native'
 import {useMemo} from "react";
-
-import {spacing} from "@/theme";
 import BestRatedTracks from "@/features/charts/components/BestRatedTracks";
 import MostListenedTracks from "@/features/charts/components/MostListenedTracks";
 import MostPopularTracks from "@/features/charts/components/MostPopularTracks";
@@ -12,7 +10,7 @@ const LabelInboxLists = () => {
         return StyleSheet.create({
             wrapper: {
                 paddingBottom: 400,
-                paddingLeft: spacing.m,
+                gap: 50
             },
         })
     }, []);

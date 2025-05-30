@@ -1,5 +1,5 @@
 import {ITrackService} from "../services/TrackService";
-import {Request, Response} from "express";
+import {Request, response, Response} from "express";
 import Controller from "../../../common/controllers/Controller";
 import {inject, singleton} from "tsyringe";
 import {CreateTrackRequest, FetchTracksRequest, FetchUserTracksRequest, LikeTrackRequest, TrackIDRequest,} from "../types/requests";
@@ -13,6 +13,7 @@ import {SingleUserInterface} from "../../user/types";
 import ValidationError from "../../../common/classes/errors/ValidationError";
 import EntityNotFoundError from "../../../common/classes/errors/EntityNotFoundError";
 import {EncodedCursorInterface} from "../../../common/types/pagination";
+import SocketManager from "../../../common/services/SocketManager";
 
 export interface ITrackController {
 	all(req: Request<any, any, any, FetchTracksRequest>, res: Response): Promise<void>
@@ -98,6 +99,9 @@ class TrackController extends Controller implements ITrackController {
 			res.status(201).json(formatSuccessResponse("Track", response));
 		} catch (error: any) {
 			this.handleError(error, req, res);
+
+			const socketManager = container.resolve<SocketManager>("SocketManager")
+			socketManager.emitToRoom(`user_${Context.get('authID')}`, 'track:upload:error', { trackUUID: req.body.uuid })
 		}
 	}
 
@@ -124,6 +128,7 @@ class TrackController extends Controller implements ITrackController {
 				labelTag: req.query.labelTag,
 				authID: Context.get("authID"),
 				subgenreID: req.query.subgenreID,
+				distinct: req.query.distinct,
 			});
 
 			res.status(200).json(formatSuccessResponse("Tracks", response));

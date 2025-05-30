@@ -12,6 +12,10 @@ import Cachable from "./common/classes/cache/Cachable";
 import {RefreshSession} from "./features/session/middleware/RefreshSession";
 import QueueWorkerManager from "./common/queues/QueueWorkerManager";
 import {CronJobService} from "./common/services/CronjobService";
+import prisma from "./common/utils/prisma";
+import axios from "axios";
+import {ITrackBoostService} from "./features/track/services/TrackBoostService";
+import { INoteService } from "./features/note/services/NoteService";
 
 require('dotenv').config()
 
@@ -89,12 +93,6 @@ async function bootstrap() {
         app.use(express.json())
         app.use(express.urlencoded({ extended: true }));
 
-        const io = new Server(server, { cors: { origin: "*" } });
-        io.on("connection", (socket) => console.log(`Socket connected: ${socket.id}`));
-
-        container.registerInstance<Server>("SocketIO", io);
-        container.resolve(SocketManager);
-
         await Cachable.deleteMany([
             "user:*",
             "lists:*",
@@ -119,6 +117,11 @@ async function bootstrap() {
         server.listen(PORT, "0.0.0.0", () => {
             console.log(`Server is listening on port ${PORT}`);
         });
+
+        const io = new Server(server, { cors: { origin: "*" } });
+
+        container.registerInstance<Server>("SocketIO", io);
+        container.resolve(SocketManager);
 
         mailchimp.setConfig({
             apiKey: "f1cb2c553f196d0caec92ac9b081f2f4-us12",

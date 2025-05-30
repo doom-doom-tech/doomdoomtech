@@ -4,6 +4,7 @@ import {Fragment, useEffect} from "react";
 import {LogBox} from "react-native";
 import useExpoUpdates from "@/common/hooks/useExpoUpdates";
 import * as Notifications from 'expo-notifications';
+import { useSocketContext } from "@/common/context/SocketContextProvider";
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -19,11 +20,6 @@ LogBox.ignoreAllLogs(true);
 // Suppress warnings
 console.warn = () => {};
 
-const APIKeys = {
-    apple: process.env['EXPO_PUBLIC_REVENUECAT_IOS'],
-    google: process.env['EXPO_PUBLIC_REVENUECAT_ANDROID'],
-};
-
 export default function Index() {
 
     const { checkForUpdates } = useExpoUpdates();
@@ -31,6 +27,8 @@ export default function Index() {
     useEffect(() => {
         checkForUpdates();
     }, []);
+    
+
 
     return (
         <Fragment>

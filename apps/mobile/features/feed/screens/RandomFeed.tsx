@@ -1,5 +1,5 @@
 import {ActivityIndicator, FlatList, StyleSheet, Text, View, ViewabilityConfig, ViewToken} from 'react-native'
-import {Fragment, useCallback, useMemo, useRef, useState} from "react";
+import {Fragment, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import useFeedRandom from "@/features/feed/hooks/useFeedRandom";
 import {FeedItemEntity} from "@/features/feed/types";
 import FeedRenderItem from "@/features/feed/components/FeedRenderItem";
@@ -13,6 +13,8 @@ import {palette, spacing} from "@/theme";
 import {useUploadProgressStoreSelectors} from "@/features/upload/store/upload-progress";
 import _ from 'lodash';
 import FeedNoteTrigger from "@/features/feed/components/FeedNoteTrigger";
+import UploadProgressIndicator from '../components/progress-indicator/UploadProgressIndicator';
+import { useQueryClient } from '@tanstack/react-query';
 
 const RandomFeed = () => {
 
@@ -96,7 +98,6 @@ const RandomFeed = () => {
             <List
                 <FeedItemEntity>
                 infinite
-                disableVirtualization
                 refreshing={isRefreshing}
                 query={randomFeedQuery}
                 renderItem={RenderItem}

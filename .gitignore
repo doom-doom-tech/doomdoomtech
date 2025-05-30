@@ -52,3 +52,4 @@ yarn-error.log*
 /apps/web/.expo/
 /apps/mobile/.expo/
 /apps/functions
+/functions/.env.prj-d-pwa-8b7a

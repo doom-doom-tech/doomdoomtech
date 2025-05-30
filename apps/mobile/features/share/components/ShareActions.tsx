@@ -31,25 +31,15 @@ const ShareActions = ({}: ShareActionsProps) => {
         if(!entity) return
 
         try {
-            if(entity.getCoverSource()) {
-                // Use the new shorter URL format
-                await Clipboard.setStringAsync(`https://doomdoom.tech/s/${entity.getID()}`)
-                router.back()
-                await wait(200)
-                Toast.show('Track link copied', TOASTCONFIG.success)
-            }
+            // Use the new shorter URL format
+            await Clipboard.setStringAsync(`https://doomdoom.tech/s/${entity.getID()}`)
+            router.back()
+            await wait(200)
+            Toast.show('Track link copied', TOASTCONFIG.success)
         } catch (error: any) {
             Toast.show('Error copying the link', TOASTCONFIG.error)
         }
     }, [entity])
-
-    if(entity?.getVideoSource()) return(
-        <View style={{ padding: spacing.m, backgroundColor: palette.granite }}>
-            <Text style={{ textAlign: 'center' }}>
-                We're sorry. Video sharing is not yet available.
-            </Text>
-        </View>
-    )
 
     return(
         <View style={styles.wrapper}>

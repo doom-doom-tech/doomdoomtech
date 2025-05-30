@@ -15,6 +15,9 @@ import * as Crypto from "expo-crypto";
 import Purchases from "react-native-purchases";
 import {useUploadProgressStoreSelectors} from "@/features/upload/store/upload-progress";
 import {TrackInterface} from "@/features/track/types";
+import useUploadCreate from '../../hooks/useUploadCreate';
+import { useQueryClient } from '@tanstack/react-query';
+import { UserInterface } from '@/features/user/types';
 
 interface UploadCompleteActionsProps {
 
@@ -28,9 +31,9 @@ const UploadCompleteActions = ({}: UploadCompleteActionsProps) => {
 
     const { premiumEnabled } = useUploadSettings()
 
-    const { packages, setCustomer } = usePaymentContext()
+    const queryClient = useQueryClient()
 
-    const setUploadProgressState = useUploadProgressStoreSelectors.setState()
+    const { packages, setCustomer } = usePaymentContext()
 
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -38,10 +41,13 @@ const UploadCompleteActions = ({}: UploadCompleteActionsProps) => {
 
     const createTrackMutation = useTrackCreate()
 
+    const setUploadProgressState = useUploadProgressStoreSelectors.setState()
+
     const styles = useMemo(() => {
         return StyleSheet.create({
             wrapper: {
-                gap: spacing.s
+                gap: spacing.s,
+                paddingHorizontal: spacing.m
             },
         })
     }, []);
@@ -69,6 +75,18 @@ const UploadCompleteActions = ({}: UploadCompleteActionsProps) => {
                     : Toast.show('Processing your upload', TOASTCONFIG.success);
 
                 const uuid = Crypto.randomUUID();
+
+                setUploadProgressState({
+                    active: true, 
+                    track: {
+                        id: 0,
+                        title: values.title,
+                        cover_url: values.files.some(file => file.mimeType?.includes('image')) ? values.files.find(file => file.mimeType?.includes('image'))?.uri ?? null : null,
+                        audio_url: values.files.find(file => file.mimeType?.includes('audio'))?.uri ?? null,
+                        video_url: values.files.find(file => file.mimeType?.includes('video'))?.uri ?? null,
+                        artists: [user?.serialize() as UserInterface]
+                    } as TrackInterface
+                })
 
                 // Upload files concurrently and collect URLs
                 const fileUploads = await Promise.all(
@@ -108,13 +126,13 @@ const UploadCompleteActions = ({}: UploadCompleteActionsProps) => {
                     ...filePayload
                 };
 
-                setUploadProgressState({ track: payload as unknown as TrackInterface, active: true })
-
                 createTrackMutation.mutate(payload as any);
             }, 300);
 
             router.dismissTo('/upload/overview');
             router.back();
+
+            router.replace('/feed')
         } catch (error: any) {
             Toast.show(formatServerErrorResponse(error), TOASTCONFIG.error);
         } finally {
@@ -134,8 +152,8 @@ const UploadCompleteActions = ({}: UploadCompleteActionsProps) => {
 
     return(
         <View style={styles.wrapper}>
-            <Button fill={'olive'} label={label} callback={handleCreate} loading={loading} />
-            <Button fill={'transparent'} border={'granite'} color={'offwhite'} label={"Cancel"} callback={handleCancel}/>
+            <Button fill={'olive'} label={label} callback={handleCreate} loading={loading} fullWidth />
+            <Button fill={'transparent'} border={'granite'} color={'offwhite'} label={"Cancel"} callback={handleCancel} fullWidth />
         </View>
     )
 }

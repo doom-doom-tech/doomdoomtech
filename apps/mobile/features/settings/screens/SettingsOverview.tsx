@@ -12,6 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {wait} from "@/common/services/utilities";
 import _ from 'lodash';
 import {usePaymentContext} from "@/common/context/PaymentContextProvider";
+import useAuthSignout from '@/features/auth/hooks/useAuthSignout';
+
 
 interface SettingsOverviewProps {
 
@@ -24,6 +26,8 @@ const SettingsOverview = ({}: SettingsOverviewProps) => {
     const { premiumMember } = usePaymentContext()
 
     const { logOutFromRevenueCat } = usePaymentContext()
+
+    const signOutMutation = useAuthSignout()
 
     const styles = useMemo(() => {
         return StyleSheet.create({
@@ -72,6 +76,8 @@ const SettingsOverview = ({}: SettingsOverviewProps) => {
                 text: "Log out",
                 style: 'destructive',
                 onPress: async () => {
+                    await signOutMutation.mutateAsync()
+
                     await AsyncStorage.removeItem('Auth.accessToken')
                     setAuthState({ authorized: false })
 

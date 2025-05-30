@@ -15,6 +15,7 @@ export class MoisesPollingMetadata implements IJob {
 
         try {
             console.log(`[MoisesPolling] Fetching status for job ${moisesJobId}`);
+
             const response = await axios.get(`https://api.music.ai/api/job/${moisesJobId}`, {
                 headers: {
                     Authorization: process.env.MUSIC_AI_API_KEY,
@@ -27,6 +28,7 @@ export class MoisesPollingMetadata implements IJob {
             if (status === "SUCCEEDED") {
                 console.log(`[MoisesPolling] Looking up track ${trackUUID} in database`);
                 const track = await db.track.findFirst({ where: { uuid: trackUUID } });
+                
                 if (!track) {
                     console.error(`[MoisesPolling] Track ${trackUUID} not found in database`);
                     throw new Error(`Track with UUID ${trackUUID} not found`);

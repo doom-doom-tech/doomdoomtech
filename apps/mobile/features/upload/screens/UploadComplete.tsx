@@ -5,7 +5,6 @@ import UploadCompleteNote from "@/features/upload/components/upload-complete/Upl
 import UploadCompleteInformation from "@/features/upload/components/upload-complete/UploadCompleteInformation";
 import UploadCompleteActions from '../components/upload-complete/UploadCompleteActions';
 import {spacing} from "@/theme";
-import UploadCompleteCaption from "@/features/upload/components/upload-complete/UploadCompleteCaption";
 import UploadCompletePaymentBanner from "@/features/upload/components/upload-complete/UploadCompletePaymentBanner";
 import Scroll from "@/common/components/Scroll";
 
@@ -28,7 +27,6 @@ const UploadComplete = () => {
             <Header title={"Looks good!"} />
             <Scroll contentContainerStyle={styles.container}>
                 <UploadCompleteInformation />
-                <UploadCompleteCaption />
                 <UploadCompleteNote />
                 <UploadCompletePaymentBanner />
                 <UploadCompleteActions />

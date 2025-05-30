@@ -3,7 +3,6 @@ import {useFonts} from "expo-font";
 import * as Device from "expo-device"
 import useRegisterDevice from "@/features/device/hooks/useRegisterDevice";
 import * as Notifications from "expo-notifications";
-import {Platform} from "react-native";
 import {router} from "expo-router";
 import TrackPlayer, {Capability, RatingType} from "react-native-track-player"
 import MediaService from "@/common/services/media";
@@ -86,19 +85,7 @@ const Initialize = () => {
                 return;
             }
 
-            const pushTokenResponse = await Notifications.getExpoPushTokenAsync({
-                projectId: "fdd82ade-643f-4899-8a37-1e9821d4900c",
-            });
-
-            const deviceTokenString = (await Notifications.getDevicePushTokenAsync()).data;
-            const pushTokenString = pushTokenResponse.data;
-
-            await registerDeviceMutation.mutateAsync({
-                platform: Platform.OS,
-                push_token: pushTokenString,
-                device_token: deviceTokenString,
-                expo_device_id: `${Device.deviceName}-${Device.modelName}`
-            })
+            await registerDeviceMutation.mutateAsync()
         }
     }, [])
 

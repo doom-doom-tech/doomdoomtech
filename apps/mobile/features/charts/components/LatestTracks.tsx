@@ -19,7 +19,7 @@ const LatestTracks = () => {
     const tag = useFilterStoreSelectors.label()
 
     const latestTracksQuery = useLatestTracks({
-        period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag, userID: user?.getID()
+        period: period.value, genreID: genre?.getID(), subgenreID: subgenre?.getID(), labelTag: tag, userID: user?.getID(), distinct: 'main_artist'
     })
 
     const RenderItem = useCallback(({item}: ListRenderItemPropsInterface<Track>) => (

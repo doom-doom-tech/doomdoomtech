@@ -41,12 +41,14 @@ interface BaseTrackInterface {
     type: 'Track'
     uuid: string
     title: string
+    created: number
     main_artist: number
     waveform_url: string
     audio_url: string | null
     cover_url: string | null
     video_url: string | null
     artists: Array<UserInterface>
+    
 }
 
 export interface TrackInterface extends BaseTrackInterface {
@@ -77,4 +79,5 @@ export interface AdditionalRankedListParams {
     labelID?: number | number
     subgenreID?: string | number
     period: FilterPeriod | string
+    distinct?: string
 }

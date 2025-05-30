@@ -56,7 +56,6 @@ const TrackPlayButton = ({ size = 50 }: TrackPlayButtonProps) => {
 
             // Then load and play the track
             await loadTrack(track)
-
             return
         }
 
